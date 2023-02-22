@@ -50,11 +50,11 @@ def render_mdp_dfa(mdp: MdpDfa, format=_default_format, **kwargs):
 
 
 def render_composition_mdp(mdp: MDP, format=_default_format):
-    digraph = mdp_to_graphviz(mdp)
+    digraph = mdp_to_graphviz2(mdp)
     render_digraph(digraph)
 
-def render_composition_mdp2(mdp: MDP, format=_default_format):
-    digraph = mdp_to_graphviz2(mdp)
+def render_comp_mdp(mdp: MDP, format=_default_format, **kwargs):
+    digraph = mdp_to_graphviz(mdp, **kwargs)
     render_digraph(digraph)
 
 def render_digraph(digraph: Digraph, format=_default_format):
