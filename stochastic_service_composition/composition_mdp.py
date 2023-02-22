@@ -130,22 +130,11 @@ def comp_mdp(
 
     system_service = build_system_service(*services)
 
-    initial_state = COMPOSITION_MDP_INITIAL_STATE
-    # one action per service (1..n) + the initial action (0)
-    actions: Set[Action] = set(range(len(services)))
-    initial_action = COMPOSITION_MDP_INITIAL_ACTION
-    actions.add(initial_action)
-
-    # add an 'undefined' action for sink states
-    actions.add(COMPOSITION_MDP_UNDEFINED_ACTION)
-
     transition_function: MDPDynamics = {}
 
     visited = set()
     to_be_visited = set()
     queue: Deque = deque()
-
-    # add initial transitions
 
     # add initial transitions
     initial_state = (system_service.initial_state, dfa.initial_state)
@@ -157,16 +146,6 @@ def comp_mdp(
         new_initial_state = (system_service_state, dfa.initial_state)
         queue.append(new_initial_state)
         to_be_visited.add(new_initial_state)
-
-    #initial_state = (system_service.initial_state, dfa.initial_state)
-    #queue.append(initial_state)
-    #to_be_visited.add(initial_state)
-    #for system_service_state in system_service.states:
-        #if system_service_state == system_service.initial_state:
-            #continue
-        #new_initial_state = (system_service_state, dfa.initial_state)
-        #queue.append(new_initial_state)
-        #to_be_visited.add(new_initial_state)
 
     while len(queue) > 0:
         cur_state = queue.popleft()
@@ -187,7 +166,7 @@ def comp_mdp(
 
             # symbols not in the transition function of the target
             # are considered as "other"; however, when we add the
-            # LMDP transition, we will label it with the original
+            # MDP transition, we will label it with the original
             # symbol.
             if symbol in dfa.transition_function[cur_dfa_state]:
                 symbol_to_next_dfa_states = dfa.transition_function[cur_dfa_state]
@@ -208,10 +187,9 @@ def comp_mdp(
                     queue.append(next_state)
                     to_be_visited.add(next_state)
 
-
         transition_function[cur_state] = trans_dist
 
     result = MDP(transition_function, gamma)
-    #result.initial_state = initial_state
+    result.initial_state = initial_state
     return result
 
