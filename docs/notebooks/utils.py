@@ -22,7 +22,7 @@ _image_classes = {
     "png": Image,
     "svg": SVG
 }
-_default_format = "png"
+_default_format = "svg"
 
 
 def display_svgs(*filenames, format: str="png"):
