@@ -1,6 +1,8 @@
 """Represent a target service."""
 from typing import Dict, Set
 
+from pythomata import SimpleDFA
+
 from stochastic_service_composition.services import Service
 from stochastic_service_composition.types import (
     Action,
@@ -145,3 +147,14 @@ def build_target_from_transitions(
         policy,
         reward,
     )
+
+
+def target_from_dfa(dfa: SimpleDFA):
+    assert isinstance(dfa, SimpleDFA)
+    transition_function: TargetDynamics = {}
+    for _start in dfa.states:
+        for start, action, end in dfa.get_transitions_from(_start):
+            dest = (end, 1.0, 1.0 if end in dfa.accepting_states else 0.0)
+            transition_function.setdefault(start, {}).setdefault(action, dest)
+
+    return build_target_from_transitions(transition_function, dfa.initial_state, dfa.accepting_states)
