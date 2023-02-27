@@ -88,7 +88,7 @@ def composition_mdp(
             next_system_states, next_system_reward = system_service.transition_function[
                 current_system_state
             ][(current_symbol, i)]
-            for next_symbol, next_prob in target.policy[next_target_state].items():
+            for next_symbol, next_prob in target.policy.get(next_target_state, {}).items():
                 for next_system_state, next_system_prob in next_system_states.items():
                     next_state = (next_system_state, next_target_state, next_symbol)
                     if next_prob * next_system_prob == 0.0:
@@ -113,6 +113,8 @@ def composition_mdp(
                 {current_state: 1.0},
                 0.0,
             )  # type: ignore
+        # TODO check correctness
+        # if next state distribution is empty, add loops
 
     return MDP(transition_function, gamma)
 
