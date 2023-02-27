@@ -4,23 +4,11 @@ ENV DEBIAN_FRONTEND noninteractive
 ENV LC_ALL C.UTF-8
 ENV LANG C.UTF-8
 
-RUN apt-get update && \
-    apt-get upgrade -y && \
-    apt-get install -y software-properties-common &&\
-    add-apt-repository ppa:deadsnakes/ppa -y &&\
-    apt-get install -y \
-        clang \
-        gcc \
-        g++ \
-        g++-multilib \
-        gdb \
-        clang-tidy \
-        clang-format \
-        gcovr \
-        llvm \
+RUN apt-get update && apt-get upgrade -y
+RUN apt-get install -y \
+        software-properties-common \
         sudo \
         make \
-        cmake \
         git \
         less \
         wget \
@@ -28,17 +16,25 @@ RUN apt-get update && \
         bison \
         nano \
         vim \
-        libgraphviz-dev \
-        libboost-all-dev \
-        python3.8 \
+        python3 \
         python3-pip \
         lsof \
         jupyter \
         curl \
-        flex \
-        graphviz &&\
-    apt-get clean &&\
-    rm -rf /var/cache
+        graphviz
+
+# not needed since we do not compile from source
+#clang \
+#gcc \
+#g++ \
+#g++-multilib \
+#gdb \
+#clang-tidy \
+#clang-format \
+#gcovr \
+#llvm \
+#libgraphviz-dev \
+#libboost-all-dev \
 
 # This adds the 'default' user to sudoers with full privileges:
 RUN HOME=/home/default && \
@@ -63,53 +59,66 @@ ENV SYFT_TAG="v0.1.1"
 
 WORKDIR /build
 
+ARG GIT_REF=main
+
+# Clone and build Lydia
+#RUN git clone --recursive https://github.com/whitemech/lydia.git /build/lydia
+#RUN git checkout ${GIT_REF} &&\
+#    rm -rf build &&\
+#    mkdir build &&\
+#    cd build &&\
+#    cmake -DCMAKE_BUILD_TYPE=Release .. &&\
+#    cmake --build . --target lydia-bin -j4 &&\
+#    make install &&\
+#    cd .. &&\
+#    rm -rf /build/lydia
+
+WORKDIR /home/default
+
+USER default
+
+
 # Install CUDD
 RUN wget https://github.com/whitemech/cudd/releases/download/v${CUDD_VERSION}/cudd_${CUDD_VERSION}_linux-amd64.tar.gz &&\
     tar -xf cudd_${CUDD_VERSION}_linux-amd64.tar.gz &&\
     cd cudd_${CUDD_VERSION}_linux-amd64 &&\
-    cp -P lib/* /usr/local/lib/ &&\
-    cp -Pr include/* /usr/local/include/ &&\
+    sudo cp -P lib/* /usr/local/lib/ &&\
+    sudo cp -Pr include/* /usr/local/include/ &&\
     rm -rf cudd_${CUDD_VERSION}_linux-amd64*
 
 # Install MONA
 RUN wget https://github.com/whitemech/MONA/releases/download/v${MONA_VERSION}/mona_${MONA_VERSION}_linux-amd64.tar.gz &&\
     tar -xf mona_${MONA_VERSION}_linux-amd64.tar.gz &&\
     cd mona_${MONA_VERSION}_linux-amd64 &&\
-    cp -P lib/* /usr/local/lib/ &&\
-    cp -Pr include/* /usr/local/include &&\
+    sudo cp -P lib/* /usr/local/lib/ &&\
+    sudo cp -Pr include/* /usr/local/include &&\
     rm -rf mona_${MONA_VERSION}_linux-amd64*
 
 # Build and install Syft
-RUN git clone https://github.com/whitemech/Syft.git &&\
-    cd Syft &&\
-    git checkout ${SYFT_TAG} &&\
-    mkdir build && cd build &&\
-    cmake -DCMAKE_BUILD_TYPE=Release .. &&\
-    make -j &&\
-    make install &&\
-    cd .. &&\
-    rm -rf Syft
+#RUN git clone https://github.com/whitemech/Syft.git &&\
+#    cd Syft &&\
+#    git checkout ${SYFT_TAG} &&\
+#    mkdir build && cd build &&\
+#    cmake -DCMAKE_BUILD_TYPE=Release .. &&\
+#    make -j &&\
+#    make install &&\
+#    cd .. &&\
+#    rm -rf Syft
 
-WORKDIR /build/lydia
+# install Syft
+RUN wget https://github.com/whitemech/Syft/releases/download/v0.1.0/syft-3.0.0_ubuntu-20.04.tar.gz && \
+  tar -xf syft-3.0.0_ubuntu-20.04.tar.gz &&\
+  cd syft-3.0.0_ubuntu-20.04 && \
+  sudo cp -P lib/* /usr/local/lib/
 
-ARG GIT_REF=main
+# install Lydia
+RUN wget https://github.com/whitemech/lydia/releases/download/v0.1.3/lydia &&\
+  chmod u+x lydia &&\
+  sudo cp lydia /usr/local/bin/lydia &&\
+  sudo chown default:default /usr/local/bin/lydia
 
-# Clone and build Lydia
-RUN git clone --recursive https://github.com/whitemech/lydia.git /build/lydia
-RUN git checkout ${GIT_REF} &&\
-    rm -rf build &&\
-    mkdir build &&\
-    cd build &&\
-    cmake -DCMAKE_BUILD_TYPE=Release .. &&\
-    cmake --build . --target lydia-bin -j4 &&\
-    make install &&\
-    cd .. &&\
-    rm -rf /build/lydia
-
-WORKDIR /home/default
-
-USER default
 
 RUN git clone https://github.com/luusi/MDP-Planner-Chip-Production.git
 
-RUN pip install --no-cache-dir -r /home/default/MDP-Planner-Chip-Production/requirements.txt
+# RUN pip install --no-cache-dir -r /home/default/MDP-Planner-Chip-Production/requirements.txt
+RUN cd MDP-Planner-Chip-Production && pip install -e .
