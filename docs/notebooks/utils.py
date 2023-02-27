@@ -75,21 +75,21 @@ def print_policy_data(policy: Policy):
 @print_policy_data.register(DetPolicy)
 def print_policy_data(policy: DetPolicy):
     print("Policy:")
-    for state, action_probs in sorted(policy.policy_data.items()):
+    for state, action_probs in policy.policy_data.items():
         unique_action = list(action_probs)[0]
         print(f"State={state},\tAction={unique_action}")
 
 
 def print_value_function(value_function: VFDictType):
     print("Value function:")
-    for state, value in sorted(value_function.items()):
+    for state, value in value_function.items():
         print(f"State={state},\tvalue={value}")
 
 
 def print_q_value_function(q_value_function: QFDictType):
     print("Q-value function:")
-    for state, action_value in sorted(q_value_function.items()):
+    for state, action_value in q_value_function.items():
         print(f"State={state}:")
-        for action, value in sorted(action_value.items()):
+        for action, value in action_value.items():
             print(f"\tAction={action},\tValue={value}")
         print()
