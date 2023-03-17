@@ -14,6 +14,8 @@ COMPOSITION_MDP_INITIAL_ACTION = "initial"
 COMPOSITION_MDP_UNDEFINED_ACTION = "undefined"
 DEFAULT_GAMMA = 0.9
 
+COMPOSITION_MDP_SINK_STATE = -1
+
 
 def composition_mdp(
     target: Target, *services: Service, gamma: float = DEFAULT_GAMMA
@@ -118,6 +120,7 @@ def composition_mdp(
 
     return MDP(transition_function, gamma)
 
+
 def comp_mdp(
     dfa: SimpleDFA, services: Service, gamma: float = DEFAULT_GAMMA
 ) -> MDP:
@@ -129,7 +132,7 @@ def comp_mdp(
     :param gamma: the discount factor.
     :return: the composition MDP.
     """
-
+    dfa = dfa.trim()
     system_service = build_system_service(*services)
 
     transition_function: MDPDynamics = {}
@@ -149,6 +152,7 @@ def comp_mdp(
         queue.append(new_initial_state)
         to_be_visited.add(new_initial_state)
 
+    mdp_sink_state_used = False
     while len(queue) > 0:
         cur_state = queue.popleft()
         to_be_visited.remove(cur_state)
@@ -166,17 +170,26 @@ def comp_mdp(
             next_system_state_distr, reward_vector = next_state_info
             system_reward = reward_vector
 
+            # if symbol is a tau action, next dfa state remains the same
+            if symbol not in dfa.alphabet:
+                next_dfa_state = cur_dfa_state
+                goal_reward = 0.0
+            # if there are no outgoing transitions from DFA state:
+            elif cur_dfa_state not in dfa.transition_function:
+                mdp_sink_state_used = True
+                trans_dist[COMPOSITION_MDP_UNDEFINED_ACTION] = ({COMPOSITION_MDP_SINK_STATE: 1}, 0.0)
+                continue
             # symbols not in the transition function of the target
             # are considered as "other"; however, when we add the
             # MDP transition, we will label it with the original
             # symbol.
-            if symbol in dfa.transition_function[cur_dfa_state]:
+            elif symbol in dfa.transition_function[cur_dfa_state]:
                 symbol_to_next_dfa_states = dfa.transition_function[cur_dfa_state]
                 next_dfa_state = symbol_to_next_dfa_states[symbol]
                 goal_reward = 1.0 if dfa.is_accepting(next_dfa_state) else 0.0
             else:
-                next_dfa_state = cur_dfa_state
-                goal_reward = 0.0
+                # if invalid target action, skip
+                continue
             final_rewards = (goal_reward + system_reward)
 
             for next_system_state, prob in next_system_state_distr.items():
@@ -190,6 +203,9 @@ def comp_mdp(
                     to_be_visited.add(next_state)
 
         transition_function[cur_state] = trans_dist
+
+    if mdp_sink_state_used:
+        transition_function[COMPOSITION_MDP_SINK_STATE] = {COMPOSITION_MDP_UNDEFINED_ACTION: ({COMPOSITION_MDP_SINK_STATE: 1.0}, 0.0)}
 
     result = MDP(transition_function, gamma)
     result.initial_state = initial_state
