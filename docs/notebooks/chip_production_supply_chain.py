@@ -965,17 +965,17 @@ def main():
         # 1
         service_film_deposition1,
         # 2
-        service_film_deposition2,
+        #service_film_deposition2,
         # 3
         service_resist_coating1,
         # 4
-        service_resist_coating2,
+        #service_resist_coating2,
         # 5
         service_exposure,
         # 6
         service_development1,
         # 7
-        service_development2,
+        #service_development2,
         # 8
         service_etching1,
         # 9
@@ -1029,6 +1029,44 @@ def main():
 
 
     print_q_value_function(q_value_function)
+
+    # simulation
+    import random
+    def sample_from_policy(policy, state):
+        states, probs = zip(*policy[state].items())
+        return random.choices(states, probs)[0]
+
+    def sample_from_mdp_dist(state_dist):
+        states, probs = zip(*[(state, prob) for state, prob in state_dist.items() if state != "broken"])
+        return random.choices(states, probs)[0]
+
+    current_system_state = [s.initial_state for s in all_services]
+    current_target_state = target.initial_state
+    current_symbol = sample_from_policy(target.policy, current_target_state)
+
+    print("*" * 50)
+    for _ in range(20):
+        current_state = (tuple(current_system_state), current_target_state, current_symbol)
+        chosen_service_id = list(opt_policy.policy_data[current_state])[0]
+
+        print("Current state: ", current_state)
+        print("Chosen service: ", chosen_service_id, all_services[chosen_service_id].transition_function)
+        print("*" * 50)
+        if chosen_service_id == "undefined":
+            print("Undefined action!")
+            break
+        next_service_state_dist, reward = \
+            all_services[chosen_service_id].transition_function[current_system_state[chosen_service_id]][current_symbol]
+        next_service_state = sample_from_mdp_dist(next_service_state_dist)
+
+        next_target_state = target.transition_function[current_target_state][current_symbol]
+        next_symbol = sample_from_policy(target.policy, next_target_state)
+
+        # update current states
+        current_system_state[chosen_service_id] = next_service_state
+        current_symbol = next_symbol
+        current_target_state = next_target_state
+
 
 if __name__ == '__main__':
     main()
