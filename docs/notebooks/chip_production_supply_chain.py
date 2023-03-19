@@ -861,9 +861,15 @@ def main():
         # 40
         service_copper_frame_china
     ]
+    start = time.time_ns()
     mdp = composition_mdp(target, *all_services, gamma=0.9)
-    render_composition_mdp(mdp)
+    end = time.time_ns()
+    #render_composition_mdp(mdp)
     print("Number of states: ", len(mdp.all_states))
+    total_ns = end - start
+    total = total_ns / 10**9
+    print("Total time for function: composition_mdp ", total)
+
 
 
 # # Optimal policy
@@ -886,7 +892,7 @@ def main():
 # In[42]:
 
 
-    print_policy_data(opt_policy)
+#    print_policy_data(opt_policy)
 
 
 # # Value Function
@@ -895,13 +901,13 @@ def main():
 # In[195]:
 
 
-    print_value_function(value_function)
+#   print_value_function(value_function)
 
 
 # In[196]:
 
 
-    print_q_value_function(q_value_function)
+#   print_q_value_function(q_value_function)
 
 
 # From the calculation of the optimal policy we observe that:
@@ -1020,7 +1026,7 @@ def main():
 # In[203]:
 
 
-    print_policy_data(opt_policy)
+#    print_policy_data(opt_policy)
 
 
 # # Value Function
@@ -1029,13 +1035,13 @@ def main():
 # In[ ]:
 
 
-    print_value_function(value_function)
+#    print_value_function(value_function)
 
 
 # In[ ]:
 
 
-    print_q_value_function(q_value_function)
+#    print_q_value_function(q_value_function)
 
     # simulation
     import random
@@ -1056,11 +1062,11 @@ def main():
         current_state = (tuple(current_system_state), current_target_state, current_symbol)
         chosen_service_id = list(opt_policy.policy_data[current_state])[0]
 
-        print("Current state: ", current_state)
-        print("Chosen service: ", chosen_service_id, all_services[chosen_service_id].transition_function)
-        print("*" * 50)
+#        print("Current state: ", current_state)
+#        print("Chosen service: ", chosen_service_id, all_services[chosen_service_id].transition_function)
+#        print("*" * 50)
         if chosen_service_id == "undefined":
-            print("Undefined action!")
+#            print("Undefined action!")
             break
         next_service_state_dist, reward = \
             all_services[chosen_service_id].transition_function[current_system_state[chosen_service_id]][current_symbol]
