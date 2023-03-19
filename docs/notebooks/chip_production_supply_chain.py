@@ -12,6 +12,9 @@ from stochastic_service_composition.composition_mdp import composition_mdp
 from stochastic_service_composition.services import build_service_from_transitions, Service
 from stochastic_service_composition.target import build_target_from_transitions
 
+from memory_profiler import profile
+
+
 
 # ## Use case for "Stochastic Service Composition with Industrial APIs" - Chip Production.
 # 
@@ -219,7 +222,7 @@ PACKAGING_SERVICE_NAME = "packaging_human"                                  # hu
 
 # In[5]:
 
-
+@profile
 def build_generic_breakable_service(service_name: str, action_name: str, broken_prob: float, broken_reward: float, action_reward: float):
     assert 0.0 <= broken_prob <= 1.0
     deterministic_prob = 1.0
