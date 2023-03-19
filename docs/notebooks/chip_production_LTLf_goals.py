@@ -855,7 +855,8 @@ all_services = [
 # stochastic_target = target_from_dfa(trimmed_declare_automaton)
 # mdp = composition_mdp(stochastic_target, *all_services, gamma=0.9)
 mdp = comp_mdp(declare_automaton, all_services, gamma=0.9)
-render_composition_mdp(mdp)
+#render_composition_mdp(mdp)
+print("Number of states: ", len(mdp.all_states))
 
 
 # # Optimal policy
