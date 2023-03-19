@@ -223,512 +223,513 @@ PACKAGING_SERVICE_NAME = "packaging_human"                                  # hu
 # In[5]:
 
 @profile
-def build_generic_breakable_service(service_name: str, action_name: str, broken_prob: float, broken_reward: float, action_reward: float):
-    assert 0.0 <= broken_prob <= 1.0
-    deterministic_prob = 1.0
-    success_prob = deterministic_prob - broken_prob
-    transitions = {
-        "available": {
-          action_name: ({"done": success_prob, "broken": broken_prob}, action_reward),
-        },
-        "broken": {
-            f"check_{action_name}": ({"available": 1.0}, broken_reward),
-        },
-        "done": {
-            f"check_{action_name}": ({"available": 1.0}, 0.0),
+def main():
+    def build_generic_breakable_service(service_name: str, action_name: str, broken_prob: float, broken_reward: float, action_reward: float):
+        assert 0.0 <= broken_prob <= 1.0
+        deterministic_prob = 1.0
+        success_prob = deterministic_prob - broken_prob
+        transitions = {
+            "available": {
+                action_name: ({"done": success_prob, "broken": broken_prob}, action_reward),
+            },
+            "broken": {
+                f"check_{action_name}": ({"available": 1.0}, broken_reward),
+            },
+            "done": {
+                f"check_{action_name}": ({"available": 1.0}, 0.0),
+            }
         }
-    }
-    final_states = {"available"}
-    initial_state = "available"
-    return build_service_from_transitions(transitions, initial_state, final_states)  # type: ignore
+        final_states = {"available"}
+        initial_state = "available"
+        return build_service_from_transitions(transitions, initial_state, final_states)  # type: ignore
 
-def build_complex_breakable_service(service_name: str, action_name: str, broken_prob: float, unemployable_prob: float, broken_reward: float, action_reward: float) -> Service:
-    assert 0.0 <= broken_prob <= 1.0
-    deterministic_prob = 1.0
-    configure_success_prob = deterministic_prob - unemployable_prob
-    op_success_prob = deterministic_prob - broken_prob
-    transitions = {
-        "ready": { # current state
-            f"config_{action_name}": # action
+    def build_complex_breakable_service(service_name: str, action_name: str, broken_prob: float, unemployable_prob: float, broken_reward: float, action_reward: float) -> Service:
+        assert 0.0 <= broken_prob <= 1.0
+        deterministic_prob = 1.0
+        configure_success_prob = deterministic_prob - unemployable_prob
+        op_success_prob = deterministic_prob - broken_prob
+        transitions = {
+            "ready": { # current state
+                f"config_{action_name}": # action
+                    (
+                        {
+                            "configured": deterministic_prob # next state : prob
+                        },
+                        0.0
+                    ),
+            },
+            "configured": {
+                f"checked_{action_name}":
+                    (
+                        {
+                        "executing": configure_success_prob,
+                        "broken": unemployable_prob
+                        } if unemployable_prob > 0.0 else {"executing": configure_success_prob},
+                        0.0
+                    ),
+            },
+            "executing": {
+                action_name: # operation
+                    (
+                        {
+                            "ready": op_success_prob,
+                            "broken": broken_prob
+                        } if broken_prob > 0.0 else {"ready": op_success_prob},
+                        action_reward
+                    ),
+            },
+            "broken": {
+                f"restore_{action_name}":
                 (
                     {
-                        "configured": deterministic_prob # next state : prob
+                           "repairing": deterministic_prob
                     },
-                    0.0
+                    broken_reward
                 ),
-        },
-        "configured": {
-            f"checked_{action_name}":
-                (
-                    {
-                    "executing": configure_success_prob,
-                    "broken": unemployable_prob
-                    } if unemployable_prob > 0.0 else {"executing": configure_success_prob},
-                    0.0
-                ),
-        },
-        "executing": {
-            action_name: # operation
-                (
-                    {
-                        "ready": op_success_prob,
-                        "broken": broken_prob
-                    } if broken_prob > 0.0 else {"ready": op_success_prob},
-                    action_reward
-                ),
-        },
-        "broken": {
-            f"restore_{action_name}":
-               (
-                   {
-                       "repairing": deterministic_prob
-                   },
-                   broken_reward
-               ),
-        },
-        "repairing": {
-            f"repaired_{action_name}":
-                (
-                    {
-                        "ready": deterministic_prob
-                    },
-                    0.0
-                ),
-        },
+            },
+            "repairing": {
+                f"repaired_{action_name}":
+                    (
+                        {
+                            "ready": deterministic_prob
+                        },
+                        0.0
+                    ),
+            },
 
-    }
-    final_states = {"ready"}
-    initial_state = "ready"
-    return build_service_from_transitions(transitions, initial_state, final_states)  # type: ignore
+        }
+        final_states = {"ready"}
+        initial_state = "ready"
+        return build_service_from_transitions(transitions, initial_state, final_states)  # type: ignore
 
-def build_generic_service_one_state(
-    service_name: str,
-    operation_names: Set[str],
-    action_reward: float,
-) -> Service:
-    """Build the one state device."""
-    transitions = {
-        "ready": {
-            operation_name: ({"ready": 1.0}, action_reward) for operation_name in operation_names
-        },
-    }
-    final_states = {"ready"}
-    initial_state = "ready"
-    return build_service_from_transitions(transitions, initial_state, final_states)  # type: ignore
+    def build_generic_service_one_state(
+        service_name: str,
+        operation_names: Set[str],
+        action_reward: float,
+    ) -> Service:
+        """Build the one state device."""
+        transitions = {
+            "ready": {
+                operation_name: ({"ready": 1.0}, action_reward) for operation_name in operation_names
+            },
+        }
+        final_states = {"ready"}
+        initial_state = "ready"
+        return build_service_from_transitions(transitions, initial_state, final_states)  # type: ignore
 
 
 # In[6]:
 
 
-def design_service(name: str, action_reward: float) -> Service:
-    """Build the design device."""
-    return build_generic_service_one_state(
-        name,
-        {PICK_BUY_DESIGN},
-        action_reward=action_reward
-    )
+    def design_service(name: str, action_reward: float) -> Service:
+        """Build the design device."""
+        return build_generic_service_one_state(
+            name,
+            {PICK_BUY_DESIGN},
+            action_reward=action_reward
+        )
 
-service_design_usa = design_service(DESIGN_SERVICE_NAME_USA, USA_REWARD)
-service_design_uk = design_service(DESIGN_SERVICE_NAME_UK, UK_REWARD)
-service_design_china = design_service(DESIGN_SERVICE_NAME_CHINA, CHINA_REWARD)
-service_design_taiwan = design_service(DESIGN_SERVICE_NAME_TAIWAN, TAIWAN_REWARD)
-render_service(service_design_usa)
-render_service(service_design_uk)
-render_service(service_design_china)
-render_service(service_design_taiwan)
+    service_design_usa = design_service(DESIGN_SERVICE_NAME_USA, USA_REWARD)
+    service_design_uk = design_service(DESIGN_SERVICE_NAME_UK, UK_REWARD)
+    service_design_china = design_service(DESIGN_SERVICE_NAME_CHINA, CHINA_REWARD)
+    service_design_taiwan = design_service(DESIGN_SERVICE_NAME_TAIWAN, TAIWAN_REWARD)
+    render_service(service_design_usa)
+    render_service(service_design_uk)
+    render_service(service_design_china)
+    render_service(service_design_taiwan)
 
 
 # In[7]:
 
 
-def silicon_warehouse_service(name: str, action_reward) -> Service:
-    """Build the silicon warehouse device."""
-    return build_generic_service_one_state(
-        name,
-        {PICK_SILICON},
-        action_reward=action_reward
-    )
+    def silicon_warehouse_service(name: str, action_reward) -> Service:
+        """Build the silicon warehouse device."""
+        return build_generic_service_one_state(
+            name,
+            {PICK_SILICON},
+            action_reward=action_reward
+        )
 
-service_silicon_china = silicon_warehouse_service(SILICON_SERVICE_NAME_CHINA, CHINA_REWARD)
-service_silicon_russia = silicon_warehouse_service(SILICON_SERVICE_NAME_RUSSIA, RUSSIA_REWARD + WAR_REWARD)
-service_silicon_norway = silicon_warehouse_service(SILICON_SERVICE_NAME_NORWAY, NORWAY_REWARD)
-service_silicon_usa = silicon_warehouse_service(SILICON_SERVICE_NAME_USA, USA_REWARD)
-service_silicon_brazil = silicon_warehouse_service(SILICON_SERVICE_NAME_BRAZIL, BRAZIL_REWARD)
-service_silicon_france = silicon_warehouse_service(SILICON_SERVICE_NAME_FRANCE, FRANCE_REWARD)
-service_silicon_malaysia = silicon_warehouse_service(SILICON_SERVICE_NAME_MALAYSIA, MALAYSIA_REWARD)
-render_service(service_silicon_china)
-render_service(service_silicon_russia)
-render_service(service_silicon_norway)
-render_service(service_silicon_usa)
-render_service(service_silicon_brazil)
-render_service(service_silicon_france)
-render_service(service_silicon_malaysia)
+    service_silicon_china = silicon_warehouse_service(SILICON_SERVICE_NAME_CHINA, CHINA_REWARD)
+    service_silicon_russia = silicon_warehouse_service(SILICON_SERVICE_NAME_RUSSIA, RUSSIA_REWARD + WAR_REWARD)
+    service_silicon_norway = silicon_warehouse_service(SILICON_SERVICE_NAME_NORWAY, NORWAY_REWARD)
+    service_silicon_usa = silicon_warehouse_service(SILICON_SERVICE_NAME_USA, USA_REWARD)
+    service_silicon_brazil = silicon_warehouse_service(SILICON_SERVICE_NAME_BRAZIL, BRAZIL_REWARD)
+    service_silicon_france = silicon_warehouse_service(SILICON_SERVICE_NAME_FRANCE, FRANCE_REWARD)
+    service_silicon_malaysia = silicon_warehouse_service(SILICON_SERVICE_NAME_MALAYSIA, MALAYSIA_REWARD)
+    render_service(service_silicon_china)
+    render_service(service_silicon_russia)
+    render_service(service_silicon_norway)
+    render_service(service_silicon_usa)
+    render_service(service_silicon_brazil)
+    render_service(service_silicon_france)
+    render_service(service_silicon_malaysia)
 
 
 # In[8]:
 
 
-def wafer_warehouse_service(name: str, action_reward: float) -> Service:
-    """Build the wafer warehouse device."""
-    return build_generic_service_one_state(
-        name,
-        {PICK_WAFER},
-        action_reward=action_reward
-    )
+    def wafer_warehouse_service(name: str, action_reward: float) -> Service:
+        """Build the wafer warehouse device."""
+        return build_generic_service_one_state(
+            name,
+            {PICK_WAFER},
+            action_reward=action_reward
+        )
 
-service_wafer_japan = wafer_warehouse_service(WAFER_SERVICE_NAME_JAPAN, JAPAN_REWARD)
-service_wafer_south_korea = wafer_warehouse_service(WAFER_SERVICE_NAME_SOUTH_KOREA, SOUTH_KOREA)
-render_service(service_wafer_japan)
-render_service(service_wafer_south_korea)
+    service_wafer_japan = wafer_warehouse_service(WAFER_SERVICE_NAME_JAPAN, JAPAN_REWARD)
+    service_wafer_south_korea = wafer_warehouse_service(WAFER_SERVICE_NAME_SOUTH_KOREA, SOUTH_KOREA)
+    render_service(service_wafer_japan)
+    render_service(service_wafer_south_korea)
 
 
 # In[9]:
 
 
-def boron_warehouse_service(name: str, action_reward: float) -> Service:
-    """Build the boron warehouse device."""
-    return build_generic_service_one_state(
-        name,
-        {PICK_BORON},
-        action_reward=action_reward
-    )
+    def boron_warehouse_service(name: str, action_reward: float) -> Service:
+        """Build the boron warehouse device."""
+        return build_generic_service_one_state(
+            name,
+            {PICK_BORON},
+            action_reward=action_reward
+        )
 
-service_boron_turkey = boron_warehouse_service(BORON_SERVICE_NAME_TURKEY, TURKEY_REWARD)
-service_boron_usa = boron_warehouse_service(BORON_SERVICE_NAME_USA, USA_REWARD)
-service_boron_kazakhstan = boron_warehouse_service(BORON_SERVICE_NAME_KAZAKHSTAN, KAZAKHSTAN_REWARD)
-service_boron_chile = boron_warehouse_service(BORON_SERVICE_NAME_CHILE, CHILE_REWARD)
-service_boron_china = boron_warehouse_service(BORON_SERVICE_NAME_CHINA, CHINA_REWARD)
-service_boron_bolivia = boron_warehouse_service(BORON_SERVICE_NAME_BOLIVIA, BOLIVIA_REWARD)
-service_boron_argentina = boron_warehouse_service(BORON_SERVICE_NAME_ARGENTINA, ARGENTINA_REWARD)
-service_boron_russia = boron_warehouse_service(BORON_SERVICE_NAME_RUSSIA, RUSSIA_REWARD + WAR_REWARD)
-render_service(service_boron_turkey)
-render_service(service_boron_usa)
-render_service(service_boron_kazakhstan)
-render_service(service_boron_chile)
-render_service(service_boron_china)
-render_service(service_boron_bolivia)
-render_service(service_boron_argentina)
-render_service(service_boron_russia)
+    service_boron_turkey = boron_warehouse_service(BORON_SERVICE_NAME_TURKEY, TURKEY_REWARD)
+    service_boron_usa = boron_warehouse_service(BORON_SERVICE_NAME_USA, USA_REWARD)
+    service_boron_kazakhstan = boron_warehouse_service(BORON_SERVICE_NAME_KAZAKHSTAN, KAZAKHSTAN_REWARD)
+    service_boron_chile = boron_warehouse_service(BORON_SERVICE_NAME_CHILE, CHILE_REWARD)
+    service_boron_china = boron_warehouse_service(BORON_SERVICE_NAME_CHINA, CHINA_REWARD)
+    service_boron_bolivia = boron_warehouse_service(BORON_SERVICE_NAME_BOLIVIA, BOLIVIA_REWARD)
+    service_boron_argentina = boron_warehouse_service(BORON_SERVICE_NAME_ARGENTINA, ARGENTINA_REWARD)
+    service_boron_russia = boron_warehouse_service(BORON_SERVICE_NAME_RUSSIA, RUSSIA_REWARD + WAR_REWARD)
+    render_service(service_boron_turkey)
+    render_service(service_boron_usa)
+    render_service(service_boron_kazakhstan)
+    render_service(service_boron_chile)
+    render_service(service_boron_china)
+    render_service(service_boron_bolivia)
+    render_service(service_boron_argentina)
+    render_service(service_boron_russia)
 
 
 # In[10]:
 
 
-def phosphor_warehouse_service(name: str, action_reward: float) -> Service:
-    """Build the phosphor warehouse device."""
-    return build_generic_service_one_state(
-        name,
-        {PICK_PHOSPHOR},
-        action_reward=action_reward
-    )
+    def phosphor_warehouse_service(name: str, action_reward: float) -> Service:
+        """Build the phosphor warehouse device."""
+        return build_generic_service_one_state(
+            name,
+            {PICK_PHOSPHOR},
+            action_reward=action_reward
+        )
 
-service_phosphor_morocco = phosphor_warehouse_service(PHOSPHOR_SERVICE_NAME_MOROCCO, MOROCCO_REWARD)
-service_phosphor_china = phosphor_warehouse_service(PHOSPHOR_SERVICE_NAME_CHINA, CHINA_REWARD)
-service_phosphor_usa = phosphor_warehouse_service(PHOSPHOR_SERVICE_NAME_USA, USA_REWARD)
-render_service(service_phosphor_morocco)
-render_service(service_phosphor_china)
-render_service(service_phosphor_usa)
+    service_phosphor_morocco = phosphor_warehouse_service(PHOSPHOR_SERVICE_NAME_MOROCCO, MOROCCO_REWARD)
+    service_phosphor_china = phosphor_warehouse_service(PHOSPHOR_SERVICE_NAME_CHINA, CHINA_REWARD)
+    service_phosphor_usa = phosphor_warehouse_service(PHOSPHOR_SERVICE_NAME_USA, USA_REWARD)
+    render_service(service_phosphor_morocco)
+    render_service(service_phosphor_china)
+    render_service(service_phosphor_usa)
 
 
 # In[11]:
 
 
-def aluminum_warehouse_service(name: str, action_reward: float) -> Service:
-    """Build the aluminum warehouse device."""
-    return build_generic_service_one_state(
-        name,
-        {PICK_ALUMINUM},
-        action_reward=action_reward
-    )
+    def aluminum_warehouse_service(name: str, action_reward: float) -> Service:
+        """Build the aluminum warehouse device."""
+        return build_generic_service_one_state(
+            name,
+            {PICK_ALUMINUM},
+            action_reward=action_reward
+        )
 
-service_aluminum_australia = aluminum_warehouse_service(ALUMINUM_SERVICE_NAME_AUSTRALIA, AUSTRALIA_REWARD)
-service_aluminum_india = aluminum_warehouse_service(ALUMINUM_SERVICE_NAME_INDIA, INDIA_REWARD)
-service_aluminum_brazil = aluminum_warehouse_service(ALUMINUM_SERVICE_NAME_BRAZIL, BRAZIL_REWARD)
-render_service(service_aluminum_australia)
-render_service(service_aluminum_india)
-render_service(service_aluminum_brazil)
+    service_aluminum_australia = aluminum_warehouse_service(ALUMINUM_SERVICE_NAME_AUSTRALIA, AUSTRALIA_REWARD)
+    service_aluminum_india = aluminum_warehouse_service(ALUMINUM_SERVICE_NAME_INDIA, INDIA_REWARD)
+    service_aluminum_brazil = aluminum_warehouse_service(ALUMINUM_SERVICE_NAME_BRAZIL, BRAZIL_REWARD)
+    render_service(service_aluminum_australia)
+    render_service(service_aluminum_india)
+    render_service(service_aluminum_brazil)
 
 
 # In[12]:
 
 
-def resist_warehouse_service(name: str, action_reward: float) -> Service:
-    """Build the resist warehouse device."""
-    return build_generic_service_one_state(
-        name,
-        {PICK_RESIST},
-        action_reward=action_reward
-    )
+    def resist_warehouse_service(name: str, action_reward: float) -> Service:
+        """Build the resist warehouse device."""
+        return build_generic_service_one_state(
+            name,
+            {PICK_RESIST},
+            action_reward=action_reward
+        )
 
 
-service_resist_usa = resist_warehouse_service(RESIST_SERVICE_NAME_USA, USA_REWARD)
-service_resist_belgium = resist_warehouse_service(RESIST_SERVICE_NAME_BELGIUM, BELGIUM_REWARD)
-service_resist_austria = resist_warehouse_service(RESIST_SERVICE_NAME_AUSTRIA, AUSTRIA_REWARD)
-service_resist_india = resist_warehouse_service(RESIST_SERVICE_NAME_INDIA, INDIA_REWARD)
-service_resist_switzerland = resist_warehouse_service(RESIST_SERVICE_NAME_SWITZERLAND, SWITZERLAND_REWARD)
-service_resist_canada = resist_warehouse_service(RESIST_SERVICE_NAME_CANADA, CANADA_REWARD)
-render_service(service_resist_usa)
-render_service(service_resist_belgium)
-render_service(service_resist_austria)
-render_service(service_resist_india)
-render_service(service_resist_switzerland)
-render_service(service_resist_canada)
+    service_resist_usa = resist_warehouse_service(RESIST_SERVICE_NAME_USA, USA_REWARD)
+    service_resist_belgium = resist_warehouse_service(RESIST_SERVICE_NAME_BELGIUM, BELGIUM_REWARD)
+    service_resist_austria = resist_warehouse_service(RESIST_SERVICE_NAME_AUSTRIA, AUSTRIA_REWARD)
+    service_resist_india = resist_warehouse_service(RESIST_SERVICE_NAME_INDIA, INDIA_REWARD)
+    service_resist_switzerland = resist_warehouse_service(RESIST_SERVICE_NAME_SWITZERLAND, SWITZERLAND_REWARD)
+    service_resist_canada = resist_warehouse_service(RESIST_SERVICE_NAME_CANADA, CANADA_REWARD)
+    render_service(service_resist_usa)
+    render_service(service_resist_belgium)
+    render_service(service_resist_austria)
+    render_service(service_resist_india)
+    render_service(service_resist_switzerland)
+    render_service(service_resist_canada)
 
 
 # In[13]:
 
 
-def plastic_warehouse_service(name: str, action_reward: float) -> Service:
-    """Build the plastic warehouse device."""
-    return build_generic_service_one_state(
-        name,
-        {PICK_PLASTIC},
-        action_reward=action_reward
-    )
+    def plastic_warehouse_service(name: str, action_reward: float) -> Service:
+        """Build the plastic warehouse device."""
+        return build_generic_service_one_state(
+            name,
+            {PICK_PLASTIC},
+            action_reward=action_reward
+        )
 
 
-service_plastic_china = plastic_warehouse_service(PLASTIC_SERVICE_NAME_CHINA, CHINA_REWARD)
-service_plastic_india = plastic_warehouse_service(PLASTIC_SERVICE_NAME_INDIA, INDIA_REWARD)
-render_service(service_plastic_china)
-render_service(service_plastic_india)
+    service_plastic_china = plastic_warehouse_service(PLASTIC_SERVICE_NAME_CHINA, CHINA_REWARD)
+    service_plastic_india = plastic_warehouse_service(PLASTIC_SERVICE_NAME_INDIA, INDIA_REWARD)
+    render_service(service_plastic_china)
+    render_service(service_plastic_india)
 
 
 # In[14]:
 
 
-def chemicals_warehouse_service(name: str, action_reward: float) -> Service:
-    """Build the chemicals warehouse device."""
-    return build_generic_service_one_state(
-        name,
-        {PICK_CHEMICALS},
-        action_reward=action_reward
-    )
+    def chemicals_warehouse_service(name: str, action_reward: float) -> Service:
+        """Build the chemicals warehouse device."""
+        return build_generic_service_one_state(
+            name,
+            {PICK_CHEMICALS},
+            action_reward=action_reward
+        )
 
 
-service_chemicals_usa = chemicals_warehouse_service(CHEMICALS_SERVICE_NAME_USA, USA_REWARD)
-service_chemicals_canada = chemicals_warehouse_service(CHEMICALS_SERVICE_NAME_CANADA, CANADA_REWARD)
-render_service(service_chemicals_usa)
-render_service(service_chemicals_canada)
+    service_chemicals_usa = chemicals_warehouse_service(CHEMICALS_SERVICE_NAME_USA, USA_REWARD)
+    service_chemicals_canada = chemicals_warehouse_service(CHEMICALS_SERVICE_NAME_CANADA, CANADA_REWARD)
+    render_service(service_chemicals_usa)
+    render_service(service_chemicals_canada)
 
 
 # In[15]:
 
 
-def copper_frame_warehouse_service(name: str, action_reward: float) -> Service:
-    """Build the copper frame warehouse device."""
-    return build_generic_service_one_state(
-        name,
-        {PICK_COPPER_FRAME},
-        action_reward=action_reward
-    )
+    def copper_frame_warehouse_service(name: str, action_reward: float) -> Service:
+        """Build the copper frame warehouse device."""
+        return build_generic_service_one_state(
+            name,
+            {PICK_COPPER_FRAME},
+            action_reward=action_reward
+        )
 
 
-service_copper_frame_usa = copper_frame_warehouse_service(COPPER_FRAME_SERVICE_NAME_USA, USA_REWARD)
-service_copper_frame_china = copper_frame_warehouse_service(COPPER_FRAME_SERVICE_NAME_CHINA, CHINA_REWARD)
-service_copper_frame_peru = copper_frame_warehouse_service(COPPER_FRAME_SERVICE_NAME_PERU, PERU_REWARD)
-service_copper_frame_chile = copper_frame_warehouse_service(COPPER_FRAME_SERVICE_NAME_CHILE, CHILE_REWARD)
-render_service(service_copper_frame_usa)
-render_service(service_copper_frame_china)
-render_service(service_copper_frame_peru)
-render_service(service_copper_frame_chile)
+    service_copper_frame_usa = copper_frame_warehouse_service(COPPER_FRAME_SERVICE_NAME_USA, USA_REWARD)
+    service_copper_frame_china = copper_frame_warehouse_service(COPPER_FRAME_SERVICE_NAME_CHINA, CHINA_REWARD)
+    service_copper_frame_peru = copper_frame_warehouse_service(COPPER_FRAME_SERVICE_NAME_PERU, PERU_REWARD)
+    service_copper_frame_chile = copper_frame_warehouse_service(COPPER_FRAME_SERVICE_NAME_CHILE, CHILE_REWARD)
+    render_service(service_copper_frame_usa)
+    render_service(service_copper_frame_china)
+    render_service(service_copper_frame_peru)
+    render_service(service_copper_frame_chile)
 
 
 # In[16]:
 
 
-def cleaning_service(name: str = CLEANING_SERVICE_NAME, action_reward: float = USA_REWARD) -> Service:
-    """Build the human cleaning device."""
-    return build_generic_service_one_state(
-        name,
-        {CLEANING},
-        action_reward=action_reward
-    )
+    def cleaning_service(name: str = CLEANING_SERVICE_NAME, action_reward: float = USA_REWARD) -> Service:
+        """Build the human cleaning device."""
+        return build_generic_service_one_state(
+            name,
+            {CLEANING},
+            action_reward=action_reward
+        )
 
 
-service_cleaning = cleaning_service()
-render_service(service_cleaning)
+    service_cleaning = cleaning_service()
+    render_service(service_cleaning)
 
 
 # In[17]:
 
 
-def film_deposition_service(name: str, broken_prob: float, unemployable_prob: float, broken_reward: float,
+    def film_deposition_service(name: str, broken_prob: float, unemployable_prob: float, broken_reward: float,
                             action_reward: float) -> Service:
-    """Build the film deposition device."""
-    return build_complex_breakable_service(name, FILM_DEPOSITION, broken_prob=broken_prob,
+        """Build the film deposition device."""
+        return build_complex_breakable_service(name, FILM_DEPOSITION, broken_prob=broken_prob,
                                            unemployable_prob=unemployable_prob, broken_reward=broken_reward,
                                            action_reward=action_reward)
 
 
-service_film_deposition1 = film_deposition_service(FILM_DEPOSITION1_SERVICE_NAME, DEFAULT_BROKEN_PROB,
-                                                   DEFAULT_UNEMPLOYABLE_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD)
-service_film_deposition2 = film_deposition_service(FILM_DEPOSITION2_SERVICE_NAME, DEFAULT_BROKEN_PROB, DEFAULT_UNEMPLOYABLE_PROB, DEFAULT_BROKEN_REWARD, HIGH_USA_REWARD)
-render_service(service_film_deposition1)
-render_service(service_film_deposition2)
+    service_film_deposition1 = film_deposition_service(FILM_DEPOSITION1_SERVICE_NAME, DEFAULT_BROKEN_PROB,
+                                                       DEFAULT_UNEMPLOYABLE_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD)
+    service_film_deposition2 = film_deposition_service(FILM_DEPOSITION2_SERVICE_NAME, DEFAULT_BROKEN_PROB, DEFAULT_UNEMPLOYABLE_PROB, DEFAULT_BROKEN_REWARD, HIGH_USA_REWARD)
+    render_service(service_film_deposition1)
+    render_service(service_film_deposition2)
 
 
 # In[18]:
 
 
-def resist_coating_service(name: str, broken_prob: float, unemployable_prob: float, broken_reward: float,
-                           action_reward: float) -> Service:
-    """Build the resist coating device."""
-    return build_complex_breakable_service(name, RESIST_COATING, broken_prob=broken_prob,
+    def resist_coating_service(name: str, broken_prob: float, unemployable_prob: float, broken_reward: float,
+                               action_reward: float) -> Service:
+        """Build the resist coating device."""
+        return build_complex_breakable_service(name, RESIST_COATING, broken_prob=broken_prob,
                                            unemployable_prob=unemployable_prob, broken_reward=broken_reward,
                                            action_reward=action_reward)
 
 
-service_resist_coating1 = resist_coating_service(RESIST_COATING1_SERVICE_NAME, DEFAULT_BROKEN_PROB,
+    service_resist_coating1 = resist_coating_service(RESIST_COATING1_SERVICE_NAME, DEFAULT_BROKEN_PROB,
                                                  DEFAULT_UNEMPLOYABLE_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD)
-service_resist_coating2 = resist_coating_service(RESIST_COATING2_SERVICE_NAME, DEFAULT_BROKEN_PROB,
+    service_resist_coating2 = resist_coating_service(RESIST_COATING2_SERVICE_NAME, DEFAULT_BROKEN_PROB,
                                                  DEFAULT_UNEMPLOYABLE_PROB, DEFAULT_BROKEN_REWARD, HIGH_USA_REWARD)
-render_service(service_resist_coating1)
-render_service(service_resist_coating2)
+    render_service(service_resist_coating1)
+    render_service(service_resist_coating2)
 
 
 # In[19]:
 
 
-def exposure_service(name: str = EXPOSURE_SERVICE_NAME, broken_prob: float = DEFAULT_BROKEN_PROB,
-                     broken_reward: float = DEFAULT_BROKEN_REWARD,
-                     action_reward: float = DEFAULT_USA_REWARD) -> Service:
-    """Build the exposure device."""
-    return build_generic_breakable_service(name, EXPOSURE, broken_prob=broken_prob, broken_reward=broken_reward,
+    def exposure_service(name: str = EXPOSURE_SERVICE_NAME, broken_prob: float = DEFAULT_BROKEN_PROB,
+                         broken_reward: float = DEFAULT_BROKEN_REWARD,
+                         action_reward: float = DEFAULT_USA_REWARD) -> Service:
+        """Build the exposure device."""
+        return build_generic_breakable_service(name, EXPOSURE, broken_prob=broken_prob, broken_reward=broken_reward,
                                            action_reward=action_reward)
 
 
-service_exposure = exposure_service()
-render_service(service_exposure)
+    service_exposure = exposure_service()
+    render_service(service_exposure)
 
 
 # In[20]:
 
 
-def development_service(name: str, broken_prob: float, unemployable_prob: float, broken_reward: float,
-                        action_reward: float) -> Service:
-    """Build the development device."""
-    return build_complex_breakable_service(name, DEVELOPMENT, broken_prob=broken_prob,
+    def development_service(name: str, broken_prob: float, unemployable_prob: float, broken_reward: float,
+                            action_reward: float) -> Service:
+        """Build the development device."""
+        return build_complex_breakable_service(name, DEVELOPMENT, broken_prob=broken_prob,
                                            unemployable_prob=unemployable_prob, broken_reward=broken_reward,
                                            action_reward=action_reward)
 
 
-service_development1 = development_service(DEVELOPMENT1_SERVICE_NAME, DEFAULT_BROKEN_PROB, DEFAULT_UNEMPLOYABLE_PROB,
+    service_development1 = development_service(DEVELOPMENT1_SERVICE_NAME, DEFAULT_BROKEN_PROB, DEFAULT_UNEMPLOYABLE_PROB,
                                            DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD)
-service_development2 = development_service(DEVELOPMENT2_SERVICE_NAME, BROKEN_PROB, DEFAULT_UNEMPLOYABLE_PROB, DEFAULT_BROKEN_REWARD, HIGH_USA_REWARD)
-render_service(service_development1)
-render_service(service_development2)
+    service_development2 = development_service(DEVELOPMENT2_SERVICE_NAME, BROKEN_PROB, DEFAULT_UNEMPLOYABLE_PROB, DEFAULT_BROKEN_REWARD, HIGH_USA_REWARD)
+    render_service(service_development1)
+    render_service(service_development2)
 
 
 # In[21]:
 
 
-def etching_service(name: str, broken_prob: float, broken_reward: float, action_reward: float) -> Service:
-    """Build the etching device."""
-    return build_generic_breakable_service(name, ETCHING, broken_prob=broken_prob, broken_reward=broken_reward,
+    def etching_service(name: str, broken_prob: float, broken_reward: float, action_reward: float) -> Service:
+        """Build the etching device."""
+        return build_generic_breakable_service(name, ETCHING, broken_prob=broken_prob, broken_reward=broken_reward,
                                            action_reward=action_reward)
 
 
-service_etching1 = etching_service(ETCHING1_SERVICE_NAME, DEFAULT_BROKEN_PROB, DEFAULT_BROKEN_REWARD,
+    service_etching1 = etching_service(ETCHING1_SERVICE_NAME, DEFAULT_BROKEN_PROB, DEFAULT_BROKEN_REWARD,
                                    DEFAULT_USA_REWARD)
-service_etching2 = etching_service(ETCHING2_SERVICE_NAME, BROKEN_PROB, DEFAULT_BROKEN_REWARD, HIGH_USA_REWARD)
-render_service(service_etching1)
-render_service(service_etching2)
+    service_etching2 = etching_service(ETCHING2_SERVICE_NAME, BROKEN_PROB, DEFAULT_BROKEN_REWARD, HIGH_USA_REWARD)
+    render_service(service_etching1)
+    render_service(service_etching2)
 
 
 # In[22]:
 
 
-def impurities_implantation_service(name: str, broken_prob: float, unemployable_prob: float, broken_reward: float,
+    def impurities_implantation_service(name: str, broken_prob: float, unemployable_prob: float, broken_reward: float,
                                     action_reward: float) -> Service:
-    """Build the impurities implantation device."""
-    return build_complex_breakable_service(name, IMPURITIES_IMPLANTATION, broken_prob=broken_prob,
+        """Build the impurities implantation device."""
+        return build_complex_breakable_service(name, IMPURITIES_IMPLANTATION, broken_prob=broken_prob,
                                            unemployable_prob=unemployable_prob, broken_reward=broken_reward,
                                            action_reward=action_reward)
 
 
-service_impurities_implantation = impurities_implantation_service(IMPURITIES_IMPLANTATION_SERVICE_NAME,
+    service_impurities_implantation = impurities_implantation_service(IMPURITIES_IMPLANTATION_SERVICE_NAME,
                                                                    DEFAULT_BROKEN_PROB, DEFAULT_UNEMPLOYABLE_PROB,
                                                                    DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD)
-render_service(service_impurities_implantation)
+    render_service(service_impurities_implantation)
 
 
 # In[23]:
 
 
-def activation_service(name: str = ACTIVATION_SERVICE_NAME, action_reward: float = USA_REWARD) -> Service:
-    """Build the human activation device."""
-    return build_generic_service_one_state(
-        name,
-        {ACTIVATION},
-        action_reward=action_reward
-    )
+    def activation_service(name: str = ACTIVATION_SERVICE_NAME, action_reward: float = USA_REWARD) -> Service:
+        """Build the human activation device."""
+        return build_generic_service_one_state(
+            name,
+            {ACTIVATION},
+            action_reward=action_reward
+        )
 
 
-service_activation = activation_service()
-render_service(service_activation)
+    service_activation = activation_service()
+    render_service(service_activation)
 
 
 # In[24]:
 
 
-def resist_stripping_service(name: str, broken_prob: float, broken_reward: float, action_reward: float) -> Service:
-    """Build the resist stripping device."""
-    return build_generic_breakable_service(name, RESIST_STRIPPING, broken_prob=broken_prob, broken_reward=broken_reward,
+    def resist_stripping_service(name: str, broken_prob: float, broken_reward: float, action_reward: float) -> Service:
+        """Build the resist stripping device."""
+        return build_generic_breakable_service(name, RESIST_STRIPPING, broken_prob=broken_prob, broken_reward=broken_reward,
                                            action_reward=action_reward)
 
 
-service_resist_stripping = resist_stripping_service(RESIST_STRIPPING_SERVICE_NAME, DEFAULT_BROKEN_PROB,
+    service_resist_stripping = resist_stripping_service(RESIST_STRIPPING_SERVICE_NAME, DEFAULT_BROKEN_PROB,
                                                      DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD)
 
-render_service(service_resist_stripping)
+    render_service(service_resist_stripping)
 
 
 # In[25]:
 
 
-def assembly_service(name: str = ASSEMBLY_SERVICE_NAME, action_reward: float = USA_REWARD) -> Service:
-    """Build the human assembly device."""
-    return build_generic_service_one_state(
-        name,
-        {ASSEMBLY},
-        action_reward=action_reward
-    )
+    def assembly_service(name: str = ASSEMBLY_SERVICE_NAME, action_reward: float = USA_REWARD) -> Service:
+        """Build the human assembly device."""
+        return build_generic_service_one_state(
+            name,
+            {ASSEMBLY},
+            action_reward=action_reward
+        )
 
 
-service_assembly = assembly_service()
-render_service(service_assembly)
+    service_assembly = assembly_service()
+    render_service(service_assembly)
 
 
 # In[26]:
 
 
-def testing_service(name: str = TESTING_SERVICE_NAME, action_reward: float = USA_REWARD) -> Service:
-    """Build the human testing device."""
-    return build_generic_service_one_state(
-        name,
-        {TESTING},
-        action_reward=action_reward
-    )
+    def testing_service(name: str = TESTING_SERVICE_NAME, action_reward: float = USA_REWARD) -> Service:
+        """Build the human testing device."""
+        return build_generic_service_one_state(
+            name,
+            {TESTING},
+            action_reward=action_reward
+        )
 
 
-service_testing = testing_service()
-render_service(service_testing)
+    service_testing = testing_service()
+    render_service(service_testing)
 
 
 # In[27]:
 
 
-def packaging_service(name: str = PACKAGING_SERVICE_NAME, action_reward: float = USA_REWARD) -> Service:
-    """Build the human packaging device."""
-    return build_generic_service_one_state(
-        name,
-        {PACKAGING},
-        action_reward=action_reward
-    )
+    def packaging_service(name: str = PACKAGING_SERVICE_NAME, action_reward: float = USA_REWARD) -> Service:
+        """Build the human packaging device."""
+        return build_generic_service_one_state(
+            name,
+            {PACKAGING},
+            action_reward=action_reward
+        )
 
 
-service_packaging = packaging_service()
-render_service(service_packaging)
+    service_packaging = packaging_service()
+    render_service(service_packaging)
 
 
 # # First Phase - Raw materials and design assortment
@@ -738,129 +739,129 @@ render_service(service_packaging)
 # In[28]:
 
 
-def target_service():
-    """Build the target service."""
-    transition_function = {
-       "s0": {
-            "pick_buy_design": ("s1", 1.0, 0),
-        },
-        "s1": {"pick_silicon": ("s2", 1.0, 0),
-        },
-        "s2": {"pick_wafer": ("s3", 1.0, 0),},
-        "s3": {"pick_boron": ("s4", 1.0, 0), },
-        "s4": {"pick_phosphor": ("s5", 1.0, 0), },
-        "s5": {"pick_aluminum": ("s6", 1.0, 0), },
-        "s6": {"pick_resist": ("s7", 1.0, 0), },
-        "s7": {"pick_plastic": ("s8", 1.0, 0), },
-        "s8": {"pick_chemicals": ("s9", 1.0, 0), },
-        "s9": {"pick_copper_frame": ("s0", 1.0, 0), },
-    }
+    def target_service():
+        """Build the target service."""
+        transition_function = {
+        "s0": {
+                "pick_buy_design": ("s1", 1.0, 0),
+            },
+            "s1": {"pick_silicon": ("s2", 1.0, 0),
+            },
+            "s2": {"pick_wafer": ("s3", 1.0, 0),},
+            "s3": {"pick_boron": ("s4", 1.0, 0), },
+            "s4": {"pick_phosphor": ("s5", 1.0, 0), },
+            "s5": {"pick_aluminum": ("s6", 1.0, 0), },
+            "s6": {"pick_resist": ("s7", 1.0, 0), },
+            "s7": {"pick_plastic": ("s8", 1.0, 0), },
+            "s8": {"pick_chemicals": ("s9", 1.0, 0), },
+            "s9": {"pick_copper_frame": ("s0", 1.0, 0), },
+        }
 
-    initial_state = "s0"
-    final_states = {"s0"}
+        initial_state = "s0"
+        final_states = {"s0"}
 
-    return build_target_from_transitions(
-        transition_function, initial_state, final_states
-    )
+        return build_target_from_transitions(
+            transition_function, initial_state, final_states
+        )
 
-target = target_service()
-render_target(target)
+    target = target_service()
+    render_target(target)
 
 
-# 
+#
 # ## Composition MDP
 # The Composition MDP is constructed in this way:
 
 # In[30]:
 
 
-all_services = [
-    # 0
-    service_design_usa,
-    # 1
-    service_design_uk,
-    # 2
-    service_design_china,
-    # 3
-    service_design_taiwan,
-    # 4
-    service_silicon_china,
-    # 5
-    service_silicon_russia,
-    # 6
-    service_silicon_norway,
-    # 7
-    service_silicon_usa,
-    # 8
-    service_silicon_brazil,
-    # 9
-    service_silicon_france,
-    # 10
-    service_silicon_malaysia,
-    # 11
-    service_wafer_japan,
-    # 12
-    service_wafer_south_korea,
-    # 13
-    service_boron_turkey,
-    # 14
-    service_boron_usa,
-    # 15
-    service_boron_kazakhstan,
-    # 16
-    service_boron_chile,
-    # 17
-    service_boron_china,
-    # 18
-    service_boron_bolivia,
-    # 19
-    service_boron_argentina,
-    # 20
-    service_boron_russia,
-    # 21
-    service_phosphor_morocco,
-    # 22
-    service_phosphor_china,
-    # 23
-    service_phosphor_usa,
-    # 24
-    service_aluminum_brazil,
-    # 25
-    service_aluminum_india,
-    # 26
-    service_aluminum_australia,
-    # 27
-    service_resist_switzerland,
-    # 28
-    service_resist_usa,
-    # 29
-    service_resist_austria,
-    # 30
-    service_resist_belgium,
-    # 31
-    service_resist_canada,
-    # 32
-    service_resist_india,
-    # 33
-    service_plastic_india,
-    # 34
-    service_plastic_china,
-    # 35
-    service_chemicals_usa,
-    # 36
-    service_chemicals_canada,
-    # 37
-    service_copper_frame_usa,
-    # 38
-    service_copper_frame_chile,
-    # 39
-    service_copper_frame_peru,
-    # 40
-    service_copper_frame_china
-]
-mdp = composition_mdp(target, *all_services, gamma=0.9)
-render_composition_mdp(mdp)
-print("Number of states: ", len(mdp.all_states))
+    all_services = [
+        # 0
+        service_design_usa,
+        # 1
+        service_design_uk,
+        # 2
+        service_design_china,
+        # 3
+        service_design_taiwan,
+        # 4
+        service_silicon_china,
+        # 5
+        service_silicon_russia,
+        # 6
+        service_silicon_norway,
+        # 7
+        service_silicon_usa,
+        # 8
+        service_silicon_brazil,
+        # 9
+        service_silicon_france,
+        # 10
+        service_silicon_malaysia,
+        # 11
+        service_wafer_japan,
+        # 12
+        service_wafer_south_korea,
+        # 13
+        service_boron_turkey,
+        # 14
+        service_boron_usa,
+        # 15
+        service_boron_kazakhstan,
+        # 16
+        service_boron_chile,
+        # 17
+        service_boron_china,
+        # 18
+        service_boron_bolivia,
+        # 19
+        service_boron_argentina,
+        # 20
+        service_boron_russia,
+        # 21
+        service_phosphor_morocco,
+        # 22
+        service_phosphor_china,
+        # 23
+        service_phosphor_usa,
+        # 24
+        service_aluminum_brazil,
+        # 25
+        service_aluminum_india,
+        # 26
+        service_aluminum_australia,
+        # 27
+        service_resist_switzerland,
+        # 28
+        service_resist_usa,
+        # 29
+        service_resist_austria,
+        # 30
+        service_resist_belgium,
+        # 31
+        service_resist_canada,
+        # 32
+        service_resist_india,
+        # 33
+        service_plastic_india,
+        # 34
+        service_plastic_china,
+        # 35
+        service_chemicals_usa,
+        # 36
+        service_chemicals_canada,
+        # 37
+        service_copper_frame_usa,
+        # 38
+        service_copper_frame_chile,
+        # 39
+        service_copper_frame_peru,
+        # 40
+        service_copper_frame_china
+    ]
+    mdp = composition_mdp(target, *all_services, gamma=0.9)
+    render_composition_mdp(mdp)
+    print("Number of states: ", len(mdp.all_states))
 
 
 # # Optimal policy
@@ -869,21 +870,21 @@ print("Number of states: ", len(mdp.all_states))
 # In[41]:
 
 
-opn = DPAnalytic(mdp, 1e-4)
-opt_policy = opn.get_optimal_policy_vi()
-value_function = opn.get_value_func_dict(opt_policy)
-q_value_function = opn.get_act_value_func_dict(opt_policy)
+    opn = DPAnalytic(mdp, 1e-4)
+    opt_policy = opn.get_optimal_policy_vi()
+    value_function = opn.get_value_func_dict(opt_policy)
+    q_value_function = opn.get_act_value_func_dict(opt_policy)
 
-# remove '0' state to sort output
-opt_policy.policy_data.pop(0, None)
-value_function.pop(0, None)
-_ = q_value_function.pop(0, None)
+    # remove '0' state to sort output
+    opt_policy.policy_data.pop(0, None)
+    value_function.pop(0, None)
+    _ = q_value_function.pop(0, None)
 
 
 # In[42]:
 
 
-print_policy_data(opt_policy)
+    print_policy_data(opt_policy)
 
 
 # # Value Function
@@ -892,13 +893,13 @@ print_policy_data(opt_policy)
 # In[195]:
 
 
-print_value_function(value_function)
+    print_value_function(value_function)
 
 
 # In[196]:
 
 
-print_q_value_function(q_value_function)
+    print_q_value_function(q_value_function)
 
 
 # From the calculation of the optimal policy we observe that:
@@ -916,85 +917,85 @@ print_q_value_function(q_value_function)
 # In[200]:
 
 
-def target_service():
-    """Build the target service."""
-    transition_function = {
-        "s0": {"cleaning": ("s1", 1.0, 0), },
-        "s1": {"config_film_deposition": ("s2", 1.0, 0), },
-        "s2": {"checked_film_deposition": ("s3", 1.0, 0), },
-        "s3": {"film_deposition": ("s4", 1.0, 0), },
-        "s4": {"config_resist_coating": ("s5", 1.0, 0), },
-        "s5": {"checked_resist_coating": ("s6", 1.0, 0), },
-        "s6": {"resist_coating": ("s7", 1.0, 0), },
-        "s7": {"exposure": ("s8", 1.0, 0), },
-        "s8": {"check_exposure": ("s9", 1.0, 0), },
-        "s9": {"config_development": ("s10", 1.0, 0), },
-        "s10": {"checked_development": ("s11", 1.0, 0), },
-        "s11": {"development": ("s12", 1.0, 0), },
-        "s12": {"etching": ("s13", 1.0, 0), },
-        "s13": {"check_etching": ("s14", 1.0, 0), },
-        "s14": {"config_impurities_implantation": ("s15", 1.0, 0), },
-        "s15": {"checked_impurities_implantation": ("s16", 1.0, 0), },
-        "s16": {"impurities_implantation": ("s17", 1.0, 0), },
-        "s17": {"activation": ("s18", 1.0, 0), },
-        "s18": {"resist_stripping": ("s19", 1.0, 0), },
-        "s19": {"check_resist_stripping": ("s20", 1.0, 0), },
-        "s20": {"assembly": ("s21", 1.0, 0), },
-        "s21": {"testing": ("s22", 1.0, 0), },
-        "s22": {"packaging": ("s0", 1.0, 0), }
- }
+    def target_service():
+        """Build the target service."""
+        transition_function = {
+            "s0": {"cleaning": ("s1", 1.0, 0), },
+            "s1": {"config_film_deposition": ("s2", 1.0, 0), },
+            "s2": {"checked_film_deposition": ("s3", 1.0, 0), },
+            "s3": {"film_deposition": ("s4", 1.0, 0), },
+            "s4": {"config_resist_coating": ("s5", 1.0, 0), },
+            "s5": {"checked_resist_coating": ("s6", 1.0, 0), },
+            "s6": {"resist_coating": ("s7", 1.0, 0), },
+            "s7": {"exposure": ("s8", 1.0, 0), },
+            "s8": {"check_exposure": ("s9", 1.0, 0), },
+            "s9": {"config_development": ("s10", 1.0, 0), },
+            "s10": {"checked_development": ("s11", 1.0, 0), },
+            "s11": {"development": ("s12", 1.0, 0), },
+            "s12": {"etching": ("s13", 1.0, 0), },
+            "s13": {"check_etching": ("s14", 1.0, 0), },
+            "s14": {"config_impurities_implantation": ("s15", 1.0, 0), },
+            "s15": {"checked_impurities_implantation": ("s16", 1.0, 0), },
+            "s16": {"impurities_implantation": ("s17", 1.0, 0), },
+            "s17": {"activation": ("s18", 1.0, 0), },
+            "s18": {"resist_stripping": ("s19", 1.0, 0), },
+            "s19": {"check_resist_stripping": ("s20", 1.0, 0), },
+            "s20": {"assembly": ("s21", 1.0, 0), },
+            "s21": {"testing": ("s22", 1.0, 0), },
+            "s22": {"packaging": ("s0", 1.0, 0), }
+    }
 
-    initial_state = "s0"
-    final_states = {"s0"}
+        initial_state = "s0"
+        final_states = {"s0"}
 
-    return build_target_from_transitions(
-        transition_function, initial_state, final_states
-    )
+        return build_target_from_transitions(
+            transition_function, initial_state, final_states
+        )
 
-target = target_service()
-render_target(target)
+    target = target_service()
+    render_target(target)
 
 
 # In[201]:
 
 
-all_services = [
-    # 0
-    service_cleaning,
-    # 1
-    service_film_deposition1,
-    # 2
-    service_film_deposition2,
-    # 3
-    service_resist_coating1,
-    # 4
-    service_resist_coating2,
-    # 5
-    service_exposure,
-    # 6
-    service_development1,
-    # 7
-    service_development2,
-    # 8
-    service_etching1,
-    # 9
-    service_etching2,
-    # 10
-    service_impurities_implantation,
-    # 11
-    service_activation,
-    # 12
-    service_resist_stripping,
-    # 13
-    service_assembly,
-    # 14
-    service_testing,
-    # 15
-    service_packaging
-]
-mdp = composition_mdp(target, *all_services, gamma=0.9)
-#render_composition_mdp2(mdp)
-print("Number of states: ", len(mdp.all_states))
+    all_services = [
+        # 0
+        service_cleaning,
+        # 1
+        service_film_deposition1,
+        # 2
+        service_film_deposition2,
+        # 3
+        service_resist_coating1,
+        # 4
+        service_resist_coating2,
+        # 5
+        service_exposure,
+        # 6
+        service_development1,
+        # 7
+        service_development2,
+        # 8
+        service_etching1,
+        # 9
+        service_etching2,
+        # 10
+        service_impurities_implantation,
+        # 11
+        service_activation,
+        # 12
+        service_resist_stripping,
+        # 13
+        service_assembly,
+        # 14
+        service_testing,
+        # 15
+        service_packaging
+    ]
+    mdp = composition_mdp(target, *all_services, gamma=0.9)
+    #render_composition_mdp2(mdp)
+    print("Number of states: ", len(mdp.all_states))
 
 
 # # Optimal policy
@@ -1003,16 +1004,16 @@ print("Number of states: ", len(mdp.all_states))
 # In[202]:
 
 
-opn = DPAnalytic(mdp, 1e-4)
-opt_policy = opn.get_optimal_policy_vi()
-value_function = opn.get_value_func_dict(opt_policy)
-q_value_function = opn.get_act_value_func_dict(opt_policy)
+    opn = DPAnalytic(mdp, 1e-4)
+    opt_policy = opn.get_optimal_policy_vi()
+    value_function = opn.get_value_func_dict(opt_policy)
+    q_value_function = opn.get_act_value_func_dict(opt_policy)
 
 
 # In[203]:
 
 
-print_policy_data(opt_policy)
+    print_policy_data(opt_policy)
 
 
 # # Value Function
@@ -1021,11 +1022,13 @@ print_policy_data(opt_policy)
 # In[ ]:
 
 
-print_value_function(value_function)
+    print_value_function(value_function)
 
 
 # In[ ]:
 
 
-print_q_value_function(q_value_function)
+    print_q_value_function(q_value_function)
 
+if __name__ == '__main__':
+    main()
