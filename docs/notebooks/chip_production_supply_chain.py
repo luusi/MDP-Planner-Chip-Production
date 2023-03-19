@@ -965,17 +965,17 @@ def main():
         # 1
         service_film_deposition1,
         # 2
-        #service_film_deposition2,
+        service_film_deposition2,
         # 3
         service_resist_coating1,
         # 4
-        #service_resist_coating2,
+        service_resist_coating2,
         # 5
         service_exposure,
         # 6
         service_development1,
         # 7
-        #service_development2,
+        service_development2,
         # 8
         service_etching1,
         # 9
