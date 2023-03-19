@@ -223,7 +223,7 @@ PACKAGING_SERVICE_NAME = "packaging_human"                                  # hu
 
 # In[5]:
 
-@profile
+#@profile
 def main():
     def build_generic_breakable_service(service_name: str, action_name: str, broken_prob: float, broken_reward: float, action_reward: float):
         assert 0.0 <= broken_prob <= 1.0
