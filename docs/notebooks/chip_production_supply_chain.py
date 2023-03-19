@@ -13,6 +13,7 @@ from stochastic_service_composition.services import build_service_from_transitio
 from stochastic_service_composition.target import build_target_from_transitions
 
 from memory_profiler import profile
+import cProfile
 
 
 
@@ -1069,4 +1070,4 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    cProfile.run('main()')
