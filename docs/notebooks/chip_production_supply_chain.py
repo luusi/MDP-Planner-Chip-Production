@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # coding: utf-8
+import time
 
 # In[1]:
 
@@ -994,9 +995,14 @@ def main():
         # 15
         service_packaging
     ]
+    start = time.time_ns()
     mdp = composition_mdp(target, *all_services, gamma=0.9)
+    end = time.time_ns()
     #render_composition_mdp2(mdp)
     print("Number of states: ", len(mdp.all_states))
+    total_ns = end - start
+    total = total_ns / 10**9
+    print("Total time for function: composition_mdp ", total)
 
 
 # # Optimal policy
@@ -1070,4 +1076,5 @@ def main():
 
 
 if __name__ == '__main__':
-    cProfile.run('main()')
+    pass
+    #cProfile.run('main()')
