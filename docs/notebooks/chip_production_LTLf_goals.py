@@ -10,6 +10,7 @@ from logaut import ltl2dfa
 from pylogics.parsers import parse_ltl
 import pylogics.parsers.ldl
 import logaut
+import time
 
 from mdp_dp_rl.algorithms.dp.dp_analytic import DPAnalytic
 from stochastic_service_composition.declare_utils import *
@@ -848,7 +849,9 @@ def main():
 # trimmed_declare_automaton.to_graphviz().render("dfa-trimmed")
 # stochastic_target = target_from_dfa(trimmed_declare_automaton)
 # mdp = composition_mdp(stochastic_target, *all_services, gamma=0.9)
+    start = time.time_ns()
     mdp = comp_mdp(declare_automaton, all_services, gamma=0.9)
+    end = time.time_ns()
 #render_composition_mdp(mdp)
     print("Number of states: ", len(mdp.all_states))
     total_ns = end - start
@@ -950,7 +953,9 @@ def main():
 # stochastic_target = target_from_dfa(trimmed_declare_automaton)
 # mdp = composition_mdp(stochastic_target, *all_services, gamma=0.9)
 #mdp = comp_mdp(declare_automaton, all_services, gamma=0.9)
+    start = time.time_ns()
     mdp = comp_mdp(declare_automaton, all_services, gamma=0.9)
+    end = time.time_ns()
 #render_composition_mdp(mdp)
     print("Number of states: ", len(mdp.all_states))
     total_ns = end - start
