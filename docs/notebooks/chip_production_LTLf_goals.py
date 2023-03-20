@@ -851,6 +851,10 @@ def main():
     mdp = comp_mdp(declare_automaton, all_services, gamma=0.9)
 #render_composition_mdp(mdp)
     print("Number of states: ", len(mdp.all_states))
+    total_ns = end - start
+    total = total_ns / 10 ** 9
+    print("Total time for function: composition_mdp ", total)
+
 
 
 # # Optimal policy
@@ -893,19 +897,16 @@ def main():
 
 # In[34]:
 
-
-    constraints = [
-        build_declare_assumption(set(SYMBOLS_PHASE_2)),
-        *[exactly_once(x) for x in SYMBOLS_PHASE_2],
-    ]
-
-    for i in range(len(SYMBOLS_PHASE_2) - 1):
-        for j in range(i, len(SYMBOLS_PHASE_2)):
-            constraints.append(alt_precedence(SYMBOLS_PHASE_2[i], SYMBOLS_PHASE_2[j]))
-    formula = pylogics.parsers.ltl.parse_ltl(" & ".join(constraints))
-    automaton = logaut.core.ltl2dfa(formula, backend="lydia")
+    formula_str = "<"
+    regex_seq = ""
+    for symbol_index, symbol in enumerate(SYMBOLS_PHASE_2):
+        all_but_symbol = set(SYMBOLS_PHASE_2).difference({symbol})
+        item = symbol + "&" + " & ".join(map(lambda x: "!" + x, all_but_symbol))
+        regex_seq = regex_seq + (";" if symbol_index != 0 else "") + item
+    formula_str = f"<({regex_seq})*>end"
+    formula = pylogics.parsers.ldl.parse_ldl(formula_str)
+    automaton = logaut.core.ldl2dfa(formula, backend="lydia")
     declare_automaton = from_symbolic_automaton_to_declare_automaton(automaton, set(SYMBOLS_PHASE_2))
-    render_mdp_dfa(mdp_from_dfa(declare_automaton), no_sink=True)
 
 
 # In[ ]:
@@ -952,6 +953,9 @@ def main():
     mdp = comp_mdp(declare_automaton, all_services, gamma=0.9)
 #render_composition_mdp(mdp)
     print("Number of states: ", len(mdp.all_states))
+    total_ns = end - start
+    total = total_ns / 10 ** 9
+    print("Total time for function: composition_mdp ", total)
 
 
 # # Optimal policy
