@@ -752,6 +752,8 @@ def main():
     formula_str = f"<({regex_seq})*>end"
     formula = pylogics.parsers.ldl.parse_ldl(formula_str)
     automaton = logaut.core.ldl2dfa(formula, backend="lydia")
+    print("Specification: ", formula_str)
+    print("Compute declare automaton")
     declare_automaton = from_symbolic_automaton_to_declare_automaton(automaton, set(SYMBOLS_PHASE_1))
 
 
@@ -849,6 +851,7 @@ def main():
 # trimmed_declare_automaton.to_graphviz().render("dfa-trimmed")
 # stochastic_target = target_from_dfa(trimmed_declare_automaton)
 # mdp = composition_mdp(stochastic_target, *all_services, gamma=0.9)
+    print("Compute MDP 1...")
     start = time.time_ns()
     mdp = comp_mdp(declare_automaton, all_services, gamma=0.9)
     end = time.time_ns()
@@ -909,6 +912,8 @@ def main():
     formula_str = f"<({regex_seq})*>end"
     formula = pylogics.parsers.ldl.parse_ldl(formula_str)
     automaton = logaut.core.ldl2dfa(formula, backend="lydia")
+    print("Specification: ", formula_str)
+    print("Compute declare automaton")
     declare_automaton = from_symbolic_automaton_to_declare_automaton(automaton, set(SYMBOLS_PHASE_2))
 
 
@@ -953,6 +958,7 @@ def main():
 # stochastic_target = target_from_dfa(trimmed_declare_automaton)
 # mdp = composition_mdp(stochastic_target, *all_services, gamma=0.9)
 #mdp = comp_mdp(declare_automaton, all_services, gamma=0.9)
+    print("Compute MDP 2...")
     start = time.time_ns()
     mdp = comp_mdp(declare_automaton, all_services, gamma=0.9)
     end = time.time_ns()
