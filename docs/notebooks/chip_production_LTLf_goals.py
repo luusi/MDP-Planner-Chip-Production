@@ -755,6 +755,7 @@ def main():
     print("Specification: ", formula_str)
     print("Compute declare automaton")
     declare_automaton = from_symbolic_automaton_to_declare_automaton(automaton, set(SYMBOLS_PHASE_1))
+    print("Number of states: ", len(declare_automaton.states))
 
 
 # 
@@ -907,7 +908,7 @@ def main():
     regex_seq = ""
     for symbol_index, symbol in enumerate(SYMBOLS_PHASE_2):
         all_but_symbol = set(SYMBOLS_PHASE_2).difference({symbol})
-        item = symbol + "&" + " & ".join(map(lambda x: "!" + x, all_but_symbol))
+        item = symbol + " & " + " & ".join(map(lambda x: "!" + x, all_but_symbol))
         regex_seq = regex_seq + (";" if symbol_index != 0 else "") + item
     formula_str = f"<({regex_seq})*>end"
     formula = pylogics.parsers.ldl.parse_ldl(formula_str)
@@ -915,7 +916,7 @@ def main():
     print("Specification: ", formula_str)
     print("Compute declare automaton")
     declare_automaton = from_symbolic_automaton_to_declare_automaton(automaton, set(SYMBOLS_PHASE_2))
-
+    print("Number of states: ", len(declare_automaton.states))
 
 # In[ ]:
 
