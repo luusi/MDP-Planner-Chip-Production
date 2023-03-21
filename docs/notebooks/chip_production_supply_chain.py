@@ -109,7 +109,7 @@ ACTIVATION = "activation"
 RESIST_STRIPPING = "resist_stripping"
 CHECK_RESIST_STRIPPING = "check_resist_stripping"
 ASSEMBLY = "assembly"
-TESTING ="testing"
+TESTING = "testing"
 PACKAGING = "packaging"
 
 SYMBOLS_PHASE_1 = [
@@ -202,14 +202,16 @@ FILM_DEPOSITION1_SERVICE_NAME = "film_deposition_machine1"                  # ma
 FILM_DEPOSITION2_SERVICE_NAME = "film_deposition_machine2"                  # machine
 RESIST_COATING1_SERVICE_NAME = "resist_coating_machine1"                    # machine
 RESIST_COATING2_SERVICE_NAME = "resist_coating_machine2"                    # machine
-EXPOSURE_SERVICE_NAME = "exposure_machine"                                  # machine
+EXPOSURE1_SERVICE_NAME = "exposure_machine1"                                # machine
+EXPOSURE2_SERVICE_NAME = "exposure_machine2"                                # machine
 DEVELOPMENT1_SERVICE_NAME = "development_machine1"                          # machine
 DEVELOPMENT2_SERVICE_NAME = "development_machine2"                          # machine
 ETCHING1_SERVICE_NAME = "etching_machine1"                                  # machine
 ETCHING2_SERVICE_NAME = "etching_machine2"                                  # machine
 IMPURITIES_IMPLANTATION_SERVICE_NAME = "impurities_implantation_machine"    # machine
 ACTIVATION_SERVICE_NAME = "activation_human"                                # human
-RESIST_STRIPPING_SERVICE_NAME = "resist_stripping_machine"                  # machine
+RESIST_STRIPPING1_SERVICE_NAME = "resist_stripping_machine1"                # machine
+RESIST_STRIPPING2_SERVICE_NAME = "resist_stripping_machine2"                # machine
 ASSEMBLY_SERVICE_NAME = "assembly_human"                                    # human
 TESTING_SERVICE_NAME = "testing_human"                                      # human
 PACKAGING_SERVICE_NAME = "packaging_human"                                  # human
@@ -599,9 +601,12 @@ def main():
         return build_generic_breakable_service(name, EXPOSURE, broken_prob=broken_prob, broken_reward=broken_reward,
                                            action_reward=action_reward)
 
-
-    service_exposure = exposure_service()
-    render_service(service_exposure)
+    service_exposure1 = exposure_service(EXPOSURE1_SERVICE_NAME, DEFAULT_BROKEN_PROB,
+                                                         DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD)
+    service_exposure2 = exposure_service(EXPOSURE2_SERVICE_NAME, BROKEN_PROB, DEFAULT_BROKEN_REWARD,
+                                                HIGH_USA_REWARD)
+    render_service(service_exposure1)
+    render_service(service_exposure2)
 
 
 # In[20]:
@@ -680,10 +685,11 @@ def main():
                                            action_reward=action_reward)
 
 
-    service_resist_stripping = resist_stripping_service(RESIST_STRIPPING_SERVICE_NAME, DEFAULT_BROKEN_PROB,
-                                                     DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD)
+    service_resist_stripping1 = resist_stripping_service(RESIST_STRIPPING1_SERVICE_NAME, DEFAULT_BROKEN_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD)
+    service_resist_stripping2 = resist_stripping_service(RESIST_STRIPPING2_SERVICE_NAME, BROKEN_PROB, DEFAULT_BROKEN_REWARD, HIGH_USA_REWARD)
 
-    render_service(service_resist_stripping)
+    render_service(service_resist_stripping1)
+    render_service(service_resist_stripping2)
 
 
 # In[25]:
