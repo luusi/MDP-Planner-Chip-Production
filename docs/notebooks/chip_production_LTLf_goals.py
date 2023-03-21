@@ -4,23 +4,20 @@
 # In[1]:
 
 
-from typing import Set
-# Python imports, put at the top for simplicity
-from logaut import ltl2dfa
-from pylogics.parsers import parse_ltl
-import pylogics.parsers.ldl
-import logaut
 import time
 
+import logaut
+import pylogics.parsers.ldl
 from mdp_dp_rl.algorithms.dp.dp_analytic import DPAnalytic
+# Python imports, put at the top for simplicity
+from pylogics.parsers import parse_ltl
+
+from docs.notebooks.utils import render_service, print_policy_data, print_value_function, print_q_value_function
+from stochastic_service_composition.composition_mdp import comp_mdp
 from stochastic_service_composition.declare_utils import *
 from stochastic_service_composition.dfa_target import from_symbolic_automaton_to_declare_automaton
-from stochastic_service_composition.dfa_target import mdp_from_dfa
-from docs.notebooks.utils import render_service, render_target, render_composition_mdp, render_mdp_dfa, \
-    print_policy_data, print_value_function, print_q_value_function, render_comp_mdp
-from stochastic_service_composition.composition_mdp import composition_mdp, comp_mdp
 from stochastic_service_composition.services import build_service_from_transitions, Service
-from stochastic_service_composition.target import build_target_from_transitions, target_from_dfa
+
 from memory_profiler import profile
 
 # ## Use case for "Stochastic Service Composition with Industrial APIs" - Chip Production.
@@ -132,25 +129,25 @@ SYMBOLS_PHASE_1 = [
 
 SYMBOLS_PHASE_2 = [
     CLEANING,
-    CONFIG_FILM_DEPOSITION,
-    CHECKED_FILM_DEPOSITION,
+    # CONFIG_FILM_DEPOSITION,
+    # CHECKED_FILM_DEPOSITION,
     FILM_DEPOSITION,
-    CONFIG_RESIST_COATING,
-    CHECKED_RESIST_COATING,
+    # CONFIG_RESIST_COATING,
+    # CHECKED_RESIST_COATING,
     RESIST_COATING,
     EXPOSURE,
-    CHECK_EXPOSURE,
-    CONFIG_DEVELOPMENT,
-    CHECKED_DEVELOPMENT,
+    # CHECK_EXPOSURE,
+    # CONFIG_DEVELOPMENT,
+    # CHECKED_DEVELOPMENT,
     DEVELOPMENT,
     ETCHING,
-    CHECK_ETCHING,
-    CONFIG_IMPURITIES_IMPLANTATION,
-    CHECKED_IMPURITIES_IMPLANTATION,
+    # CHECK_ETCHING,
+    # CONFIG_IMPURITIES_IMPLANTATION,
+    # CHECKED_IMPURITIES_IMPLANTATION,
     IMPURITIES_IMPLANTATION,
     ACTIVATION,
     RESIST_STRIPPING,
-    CHECK_RESIST_STRIPPING,
+    # CHECK_RESIST_STRIPPING,
     ASSEMBLY,
     TESTING,
     PACKAGING
@@ -963,7 +960,6 @@ def main():
     start = time.time_ns()
     mdp = comp_mdp(declare_automaton, all_services, gamma=0.9)
     end = time.time_ns()
-#render_composition_mdp(mdp)
     print("Number of states: ", len(mdp.all_states))
     total_ns = end - start
     total = total_ns / 10 ** 9
@@ -1001,6 +997,42 @@ def main():
 
 
     print_q_value_function(q_value_function)
+
+    # simulation
+    import random
+    def sample_from_policy(policy, state):
+        states, probs = zip(*policy[state].items())
+        return random.choices(states, probs)[0]
+
+    def sample_from_mdp_dist(state_dist):
+        states, probs = zip(*[(state, prob) for state, prob in state_dist.items() if state != "broken"])
+        return random.choices(states, probs)[0]
+
+    current_system_state = [s.initial_state for s in all_services]
+    current_target_state = declare_automaton.initial_state
+
+    print("*" * 50)
+    for _ in range(20):
+        current_symbol, chosen_service_id = list(opt_policy.policy_data[(tuple(current_system_state), current_target_state)].keys())[0]
+
+        print("Current state: ", current_system_state)
+        print("Chosen service: ", chosen_service_id, "Chosen action: ", current_symbol, all_services[chosen_service_id].transition_function)
+        print("*" * 50)
+        if chosen_service_id == "undefined":
+#            print("Undefined action!")
+            break
+        next_service_state_dist, reward = \
+            all_services[chosen_service_id].transition_function[current_system_state[chosen_service_id]][current_symbol]
+        next_service_state = sample_from_mdp_dist(next_service_state_dist)
+
+        if current_symbol in declare_automaton.alphabet:
+            next_target_state = declare_automaton.transition_function[current_target_state][current_symbol]
+        else:
+            next_target_state = current_target_state
+
+        # update current states
+        current_system_state[chosen_service_id] = next_service_state
+        current_target_state = next_target_state
 
 
 if __name__ == '__main__':

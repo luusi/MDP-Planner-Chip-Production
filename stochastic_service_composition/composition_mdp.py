@@ -1,4 +1,5 @@
 """This module implements the algorithm to compute the system-target MDP."""
+import time
 from collections import deque
 from typing import Deque, Dict, List, Set, Tuple
 
@@ -133,7 +134,9 @@ def comp_mdp(
     :return: the composition MDP.
     """
     dfa = dfa.trim()
+    print("Start build system service ", time.time_ns())
     system_service = build_system_service(*services)
+    print("Stop build system service", time.time_ns())
 
     transition_function: MDPDynamics = {}
 
@@ -152,6 +155,16 @@ def comp_mdp(
         queue.append(new_initial_state)
         to_be_visited.add(new_initial_state)
 
+    service_id_to_target_action = {
+        service_id: set(dfa.alphabet).intersection(service.actions)
+        for service_id, service in enumerate(services)
+    }
+    target_action_to_service_id = {}
+    for service_id, supported_actions in service_id_to_target_action.items():
+        assert len(supported_actions) == 1
+        supported_action = list(supported_actions)[0]
+        target_action_to_service_id.setdefault(supported_action, set()).add(service_id)
+
     mdp_sink_state_used = False
     while len(queue) > 0:
         cur_state = queue.popleft()
@@ -164,9 +177,20 @@ def comp_mdp(
             cur_system_state
         ].items()
 
+        # optimization: filter services, consider only the ones that can do the next DFA action
+        next_dfa_actions = set(dfa.transition_function[cur_dfa_state].keys())
+        allowed_services = set()
+        for next_dfa_action in next_dfa_actions:
+            allowed_services.update(target_action_to_service_id[next_dfa_action])
+
         # iterate over all available actions of system service
         # in case symbol is in DFA available actions, progress DFA state component
         for (symbol, service_id), next_state_info in next_system_state_trans:
+
+            if service_id not in allowed_services:
+                # this service id cannot do any of the next dfa actions
+                continue
+
             next_system_state_distr, reward_vector = next_state_info
             system_reward = reward_vector
 
