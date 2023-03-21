@@ -226,7 +226,7 @@ PACKAGING_SERVICE_NAME = "packaging_human"                                  # hu
 
 # In[5]:
 
-#@profile
+@profile
 def main():
     def build_generic_breakable_service(service_name: str, action_name: str, broken_prob: float, broken_reward: float, action_reward: float):
         assert 0.0 <= broken_prob <= 1.0
@@ -594,9 +594,7 @@ def main():
 # In[19]:
 
 
-    def exposure_service(name: str = EXPOSURE_SERVICE_NAME, broken_prob: float = DEFAULT_BROKEN_PROB,
-                         broken_reward: float = DEFAULT_BROKEN_REWARD,
-                         action_reward: float = DEFAULT_USA_REWARD) -> Service:
+    def exposure_service(name: str, broken_prob: float, broken_reward: float, action_reward: float) -> Service:
         """Build the exposure device."""
         return build_generic_breakable_service(name, EXPOSURE, broken_prob=broken_prob, broken_reward=broken_reward,
                                            action_reward=action_reward)
@@ -985,26 +983,30 @@ def main():
         # 4
         service_resist_coating2,
         # 5
-        service_exposure,
+        service_exposure1,
         # 6
-        service_development1,
+        service_exposure2,
         # 7
-        service_development2,
+        service_development1,
         # 8
-        service_etching1,
+        service_development2,
         # 9
-        service_etching2,
+        service_etching1,
         # 10
-        service_impurities_implantation,
+        service_etching2,
         # 11
-        service_activation,
+        service_impurities_implantation,
         # 12
-        service_resist_stripping,
+        service_activation,
         # 13
-        service_assembly,
+        service_resist_stripping1,
         # 14
-        service_testing,
+        service_resist_stripping2,
         # 15
+        service_assembly,
+        # 16
+        service_testing,
+        # 17
         service_packaging
     ]
     start = time.time_ns()
@@ -1032,7 +1034,7 @@ def main():
 # In[203]:
 
 
-#    print_policy_data(opt_policy)
+    print_policy_data(opt_policy)
 
 
 # # Value Function
@@ -1088,5 +1090,5 @@ def main():
 
 
 if __name__ == '__main__':
-    pass
+    main()
     #cProfile.run('main()')
