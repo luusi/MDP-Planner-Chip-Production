@@ -965,7 +965,7 @@ def main():
         )
 
     target = target_service()
-    render_target(target)
+    #render_target(target)
 
 
 # In[201]:
@@ -1010,13 +1010,13 @@ def main():
         service_packaging
     ]
     start = time.time_ns()
-    mdp = composition_mdp(target, *all_services, gamma=0.9)
-    end = time.time_ns()
+    #mdp = composition_mdp(target, *all_services, gamma=0.9)
+    #end = time.time_ns()
     #render_composition_mdp2(mdp)
-    print("Number of states: ", len(mdp.all_states))
-    total_ns = end - start
-    total = total_ns / 10**9
-    print("Total time for function: composition_mdp ", total)
+    #print("Number of states: ", len(mdp.all_states))
+    #total_ns = end - start
+    #total = total_ns / 10**9
+    #print("Total time for function: composition_mdp ", total)
 
 
 # # Optimal policy
@@ -1025,16 +1025,16 @@ def main():
 # In[202]:
 
 
-    opn = DPAnalytic(mdp, 1e-4)
-    opt_policy = opn.get_optimal_policy_vi()
-    value_function = opn.get_value_func_dict(opt_policy)
-    q_value_function = opn.get_act_value_func_dict(opt_policy)
+    #opn = DPAnalytic(mdp, 1e-4)
+    #opt_policy = opn.get_optimal_policy_vi()
+    #value_function = opn.get_value_func_dict(opt_policy)
+    #q_value_function = opn.get_act_value_func_dict(opt_policy)
 
 
 # In[203]:
 
 
-    print_policy_data(opt_policy)
+    #print_policy_data(opt_policy)
 
 
 # # Value Function
