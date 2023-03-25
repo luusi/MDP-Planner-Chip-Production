@@ -118,7 +118,7 @@ RUN wget https://github.com/whitemech/lydia/releases/download/v0.1.3/lydia &&\
   sudo chown default:default /usr/local/bin/lydia
 
 
-RUN git clone https://github.com/luusi/MDP-Planner-Chip-Production.git
+
 
 # RUN pip install --no-cache-dir -r /home/default/MDP-Planner-Chip-Production/requirements.txt
 RUN cd MDP-Planner-Chip-Production && pip install -e .
