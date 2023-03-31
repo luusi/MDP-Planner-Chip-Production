@@ -134,9 +134,9 @@ def comp_mdp(
     :return: the composition MDP.
     """
     dfa = dfa.trim()
-    print("Start build system service ", time.time_ns())
+    #print("Start build system service ", time.time_ns())
     system_service = build_system_service(*services)
-    print("Stop build system service", time.time_ns())
+    #print("Stop build system service", time.time_ns())
 
     transition_function: MDPDynamics = {}
 
@@ -178,7 +178,7 @@ def comp_mdp(
         ].items()
 
         # optimization: filter services, consider only the ones that can do the next DFA action
-        next_dfa_actions = set(dfa.transition_function[cur_dfa_state].keys())
+        next_dfa_actions = set(dfa.transition_function.get(cur_dfa_state, {}).keys())
         allowed_services = set()
         for next_dfa_action in next_dfa_actions:
             allowed_services.update(target_action_to_service_id[next_dfa_action])
