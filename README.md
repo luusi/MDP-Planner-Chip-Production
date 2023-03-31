@@ -6,7 +6,7 @@ The following sections are:
 - Preliminaries
 - Structure of the code
 - Instructions on how to run the code
-
+- Discussion of the output
 
 ## Preliminaries
 
@@ -42,7 +42,7 @@ pip install -e .
 
 `docs/notebooks/chip_production_LTLf_goals.ipynb`: link to the notebook showing the Chip Production case study based on stochastic constraint-based policy described in the paper.
 
-## Instruction on how to run the code
+## Instructions on how to run the code
 
 Each of the following commands must be run on a terminal with the virtual environment activated.
 - Go to the notebook's folder:
@@ -58,8 +58,11 @@ jupyter-notebook
 We base the manufacturing process of chip in the USA.
 The Chip Production case study is formed by two phases:
 - raw materials and design assortment phase consists of the
-collection of the chip design and the essential raw materials. 
-In this phase we have that materials and design can be picked from different states.
+collection of the chip design and the essential raw materials.
+- manufacturing processes phase that  represents the effective operations for the manufacturing of chips
+  (cleaning, fil deposition, resist coating, exposure, development, etching, impurities implantation, activation, resist stripping, assembly, testing, packaging)
+
+In the first phase we have that materials and design can be picked from different states.
 Every service has its cost to perform the action. Basically the services located in the USA have a unitary cost 
 (1.0), while the other costs are computed by measuring the distance between the US and the
 identified states. The planner will choose always the convenient service (service located in the USA), 
@@ -107,6 +110,18 @@ From this output we observe that:
 - the planner preferred using service `service_plastic_china` (service `34`) because it was more convenient pick the plastic from the warehouse located in China instead of picking it from India;
 - the planner preferred using service `service_chemicals_usa` (service `35`) because it was more convenient pick the chemicals from the warehouse located in the USA instead of picking it from Canada;
 - the planner preferred using service `service_copper_frame_usa` (service `37`) because it was more convenient pick the copper frame from the warehouse located in the USA instead of picking it from other costly countries.
+
+In the second phase the manufacturing services are located in a unique factory in the USA and
+generally the cost of the operations is set to 1. However, we have multiple copies of the same service
+performing the same operation but more costly and wear out. The planner will choose the best service 
+i.e., with a low probability to break and a low cost.
+
+In fact,  from the calculation of the optimal policy we observe that:
+- the planner when performs the action `film_deposition` preferred using service `service_film_deposition1` (service `1`) because this service had a more convenient cost respect to `service_film_deposition2`;
+- the planner when performs the action `resist_coating` preferred using service `service_resist_coating1` (service `3`) because this service had a more convenient cost respect to `service_resist_coating2`;
+- the planner when performs the action `exposure` preferred using service `service_exposure1` (service `5`) because this service had a more convenient cost and less probability to break respect to `service_exposure2`;
+- the planner when performs the action `development` preferred using service `service_development1` (service `7`) because this service had a more convenient cost respect to `service_development2`;
+- the planner when performs the action `etching` preferred using service `service_etching1` (service `9`) because this service had a more convenient cost and less probability to break respect to `service_etching2`.
 
 
 
