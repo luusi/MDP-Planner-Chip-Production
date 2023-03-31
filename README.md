@@ -37,7 +37,9 @@ pip install -e .
 
 ## Structure of the code 
 `stochastic_service_composition`: the library; reusable software components of the code.
+
 `docs/notebooks/chip_production_supply_chain.ipynb`: link to the notebook showing the Chip Production case study based on stochastic policy described in the paper.
+
 `docs/notebooks/chip_production_LTLf_goals.ipynb`: link to the notebook showing the Chip Production case study based on stochastic constraint-based policy described in the paper.
 
 ## Instruction on how to run the code
