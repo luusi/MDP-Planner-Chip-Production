@@ -183,48 +183,52 @@ def comp_mdp(
         for next_dfa_action in next_dfa_actions:
             allowed_services.update(target_action_to_service_id[next_dfa_action])
 
-        # iterate over all available actions of system service
-        # in case symbol is in DFA available actions, progress DFA state component
-        for (symbol, service_id), next_state_info in next_system_state_trans:
+        if len(allowed_services) == 0:
+            mdp_sink_state_used = True
+            trans_dist[COMPOSITION_MDP_UNDEFINED_ACTION] = ({COMPOSITION_MDP_SINK_STATE: 1}, 0.0)
+        else:
+            # iterate over all available actions of system service
+            # in case symbol is in DFA available actions, progress DFA state component
+            for (symbol, service_id), next_state_info in next_system_state_trans:
 
-            if service_id not in allowed_services:
-                # this service id cannot do any of the next dfa actions
-                continue
+                if service_id not in allowed_services:
+                    # this service id cannot do any of the next dfa actions
+                    continue
 
-            next_system_state_distr, reward_vector = next_state_info
-            system_reward = reward_vector
+                next_system_state_distr, reward_vector = next_state_info
+                system_reward = reward_vector
 
-            # if symbol is a tau action, next dfa state remains the same
-            if symbol not in dfa.alphabet:
-                next_dfa_state = cur_dfa_state
-                goal_reward = 0.0
-            # if there are no outgoing transitions from DFA state:
-            elif cur_dfa_state not in dfa.transition_function:
-                mdp_sink_state_used = True
-                trans_dist[COMPOSITION_MDP_UNDEFINED_ACTION] = ({COMPOSITION_MDP_SINK_STATE: 1}, 0.0)
-                continue
-            # symbols not in the transition function of the target
-            # are considered as "other"; however, when we add the
-            # MDP transition, we will label it with the original
-            # symbol.
-            elif symbol in dfa.transition_function[cur_dfa_state]:
-                symbol_to_next_dfa_states = dfa.transition_function[cur_dfa_state]
-                next_dfa_state = symbol_to_next_dfa_states[symbol]
-                goal_reward = 1.0 if dfa.is_accepting(next_dfa_state) else 0.0
-            else:
-                # if invalid target action, skip
-                continue
-            final_rewards = (goal_reward + system_reward)
+                # if symbol is a tau action, next dfa state remains the same
+                if symbol not in dfa.alphabet:
+                    next_dfa_state = cur_dfa_state
+                    goal_reward = 0.0
+                # if there are no outgoing transitions from DFA state:
+                elif cur_dfa_state not in dfa.transition_function:
+                    mdp_sink_state_used = True
+                    trans_dist[COMPOSITION_MDP_UNDEFINED_ACTION] = ({COMPOSITION_MDP_SINK_STATE: 1}, 0.0)
+                    continue
+                # symbols not in the transition function of the target
+                # are considered as "other"; however, when we add the
+                # MDP transition, we will label it with the original
+                # symbol.
+                elif symbol in dfa.transition_function[cur_dfa_state]:
+                    symbol_to_next_dfa_states = dfa.transition_function[cur_dfa_state]
+                    next_dfa_state = symbol_to_next_dfa_states[symbol]
+                    goal_reward = 1.0 if dfa.is_accepting(next_dfa_state) else 0.0
+                else:
+                    # if invalid target action, skip
+                    continue
+                final_rewards = (goal_reward + system_reward)
 
-            for next_system_state, prob in next_system_state_distr.items():
-                assert prob > 0.0
-                next_state = (next_system_state, next_dfa_state)
-                trans_dist.setdefault((symbol, service_id), ({}, final_rewards))[0][
-                    next_state
-                ] = prob
-                if next_state not in visited and next_state not in to_be_visited:
-                    queue.append(next_state)
-                    to_be_visited.add(next_state)
+                for next_system_state, prob in next_system_state_distr.items():
+                    assert prob > 0.0
+                    next_state = (next_system_state, next_dfa_state)
+                    trans_dist.setdefault((symbol, service_id), ({}, final_rewards))[0][
+                        next_state
+                    ] = prob
+                    if next_state not in visited and next_state not in to_be_visited:
+                        queue.append(next_state)
+                        to_be_visited.add(next_state)
 
         transition_function[cur_state] = trans_dist
 
