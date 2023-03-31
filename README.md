@@ -4,7 +4,8 @@ Implementation of Industrial APIs Composition in Smart Manufacturing via Markov 
 
 The following sections are:
 - Preliminaries
-- Instructions to reproduce the experiments
+- Structure of the code
+- Instructions on how to run the code
 
 
 ## Preliminaries
@@ -39,7 +40,7 @@ pip install -e .
 `docs/notebooks/chip_production_supply_chain.ipynb`: link to the notebook showing the Chip Production case study based on stochastic policy described in the paper.
 `docs/notebooks/chip_production_LTLf_goals.ipynb`: link to the notebook showing the Chip Production case study based on stochastic constraint-based policy described in the paper.
 
-## Instruction on how the code
+## Instruction on how to run the code
 
 Each of the following commands must be run on a terminal with the virtual environment activated.
 - Go to the notebook's folder:
