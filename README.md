@@ -174,6 +174,7 @@ Chosen service:  9 Chosen action:  etching {'available': {'etching': ({'done': 0
 **************************************************
 ```
 
+
 In fact,  from the calculation of the optimal policy we observe that:
 - the planner when performs the action `film_deposition` preferred using service `service_film_deposition1` (service `1`) because this service had a more convenient cost respect to `service_film_deposition2`;
 - the planner when performs the action `resist_coating` preferred using service `service_resist_coating1` (service `3`) because this service had a more convenient cost respect to `service_resist_coating2`;
