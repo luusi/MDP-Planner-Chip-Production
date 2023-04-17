@@ -1,4 +1,4 @@
-# Stochastic Service Composition
+# Stochastic Service Composition - Chip Chain Case Study
 
 Implementation of Industrial APIs Composition in Smart Manufacturing via Markov Decision Processes.
 
@@ -38,9 +38,9 @@ pip install -e .
 ## Structure of the code 
 `stochastic_service_composition`: the library; reusable software components of the code.
 
-`docs/notebooks/chip_production_supply_chain.ipynb`: link to the notebook showing the Chip Production case study based on stochastic policy described in the paper.
+`docs/notebooks/chip_production_supply_chain.ipynb`: link to the notebook showing the Chip Chain case study based on stochastic policy described in the paper.
 
-`docs/notebooks/chip_production_LTLf_goals.ipynb`: link to the notebook showing the Chip Production case study based on stochastic constraint-based policy described in the paper.
+`docs/notebooks/chip_production_LTLf_goals.ipynb`: link to the notebook showing the Chip Chain case study based on stochastic constraint-based policy described in the paper.
 
 ## Instructions on how to run the code
 
@@ -56,15 +56,15 @@ jupyter-notebook
 
 ## Discussion of the output:
 We base the manufacturing process of chip in the USA.
-The Chip Production case study is formed by two phases:
-- raw materials and design assortment phase consists of the
+The Chip Chain case study is formed by two phases:
+- raw materials and design assortment phase that consists of the
 collection of the chip design and the essential raw materials.
 - manufacturing processes phase that  represents the effective operations for the manufacturing of chips
-  (cleaning, fil deposition, resist coating, exposure, development, etching, impurities implantation, activation, resist stripping, assembly, testing, packaging)
+  (cleaning, film deposition, resist coating, exposure, development, etching, impurities implantation, activation, resist stripping, assembly, testing, packaging)
 
 In the first phase we have that materials and design can be picked from different states.
-Every service has its cost to perform the action. Basically the services located in the USA have a unitary cost 
-(1.0), while the other costs are computed by measuring the distance between the US and the
+Every service has its cost to perform the action. Basically, the services located in the USA have a unitary cost 
+(1.0), while the other costs are computed by measuring the distance between the USA and the
 identified states. The planner will choose always the convenient service (service located in the USA), 
 otherwise will choose the service that has a shorter distance from the USA. In the following
 we show the optimal policy that the planner computes:
@@ -114,7 +114,65 @@ From this output we observe that:
 In the second phase the manufacturing services are located in a unique factory in the USA and
 generally the cost of the operations is set to 1. However, we have multiple copies of the same service
 performing the same operation but more costly and wear out. The planner will choose the best service 
-i.e., with a low probability to break and a low cost.
+i.e., with a low probability to break and a low cost. In the following we show the optimal policy that the planner computes:
+
+```
+**************************************************
+Current state:  ['ready', 'ready', 'ready', 'ready', 'ready', 'available']
+Chosen service:  0 Chosen action:  cleaning {'ready': {'cleaning': ({'ready': 1.0}, -1.0)}}
+**************************************************
+Current state:  ['ready', 'ready', 'ready', 'ready', 'ready', 'available']
+Chosen service:  1 Chosen action:  config_film_deposition {'ready': {'config_film_deposition': ({'configured': 1.0}, 0.0)}, 'configured': {'checked_film_deposition': ({'executing': 0.95, 'broken': 0.05}, 0.0)}, 'executing': {'film_deposition': ({'ready': 0.95, 'broken': 0.05}, -1.0)}, 'broken': {'restore_film_deposition': ({'repairing': 1.0}, -10.0)}, 'repairing': {'repaired_film_deposition': ({'ready': 1.0}, 0.0)}}
+**************************************************
+Current state:  ['ready', 'configured', 'ready', 'ready', 'ready', 'available']
+Chosen service:  2 Chosen action:  config_film_deposition {'ready': {'config_film_deposition': ({'configured': 1.0}, 0.0)}, 'configured': {'checked_film_deposition': ({'executing': 0.5, 'broken': 0.5}, 0.0)}, 'executing': {'film_deposition': ({'ready': 0.95, 'broken': 0.05}, -5.0)}, 'broken': {'restore_film_deposition': ({'repairing': 1.0}, -10.0)}, 'repairing': {'repaired_film_deposition': ({'ready': 1.0}, 0.0)}}
+**************************************************
+Current state:  ['ready', 'configured', 'configured', 'ready', 'ready', 'available']
+Chosen service:  1 Chosen action:  checked_film_deposition {'ready': {'config_film_deposition': ({'configured': 1.0}, 0.0)}, 'configured': {'checked_film_deposition': ({'executing': 0.95, 'broken': 0.05}, 0.0)}, 'executing': {'film_deposition': ({'ready': 0.95, 'broken': 0.05}, -1.0)}, 'broken': {'restore_film_deposition': ({'repairing': 1.0}, -10.0)}, 'repairing': {'repaired_film_deposition': ({'ready': 1.0}, 0.0)}}
+**************************************************
+Current state:  ['ready', 'executing', 'configured', 'ready', 'ready', 'available']
+Chosen service:  2 Chosen action:  checked_film_deposition {'ready': {'config_film_deposition': ({'configured': 1.0}, 0.0)}, 'configured': {'checked_film_deposition': ({'executing': 0.5, 'broken': 0.5}, 0.0)}, 'executing': {'film_deposition': ({'ready': 0.95, 'broken': 0.05}, -5.0)}, 'broken': {'restore_film_deposition': ({'repairing': 1.0}, -10.0)}, 'repairing': {'repaired_film_deposition': ({'ready': 1.0}, 0.0)}}
+**************************************************
+Current state:  ['ready', 'executing', 'executing', 'ready', 'ready', 'available']
+Chosen service:  1 Chosen action:  film_deposition {'ready': {'config_film_deposition': ({'configured': 1.0}, 0.0)}, 'configured': {'checked_film_deposition': ({'executing': 0.95, 'broken': 0.05}, 0.0)}, 'executing': {'film_deposition': ({'ready': 0.95, 'broken': 0.05}, -1.0)}, 'broken': {'restore_film_deposition': ({'repairing': 1.0}, -10.0)}, 'repairing': {'repaired_film_deposition': ({'ready': 1.0}, 0.0)}}
+**************************************************
+Current state:  ['ready', 'ready', 'executing', 'ready', 'ready', 'available']
+Chosen service:  3 Chosen action:  config_resist_coating {'ready': {'config_resist_coating': ({'configured': 1.0}, 0.0)}, 'configured': {'checked_resist_coating': ({'executing': 0.95, 'broken': 0.05}, 0.0)}, 'executing': {'resist_coating': ({'ready': 0.95, 'broken': 0.05}, -1.0)}, 'broken': {'restore_resist_coating': ({'repairing': 1.0}, -10.0)}, 'repairing': {'repaired_resist_coating': ({'ready': 1.0}, 0.0)}}
+**************************************************
+Current state:  ['ready', 'ready', 'executing', 'configured', 'ready', 'available']
+Chosen service:  3 Chosen action:  checked_resist_coating {'ready': {'config_resist_coating': ({'configured': 1.0}, 0.0)}, 'configured': {'checked_resist_coating': ({'executing': 0.95, 'broken': 0.05}, 0.0)}, 'executing': {'resist_coating': ({'ready': 0.95, 'broken': 0.05}, -1.0)}, 'broken': {'restore_resist_coating': ({'repairing': 1.0}, -10.0)}, 'repairing': {'repaired_resist_coating': ({'ready': 1.0}, 0.0)}}
+**************************************************
+Current state:  ['ready', 'ready', 'executing', 'executing', 'ready', 'available']
+Chosen service:  4 Chosen action:  config_resist_coating {'ready': {'config_resist_coating': ({'configured': 1.0}, 0.0)}, 'configured': {'checked_resist_coating': ({'executing': 0.95, 'broken': 0.05}, 0.0)}, 'executing': {'resist_coating': ({'ready': 0.95, 'broken': 0.05}, -1.0)}, 'broken': {'restore_resist_coating': ({'repairing': 1.0}, -10.0)}, 'repairing': {'repaired_resist_coating': ({'ready': 1.0}, 0.0)}}
+**************************************************
+Current state:  ['ready', 'ready', 'executing', 'executing', 'configured', 'available']
+Chosen service:  4 Chosen action:  checked_resist_coating {'ready': {'config_resist_coating': ({'configured': 1.0}, 0.0)}, 'configured': {'checked_resist_coating': ({'executing': 0.95, 'broken': 0.05}, 0.0)}, 'executing': {'resist_coating': ({'ready': 0.95, 'broken': 0.05}, -1.0)}, 'broken': {'restore_resist_coating': ({'repairing': 1.0}, -10.0)}, 'repairing': {'repaired_resist_coating': ({'ready': 1.0}, 0.0)}}
+**************************************************
+Current state:  ['ready', 'ready', 'executing', 'executing', 'executing', 'available']
+Chosen service:  3 Chosen action:  resist_coating {'ready': {'config_resist_coating': ({'configured': 1.0}, 0.0)}, 'configured': {'checked_resist_coating': ({'executing': 0.95, 'broken': 0.05}, 0.0)}, 'executing': {'resist_coating': ({'ready': 0.95, 'broken': 0.05}, -1.0)}, 'broken': {'restore_resist_coating': ({'repairing': 1.0}, -10.0)}, 'repairing': {'repaired_resist_coating': ({'ready': 1.0}, 0.0)}}
+**************************************************
+Current state:  ['ready', 'ready', 'executing', 'ready', 'executing', 'available']
+Chosen service:  5 Chosen action:  exposure {'available': {'exposure': ({'done': 0.95, 'broken': 0.05}, -1.0)}, 'broken': {'check_exposure': ({'available': 1.0}, -10.0)}, 'done': {'check_exposure': ({'available': 1.0}, 0.0)}}
+**************************************************
+Current state:  ['done', 'available', 'ready', 'ready', 'available', 'available']
+Chosen service:  7 Chosen action:  config_development {'ready': {'config_development': ({'configured': 1.0}, 0.0)}, 'configured': {'checked_development': ({'executing': 0.95, 'broken': 0.05}, 0.0)}, 'executing': {'development': ({'ready': 0.95, 'broken': 0.05}, -1.0)}, 'broken': {'restore_development': ({'repairing': 1.0}, -10.0)}, 'repairing': {'repaired_development': ({'ready': 1.0}, 0.0)}}
+**************************************************
+Current state:  ['done', 'available', 'configured', 'ready', 'available', 'available']
+Chosen service:  7 Chosen action:  checked_development {'ready': {'config_development': ({'configured': 1.0}, 0.0)}, 'configured': {'checked_development': ({'executing': 0.95, 'broken': 0.05}, 0.0)}, 'executing': {'development': ({'ready': 0.95, 'broken': 0.05}, -1.0)}, 'broken': {'restore_development': ({'repairing': 1.0}, -10.0)}, 'repairing': {'repaired_development': ({'ready': 1.0}, 0.0)}}
+**************************************************
+Current state:  ['done', 'available', 'executing', 'ready', 'available', 'available']
+Chosen service:  8 Chosen action:  config_development {'ready': {'config_development': ({'configured': 1.0}, 0.0)}, 'configured': {'checked_development': ({'executing': 0.95, 'broken': 0.05}, 0.0)}, 'executing': {'development': ({'ready': 0.95, 'broken': 0.05}, -5.0)}, 'broken': {'restore_development': ({'repairing': 1.0}, -10.0)}, 'repairing': {'repaired_development': ({'ready': 1.0}, 0.0)}}
+**************************************************
+Current state:  ['done', 'available', 'executing', 'configured', 'available', 'available']
+Chosen service:  8 Chosen action:  checked_development {'ready': {'config_development': ({'configured': 1.0}, 0.0)}, 'configured': {'checked_development': ({'executing': 0.95, 'broken': 0.05}, 0.0)}, 'executing': {'development': ({'ready': 0.95, 'broken': 0.05}, -5.0)}, 'broken': {'restore_development': ({'repairing': 1.0}, -10.0)}, 'repairing': {'repaired_development': ({'ready': 1.0}, 0.0)}}
+**************************************************
+Current state:  ['done', 'available', 'executing', 'executing', 'available', 'available']
+Chosen service:  7 Chosen action:  development {'ready': {'config_development': ({'configured': 1.0}, 0.0)}, 'configured': {'checked_development': ({'executing': 0.95, 'broken': 0.05}, 0.0)}, 'executing': {'development': ({'ready': 0.95, 'broken': 0.05}, -1.0)}, 'broken': {'restore_development': ({'repairing': 1.0}, -10.0)}, 'repairing': {'repaired_development': ({'ready': 1.0}, 0.0)}}
+**************************************************
+Current state:  ['done', 'available', 'ready', 'executing', 'available', 'available']
+Chosen service:  9 Chosen action:  etching {'available': {'etching': ({'done': 0.95, 'broken': 0.05}, -1.0)}, 'broken': {'check_etching': ({'available': 1.0}, -10.0)}, 'done': {'check_etching': ({'available': 1.0}, 0.0)}}
+**************************************************
+```
 
 In fact,  from the calculation of the optimal policy we observe that:
 - the planner when performs the action `film_deposition` preferred using service `service_film_deposition1` (service `1`) because this service had a more convenient cost respect to `service_film_deposition2`;
