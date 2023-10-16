@@ -1,31 +1,46 @@
-# Stochastic Service Composition - Chip Chain Case Study
+# Industrial API composition via Policy-based techiques - Chip Supply Chain Case Study
 
-Implementation of Industrial APIs Composition in Smart Manufacturing via Markov Decision Processes.
+Implementation of a tool to compose Industral API via Markov Decision Processes.
 
-The following sections are:
-- Preliminaries
-- Structure of the code
-- Instructions on how to run the code
-- Discussion of the output
+## How to replicate the experiments
+The experiments can be replicated either using Docker or from source code. We suggest to use Docker.
 
-## Preliminaries
+### Use the Docker image
+
+1. Build the image from the [Dockerfile](Dockerfile):
+```sh
+docker build -t mdp_controller .
+```
+
+2. Run a new container and open a terminal from the created image:
+```sh
+docker run mdp_controller bash
+```
+
+3. Start the controller:
+```sh
+cd docs/notebooks
+python3 chip_production_supply_chain.py 
+```
+
+### From the source code
 
 We assume the review uses a UNIX-like machine and that has Python 3.8 installed.
 
 - Set up the virtual environment. 
 First, install [Pipenv](https://pipenv-fork.readthedocs.io/en/latest/).
 Then:
-```
+```sh
 pipenv install --dev
 ```
                     
 - this command is to start a shell within the Python virtual environment (to be done whenever a new terminal is opened):
-```
+```sh
 pipenv shell
 ```
 
 - Install the Python package in development mode:
-```
+```sh
 pip install -e .
 # alternatively:
 # python setup.py develop 
@@ -35,10 +50,16 @@ pip install -e .
   At [this page](https://www.graphviz.org/download/) you will
   find the releases for all the supported platform.
 
+- Run the Controller
+```sh
+cd docs/notebook
+python chip_production_supply_chain.py
+```
+
 ## Structure of the code 
 `stochastic_service_composition`: the library; reusable software components of the code.
 
-`docs/notebooks/chip_production_supply_chain.ipynb`: link to the notebook showing the Chip Chain case study based on stochastic policy described in the paper.
+`docs/notebooks/chip_production_automata_goalse.ipynb`: link to the notebook showing the Chip Chain case study based on stochastic policy described in the paper.
 
 `docs/notebooks/chip_production_LTLf_goals.ipynb`: link to the notebook showing the Chip Chain case study based on stochastic constraint-based policy described in the paper.
 

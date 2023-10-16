@@ -134,9 +134,7 @@ def comp_mdp(
     :return: the composition MDP.
     """
     dfa = dfa.trim()
-    #print("Start build system service ", time.time_ns())
     system_service = build_system_service(*services)
-    #print("Stop build system service", time.time_ns())
 
     transition_function: MDPDynamics = {}
 
