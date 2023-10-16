@@ -1,3 +1,0 @@
-tot_services: 14
-composition elapsed time: 104.805862022 s
-policy elapsed time: 0.886436142 s

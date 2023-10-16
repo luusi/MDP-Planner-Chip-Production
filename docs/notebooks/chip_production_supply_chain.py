@@ -7,15 +7,22 @@ from stochastic_service_composition.composition_mdp import composition_mdp
 from stochastic_service_composition.composition_mdp import comp_mdp
 from mdp_dp_rl.algorithms.dp.dp_analytic import DPAnalytic
 from docs.notebooks.setup import *
+#from tqdm import tqdm
+
 
 config_json = json.load(open('config.json', 'r'))
 mode = config_json['mode']
 phase = config_json['phase']
 size = config_json['size']
 
-file_name = f"experimental_results/time_profiler_{mode}_phase{phase}_{size}.txt"
-fp_compMDP = open(f"experimental_results/memory_profiler_composition_{mode}_phase{phase}_{size}.log","w+")
-fp_DPAnalytic = open(f"experimental_results/memory_profiler_policy_{mode}_phase{phase}_{size}.log","w+")
+if phase == 1:
+    file_name = f"experimental_results/time_profiler_{mode}_phase{phase}.txt"
+    fp_compMDP = open(f"experimental_results/memory_profiler_composition_{mode}_phase{phase}.log","w+")
+    fp_DPAnalytic = open(f"experimental_results/memory_profiler_policy_{mode}_phase{phase}.log","w+")
+else:
+    file_name = f"experimental_results/time_profiler_{mode}_phase{phase}_{size}.txt"
+    fp_compMDP = open(f"experimental_results/memory_profiler_composition_{mode}_phase{phase}_{size}.log","w+")
+    fp_DPAnalytic = open(f"experimental_results/memory_profiler_policy_{mode}_phase{phase}_{size}.log","w+")
 
 @profile(stream=fp_compMDP)
 def execute_composition_automata(target, services):
@@ -34,6 +41,9 @@ def execute_policy(mdp):
     return opt_policy
     
 def main():
+    to_print = f"mode {mode}, phase {phase}" if phase == 1 else f"mode {mode}, phase {phase}, size {size}"
+    print(to_print)
+    
     if phase == 1:
         all_services = all_services_phase1
         
@@ -56,10 +66,15 @@ def main():
         elif mode == "ltlf":
             target = target_phase2_ltlf
     
+    print("Services created.\nStarting composition...")
+    #total_iterations = 1000
+    #for i in tqdm(range(total_iterations), desc="Processing", ncols=100):
+    
     if mode == "automata":
         now = time.time_ns()
         mdp = execute_composition_automata(target, all_services)
         elapsed1 = time.time_ns() - now
+        print("Composition MDP computed.\nStarting computing policy...")
         now = time.time_ns()
         execute_policy(mdp)
         elapsed2 = time.time_ns() - now
@@ -67,9 +82,12 @@ def main():
         now = time.time_ns()
         mdp = execute_composition_ltlf(target, all_services)
         elapsed1 = time.time_ns() - now
+        print("Composition MDP computed.\nStarting computing policy...")
         now = time.time_ns()
         execute_policy(mdp)
         elapsed2 = time.time_ns() - now
+    
+    print("Policy computed.")
     
     elapsed1 = elapsed1 / 10 ** 9
     elapsed2 = elapsed2 / 10 ** 9

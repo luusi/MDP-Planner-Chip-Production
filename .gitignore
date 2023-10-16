@@ -3,3 +3,4 @@ __pycache__
 .ipynb_checkpoints
 .bash_history
 .sudo_as_admin_successful
+nohup.out

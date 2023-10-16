@@ -10,4 +10,5 @@ numpy
 paho-mqtt
 pythomata
 requests
+tqdm
 websockets
