@@ -169,28 +169,66 @@ COPPER_FRAME_SERVICE_NAME_PERU = "copper_frame_peru"                        # wa
 COPPER_FRAME_SERVICE_NAME_CHILE = "copper_frame_chile"                      # warehouse
 
 # phase2
-CLEANING_SERVICE_NAME = "cleaning_human"                                    # human
+CLEANING1_SERVICE_NAME = "cleaning_human1"                                    # human
+CLEANING2_SERVICE_NAME = "cleaning_human2"                                    # human
+CLEANING3_SERVICE_NAME = "cleaning_human3"                                    # human
+CLEANING4_SERVICE_NAME = "cleaning_human4"                                    # human
+CLEANING5_SERVICE_NAME = "cleaning_human5"                                    # human
 FILM_DEPOSITION1_SERVICE_NAME = "film_deposition_machine1"                  # machine
 FILM_DEPOSITION2_SERVICE_NAME = "film_deposition_machine2"                  # machine
+FILM_DEPOSITION3_SERVICE_NAME = "film_deposition_machine3"                  # machine
+FILM_DEPOSITION4_SERVICE_NAME = "film_deposition_machine4"                  # machine
+FILM_DEPOSITION5_SERVICE_NAME = "film_deposition_machine5"                  # machine
 RESIST_COATING1_SERVICE_NAME = "resist_coating_machine1"                    # machine
 RESIST_COATING2_SERVICE_NAME = "resist_coating_machine2"                    # machine
+RESIST_COATING3_SERVICE_NAME = "resist_coating_machine3"                    # machine
+RESIST_COATING4_SERVICE_NAME = "resist_coating_machine4"                    # machine
+RESIST_COATING5_SERVICE_NAME = "resist_coating_machine5"                    # machine
 EXPOSURE1_SERVICE_NAME = "exposure_machine1"                                # machine
 EXPOSURE2_SERVICE_NAME = "exposure_machine2"                                # machine
+EXPOSURE3_SERVICE_NAME = "exposure_machine3"                                # machine
+EXPOSURE4_SERVICE_NAME = "exposure_machine4"                                # machine
+EXPOSURE5_SERVICE_NAME = "exposure_machine5"                                # machine
 DEVELOPMENT1_SERVICE_NAME = "development_machine1"                          # machine
 DEVELOPMENT2_SERVICE_NAME = "development_machine2"                          # machine
+DEVELOPMENT3_SERVICE_NAME = "development_machine3"                          # machine
+DEVELOPMENT4_SERVICE_NAME = "development_machine4"                          # machine
+DEVELOPMENT5_SERVICE_NAME = "development_machine5"                          # machine
 ETCHING1_SERVICE_NAME = "etching_machine1"                                  # machine
 ETCHING2_SERVICE_NAME = "etching_machine2"                                  # machine
+ETCHING3_SERVICE_NAME = "etching_machine3"                                  # machine
+ETCHING4_SERVICE_NAME = "etching_machine4"                                  # machine
+ETCHING5_SERVICE_NAME = "etching_machine5"                                  # machine
 IMPURITIES_IMPLANTATION1_SERVICE_NAME = "impurities_implantation_machine1"    # machine
 IMPURITIES_IMPLANTATION2_SERVICE_NAME = "impurities_implantation_machine2"    # machine
-ACTIVATION_SERVICE_NAME = "activation_human"                                # human
+IMPURITIES_IMPLANTATION3_SERVICE_NAME = "impurities_implantation_machine3"    # machine
+IMPURITIES_IMPLANTATION4_SERVICE_NAME = "impurities_implantation_machine4"    # machine
+IMPURITIES_IMPLANTATION5_SERVICE_NAME = "impurities_implantation_machine5"    # machine
+ACTIVATION1_SERVICE_NAME = "activation_human1"                                # human
+ACTIVATION2_SERVICE_NAME = "activation_human2"                                # human
+ACTIVATION3_SERVICE_NAME = "activation_human3"                                # human
+ACTIVATION4_SERVICE_NAME = "activation_human4"                                # human
+ACTIVATION5_SERVICE_NAME = "activation_human5"                                # human
 RESIST_STRIPPING1_SERVICE_NAME = "resist_stripping_machine1"                # machine
 RESIST_STRIPPING2_SERVICE_NAME = "resist_stripping_machine2"                # machine
+RESIST_STRIPPING3_SERVICE_NAME = "resist_stripping_machine3"                # machine
+RESIST_STRIPPING4_SERVICE_NAME = "resist_stripping_machine4"                # machine
+RESIST_STRIPPING5_SERVICE_NAME = "resist_stripping_machine5"                # machine
 ASSEMBLY1_SERVICE_NAME = "assembly_human1"                                  # human
 ASSEMBLY2_SERVICE_NAME = "assembly_human2"                                  # human
+ASSEMBLY3_SERVICE_NAME = "assembly_human3"                                  # human
+ASSEMBLY4_SERVICE_NAME = "assembly_human4"                                  # human
+ASSEMBLY5_SERVICE_NAME = "assembly_human5"                                  # human
 TESTING1_SERVICE_NAME = "testing_human1"                                      # human
 TESTING2_SERVICE_NAME = "testing_human2"                                      # human
+TESTING3_SERVICE_NAME = "testing_human3"                                      # human
+TESTING4_SERVICE_NAME = "testing_human4"                                      # human
+TESTING5_SERVICE_NAME = "testing_human5"                                      # human
 PACKAGING1_SERVICE_NAME = "packaging_human1"                                  # human
 PACKAGING2_SERVICE_NAME = "packaging_human2"                                  # human
+PACKAGING3_SERVICE_NAME = "packaging_human3"                                  # human
+PACKAGING4_SERVICE_NAME = "packaging_human4"                                  # human
+PACKAGING5_SERVICE_NAME = "packaging_human5"                                  # human
 
 
 def build_generic_breakable_service(service_name: str, action_name: str, broken_prob: float, broken_reward: float, action_reward: float):
@@ -370,7 +408,7 @@ def copper_frame_warehouse_service(name: str, action_reward: float) -> Service:
 
 
 # PHASE 2
-def cleaning_service(name: str = CLEANING_SERVICE_NAME, action_reward: float = USA_REWARD) -> Service:
+def cleaning_service(name: str, action_reward: float = USA_REWARD) -> Service:
     """Build the human cleaning device."""
     return build_generic_service_one_state(
         name,
@@ -416,7 +454,7 @@ def impurities_implantation_service(name: str, broken_prob: float, unemployable_
                                         unemployable_prob=unemployable_prob, broken_reward=broken_reward,
                                         action_reward=action_reward)
 
-def activation_service(name: str = ACTIVATION_SERVICE_NAME, action_reward: float = USA_REWARD) -> Service:
+def activation_service(name: str, action_reward: float = USA_REWARD) -> Service:
     """Build the human activation device."""
     return build_generic_service_one_state(
         name,
@@ -497,28 +535,66 @@ service_copper_frame_peru = copper_frame_warehouse_service(COPPER_FRAME_SERVICE_
 service_copper_frame_chile = copper_frame_warehouse_service(COPPER_FRAME_SERVICE_NAME_CHILE, CHILE_REWARD)
 
 # PHASE 2
-service_cleaning = cleaning_service()
+service_cleaning1 = cleaning_service(CLEANING1_SERVICE_NAME, DEFAULT_USA_REWARD)
+service_cleaning2 = cleaning_service(CLEANING2_SERVICE_NAME, HIGH_USA_REWARD)
+service_cleaning3 = cleaning_service(CLEANING3_SERVICE_NAME, DEFAULT_USA_REWARD-1)
+service_cleaning4 = cleaning_service(CLEANING4_SERVICE_NAME, DEFAULT_USA_REWARD-2)
+service_cleaning5 = cleaning_service(CLEANING5_SERVICE_NAME, DEFAULT_USA_REWARD-3)
 service_film_deposition1 = film_deposition_service(FILM_DEPOSITION1_SERVICE_NAME, DEFAULT_BROKEN_PROB, DEFAULT_UNEMPLOYABLE_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD)
 service_film_deposition2 = film_deposition_service(FILM_DEPOSITION2_SERVICE_NAME, DEFAULT_BROKEN_PROB, DEFAULT_UNEMPLOYABLE_PROB, DEFAULT_BROKEN_REWARD, HIGH_USA_REWARD)
+service_film_deposition3 = film_deposition_service(FILM_DEPOSITION3_SERVICE_NAME, DEFAULT_BROKEN_PROB, DEFAULT_UNEMPLOYABLE_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD-1)
+service_film_deposition4 = film_deposition_service(FILM_DEPOSITION4_SERVICE_NAME, DEFAULT_BROKEN_PROB, DEFAULT_UNEMPLOYABLE_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD-2)
+service_film_deposition5 = film_deposition_service(FILM_DEPOSITION5_SERVICE_NAME, DEFAULT_BROKEN_PROB, DEFAULT_UNEMPLOYABLE_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD-3)
 service_resist_coating1 = resist_coating_service(RESIST_COATING1_SERVICE_NAME, DEFAULT_BROKEN_PROB, DEFAULT_UNEMPLOYABLE_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD)
 service_resist_coating2 = resist_coating_service(RESIST_COATING2_SERVICE_NAME, DEFAULT_BROKEN_PROB, DEFAULT_UNEMPLOYABLE_PROB, DEFAULT_BROKEN_REWARD, HIGH_USA_REWARD)
+service_resist_coating3 = resist_coating_service(RESIST_COATING3_SERVICE_NAME, DEFAULT_BROKEN_PROB, DEFAULT_UNEMPLOYABLE_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD-1)
+service_resist_coating4 = resist_coating_service(RESIST_COATING4_SERVICE_NAME, DEFAULT_BROKEN_PROB, DEFAULT_UNEMPLOYABLE_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD-2)
+service_resist_coating5 = resist_coating_service(RESIST_COATING5_SERVICE_NAME, DEFAULT_BROKEN_PROB, DEFAULT_UNEMPLOYABLE_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD-3)
 service_exposure1 = exposure_service(EXPOSURE1_SERVICE_NAME, DEFAULT_BROKEN_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD)
 service_exposure2 = exposure_service(EXPOSURE2_SERVICE_NAME, BROKEN_PROB, DEFAULT_BROKEN_REWARD, HIGH_USA_REWARD)
+service_exposure3 = exposure_service(EXPOSURE3_SERVICE_NAME, DEFAULT_BROKEN_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD-1)
+service_exposure4 = exposure_service(EXPOSURE4_SERVICE_NAME, DEFAULT_BROKEN_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD-2)
+service_exposure5 = exposure_service(EXPOSURE5_SERVICE_NAME, DEFAULT_BROKEN_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD-3)
 service_development1 = development_service(DEVELOPMENT1_SERVICE_NAME, DEFAULT_BROKEN_PROB, DEFAULT_UNEMPLOYABLE_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD)
 service_development2 = development_service(DEVELOPMENT2_SERVICE_NAME, BROKEN_PROB, DEFAULT_UNEMPLOYABLE_PROB, DEFAULT_BROKEN_REWARD, HIGH_USA_REWARD)
+service_development3 = development_service(DEVELOPMENT3_SERVICE_NAME, DEFAULT_BROKEN_PROB, DEFAULT_UNEMPLOYABLE_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD-1)
+service_development4 = development_service(DEVELOPMENT4_SERVICE_NAME, DEFAULT_BROKEN_PROB, DEFAULT_UNEMPLOYABLE_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD-2)
+service_development5 = development_service(DEVELOPMENT5_SERVICE_NAME, DEFAULT_BROKEN_PROB, DEFAULT_UNEMPLOYABLE_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD-3)
 service_etching1 = etching_service(ETCHING1_SERVICE_NAME, DEFAULT_BROKEN_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD)
 service_etching2 = etching_service(ETCHING2_SERVICE_NAME, BROKEN_PROB, DEFAULT_BROKEN_REWARD, HIGH_USA_REWARD)
+service_etching3 = etching_service(ETCHING3_SERVICE_NAME, DEFAULT_BROKEN_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD-1)
+service_etching4 = etching_service(ETCHING4_SERVICE_NAME, DEFAULT_BROKEN_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD-2)
+service_etching5 = etching_service(ETCHING5_SERVICE_NAME, DEFAULT_BROKEN_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD-3)
 service_impurities_implantation1 = impurities_implantation_service(IMPURITIES_IMPLANTATION1_SERVICE_NAME, DEFAULT_BROKEN_PROB, DEFAULT_UNEMPLOYABLE_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD)
 service_impurities_implantation2 = impurities_implantation_service(IMPURITIES_IMPLANTATION2_SERVICE_NAME, BROKEN_PROB, DEFAULT_UNEMPLOYABLE_PROB, DEFAULT_BROKEN_REWARD, HIGH_USA_REWARD)
-service_activation = activation_service()
+service_impurities_implantation3 = impurities_implantation_service(IMPURITIES_IMPLANTATION3_SERVICE_NAME, DEFAULT_BROKEN_PROB, DEFAULT_UNEMPLOYABLE_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD-1)
+service_impurities_implantation4 = impurities_implantation_service(IMPURITIES_IMPLANTATION4_SERVICE_NAME, DEFAULT_BROKEN_PROB, DEFAULT_UNEMPLOYABLE_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD-2)
+service_impurities_implantation5 = impurities_implantation_service(IMPURITIES_IMPLANTATION5_SERVICE_NAME, DEFAULT_BROKEN_PROB, DEFAULT_UNEMPLOYABLE_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD-3)
+service_activation1 = activation_service(ACTIVATION1_SERVICE_NAME, DEFAULT_USA_REWARD)
+service_activation2 = activation_service(ACTIVATION2_SERVICE_NAME, HIGH_USA_REWARD)
+service_activation3 = activation_service(ACTIVATION3_SERVICE_NAME, DEFAULT_USA_REWARD-1)
+service_activation4 = activation_service(ACTIVATION4_SERVICE_NAME, DEFAULT_USA_REWARD-2)
+service_activation5 = activation_service(ACTIVATION5_SERVICE_NAME, DEFAULT_USA_REWARD-3)
 service_resist_stripping1 = resist_stripping_service(RESIST_STRIPPING1_SERVICE_NAME, DEFAULT_BROKEN_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD)
 service_resist_stripping2 = resist_stripping_service(RESIST_STRIPPING2_SERVICE_NAME, BROKEN_PROB, DEFAULT_BROKEN_REWARD, HIGH_USA_REWARD)
-service_assembly1 = assembly_service(ASSEMBLY1_SERVICE_NAME)
+service_resist_stripping3 = resist_stripping_service(RESIST_STRIPPING3_SERVICE_NAME, DEFAULT_BROKEN_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD-1)
+service_resist_stripping4 = resist_stripping_service(RESIST_STRIPPING4_SERVICE_NAME, DEFAULT_BROKEN_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD-2)
+service_resist_stripping5 = resist_stripping_service(RESIST_STRIPPING5_SERVICE_NAME, DEFAULT_BROKEN_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD-3)
+service_assembly1 = assembly_service(ASSEMBLY1_SERVICE_NAME, DEFAULT_USA_REWARD)
 service_assembly2 = assembly_service(ASSEMBLY2_SERVICE_NAME, HIGH_USA_REWARD)
-service_testing1 = testing_service(TESTING1_SERVICE_NAME)
+service_assembly3 = assembly_service(ASSEMBLY3_SERVICE_NAME, DEFAULT_USA_REWARD-1)
+service_assembly4 = assembly_service(ASSEMBLY4_SERVICE_NAME, DEFAULT_USA_REWARD-2)
+service_assembly5 = assembly_service(ASSEMBLY5_SERVICE_NAME, DEFAULT_USA_REWARD-3)
+service_testing1 = testing_service(TESTING1_SERVICE_NAME, DEFAULT_USA_REWARD)
 service_testing2 = testing_service(TESTING2_SERVICE_NAME, HIGH_USA_REWARD)
-service_packaging1 = packaging_service(PACKAGING1_SERVICE_NAME)
+service_testing3 = testing_service(TESTING3_SERVICE_NAME, DEFAULT_USA_REWARD-1)
+service_testing4 = testing_service(TESTING4_SERVICE_NAME, DEFAULT_USA_REWARD-2)
+service_testing5 = testing_service(TESTING5_SERVICE_NAME, DEFAULT_USA_REWARD-3)
+service_packaging1 = packaging_service(PACKAGING1_SERVICE_NAME, DEFAULT_USA_REWARD)
 service_packaging2 = packaging_service(PACKAGING2_SERVICE_NAME, HIGH_USA_REWARD)
+service_packaging3 = packaging_service(PACKAGING3_SERVICE_NAME, DEFAULT_USA_REWARD-1)
+service_packaging4 = packaging_service(PACKAGING4_SERVICE_NAME, DEFAULT_USA_REWARD-2)
+service_packaging5 = packaging_service(PACKAGING5_SERVICE_NAME, DEFAULT_USA_REWARD-3)
 
 # creare 60 servizi per la fase 2 per testare la size COMPLEX
 
@@ -612,7 +688,7 @@ def services_phase2 (dimension):
     if dimension == "small":
         all_services = [
             # 0
-            service_cleaning,
+            service_cleaning1,
             # 1
             service_film_deposition1,
             # 2
@@ -628,7 +704,7 @@ def services_phase2 (dimension):
             # 7
             service_impurities_implantation1,
             # 8
-            service_activation,
+            service_activation1,
             # 9
             service_resist_stripping1,
             # 10
@@ -643,7 +719,7 @@ def services_phase2 (dimension):
     elif dimension == "manageable1":
         all_services = [
             # 0
-            service_cleaning,
+            service_cleaning1,
             # 1
             service_film_deposition1,
             # 2
@@ -665,7 +741,7 @@ def services_phase2 (dimension):
             # 10
             service_impurities_implantation1,
             # 11
-            service_activation,
+            service_activation1,
             # 12
             service_resist_stripping1,
             # 13
@@ -680,7 +756,7 @@ def services_phase2 (dimension):
     elif dimension == "manageable2":
         all_services = [
             # 0
-            service_cleaning,
+            service_cleaning1,
             # 1
             service_film_deposition1,
             # 2
@@ -706,7 +782,7 @@ def services_phase2 (dimension):
             # 12
             service_impurities_implantation2,
             # 13
-            service_activation,
+            service_activation1,
             # 14
             service_resist_stripping1,
             # 15
@@ -725,7 +801,80 @@ def services_phase2 (dimension):
             service_packaging2
         ]
     elif dimension == "complex":
-        #TODO create lot of services
+        all_services = [
+            # 0
+            service_cleaning1,
+            service_cleaning2,
+            service_cleaning3,
+            service_cleaning4,
+            service_cleaning5,            
+            # 6
+            service_film_deposition1,
+            service_film_deposition2,
+            service_film_deposition3,
+            service_film_deposition4,
+            service_film_deposition5,
+            # 11
+            service_resist_coating1,
+            service_resist_coating2,
+            service_resist_coating3,
+            service_resist_coating4,
+            service_resist_coating5,
+            # 16
+            service_exposure1,
+            service_exposure2,
+            service_exposure3,
+            service_exposure4,
+            service_exposure5,
+            # 21
+            service_development1,
+            service_development2,
+            service_development3,
+            service_development4,
+            service_development5,
+            # 26
+            service_etching1,
+            service_etching2,
+            service_etching3,
+            service_etching4,
+            service_etching5,
+            # 31
+            service_impurities_implantation1,
+            service_impurities_implantation2,
+            service_impurities_implantation3,
+            service_impurities_implantation4,
+            service_impurities_implantation5,
+            # 36
+            service_activation1,
+            service_activation2,
+            service_activation3,
+            service_activation4,
+            service_activation5,
+            # 41
+            service_resist_stripping1,
+            service_resist_stripping2,
+            service_resist_stripping3,
+            service_resist_stripping4,
+            service_resist_stripping5,
+            # 46
+            service_assembly1,
+            service_assembly2,
+            service_assembly3,
+            service_assembly4,
+            service_assembly5,
+            # 51
+            service_testing1,
+            service_testing2,
+            service_testing3,
+            service_testing4,
+            service_testing5,
+            # 56
+            service_packaging1,
+            service_packaging2,
+            service_packaging3,
+            service_packaging4,
+            service_packaging5
+        ]
         return
     
     return all_services
