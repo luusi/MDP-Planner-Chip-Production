@@ -23,6 +23,8 @@ cd docs/notebooks
 python3 chip_production_supply_chain.py 
 ```
 
+**Please note:** the configuration file conf.json contains the basic information needed to run the experiments. The JSON key ``mode`` accept the values ``[automata, ltlf]``, the key ``phase`` accepts ``[1,2]`` values (representing the assortment and manufacturing phases respectively), and the key ``size`` accepts ``[small, manageable1, manageable2, complex]`` values (related to the number of involved actors).
+
 ### From the source code
 
 We assume the review uses a UNIX-like machine and that has Python 3.8 installed.

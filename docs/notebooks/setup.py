@@ -99,7 +99,7 @@ SYMBOLS_PHASE_1 = [
     PICK_COPPER_FRAME
 ]
 
-SYMBOLS_PHASE_2 = [
+ALL_SYMBOLS_PHASE_2 = [
     CLEANING,
     CONFIG_FILM_DEPOSITION,
     CHECKED_FILM_DEPOSITION,
@@ -120,6 +120,21 @@ SYMBOLS_PHASE_2 = [
     ACTIVATION,
     RESIST_STRIPPING,
     CHECK_RESIST_STRIPPING,
+    ASSEMBLY,
+    TESTING,
+    PACKAGING
+]
+
+SYMBOLS_PHASE_2_LTLF = [
+    CLEANING,
+    FILM_DEPOSITION,
+    RESIST_COATING,
+    EXPOSURE,
+    DEVELOPMENT,
+    ETCHING,
+    IMPURITIES_IMPLANTATION,
+    ACTIVATION,
+    RESIST_STRIPPING,
     ASSEMBLY,
     TESTING,
     PACKAGING
@@ -670,17 +685,16 @@ def target_service_phase2_automata():
     )
     
 def target_service_phase2_ltlf():
-    formula_str = "<"
     regex_seq = ""
-    for symbol_index, symbol in enumerate(SYMBOLS_PHASE_2):
-        all_but_symbol = set(SYMBOLS_PHASE_2).difference({symbol})
+    for symbol_index, symbol in enumerate(SYMBOLS_PHASE_2_LTLF):
+        all_but_symbol = set(SYMBOLS_PHASE_2_LTLF).difference({symbol})
         item = symbol + " & " + " & ".join(map(lambda x: "!" + x, all_but_symbol))
         regex_seq = regex_seq + (";" if symbol_index != 0 else "") + item
     formula_str = f"<({regex_seq})*>end"
     formula = pylogics.parsers.ldl.parse_ldl(formula_str)
     automaton = logaut.core.ldl2dfa(formula, backend="lydia")
     #print("Specification: ", formula_str)
-    declare_automaton = from_symbolic_automaton_to_declare_automaton(automaton, set(SYMBOLS_PHASE_2))
+    declare_automaton = from_symbolic_automaton_to_declare_automaton(automaton, set(SYMBOLS_PHASE_2_LTLF))
     return declare_automaton
     
     
