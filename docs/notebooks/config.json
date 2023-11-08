@@ -1,5 +1,6 @@
 {
     "mode": "automata",
     "phase": 1,
-    "size": "small"
+    "size": "small",
+    "encode": true
 }

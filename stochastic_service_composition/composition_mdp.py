@@ -6,9 +6,9 @@ from typing import Deque, Dict, List, Set, Tuple
 from mdp_dp_rl.processes.mdp import MDP
 from pythomata import SimpleDFA
 
-from stochastic_service_composition.services import Service, build_system_service
-from stochastic_service_composition.target import Target
-from stochastic_service_composition.types import Action, State, MDPDynamics
+from stochastic_service_composition.services import Service, build_system_service, build_service_from_transitions
+from stochastic_service_composition.target import Target, build_target_from_transitions
+from stochastic_service_composition.types import Action, State, MDPDynamics, TargetDynamics
 
 COMPOSITION_MDP_INITIAL_STATE = 0
 COMPOSITION_MDP_INITIAL_ACTION = "initial"
@@ -17,29 +17,148 @@ DEFAULT_GAMMA = 0.9
 
 COMPOSITION_MDP_SINK_STATE = -1
 
+def translate_services_and_target_to_integers(target, *services, tf):
+    print(len(services))
+    n_elem = 0
+    
+    # encode services
+    print("\tStarting encoding services...")
+    new_services : List[Service] = []    
+    dict_act = {}
+    dict_states_ser = {}
+    
+    for service in services:
+        states = service.states
+        for state in states:
+            if state not in dict_states_ser.keys():
+                dict_states_ser[state] = n_elem
+                n_elem += 1
+    
+    for service in services:
+        actions = service.actions
+        for action in actions:
+            if action not in dict_act.keys():
+                dict_act[action] = n_elem
+                n_elem += 1
+        in_action = n_elem
+        n_elem += 1
+        in_und_action = n_elem
+        n_elem += 1
+        
+    for service in services:
+        final_states = service.final_states
+        initial_state = service.initial_state
+        transition_function = service.transition_function 
+        
+        transition_function_ser : MDPDynamics = {}
+        final_states_ser : Set[State] = set()
+        initial_state_ser : State = None        
+        
+        # encode final states and initial state
+        for state in final_states:
+            final_states_ser.add(dict_states_ser[state])
+        initial_state_ser = dict_states_ser[initial_state]
+        
+        # encode transition function (from the new created states and actions)
+        # Dict[State, Dict[Action, Tuple[Dict[State, Prob], Reward]]]
+        for state in transition_function:
+            actions_state_ser = {}
+            for action in transition_function[state]:
+                dict_next_state = {}
+                next_states = list(transition_function[state][action][0].keys())
+                for next_state in next_states:
+                    prob = transition_function[state][action][0][next_state]
+                    dict_next_state[dict_states_ser[next_state]] = prob
+                rew = transition_function[state][action][1]
+                actions_state_ser[dict_act[action]] = (dict_next_state, rew)
+            transition_function_ser[dict_states_ser[state]] = actions_state_ser
+                
+        # create an updated service and add it to the list
+        new_service : Service = build_service_from_transitions(transition_function_ser, initial_state_ser, final_states_ser)
+        new_services.append(new_service)
+    print("\tService encoded.")
+    
+    # encode target
+    print("\tStarting encoding target...")
+    
+    dict_states_targ = {}
+    final_states_tar : Set[State] = set()
+    initial_state_targ : State = None
+    transition_function_targ : TargetDynamics = {}
+    
+    # original target
+    states = target.states
+    final_states = target.final_states
+    initial_state = target.initial_state
+    
+    in_state = n_elem
+    n_elem += 1
+    
+    # encode states and actions
+    for state in states:
+        if state not in dict_states_targ:
+            dict_states_targ[state] = n_elem
+            n_elem += 1
+    
+    # encode final states and initial state
+    for state in final_states:
+        final_states_tar.add(dict_states_targ[state])
+    initial_state_targ = dict_states_targ[initial_state]
+    
+    # encode transition function (from the new created states and actions)
+    # Dict[State, Dict[Action, Tuple[State, Prob, Reward]]]
+    for state in tf:
+        actions_state_targ = {}
+        for action in tf[state]:
+            value_action = tf[state][action]
+            state_other = value_action[0]
+            prob = value_action[1]
+            rew = value_action[2]
+            actions_state_targ[dict_act[action]] = (dict_states_targ[state_other], prob, rew)
+        transition_function_targ[dict_states_targ[state]] = actions_state_targ
+    
+    # create an updated target
+    new_target : Target = build_target_from_transitions(transition_function_targ, initial_state_targ, final_states_tar)
+    print("\tTarget encoded.")
+    
+    return new_target, new_services, (in_state, in_action, in_und_action)
+
 
 def composition_mdp(
-    target: Target, *services: Service, gamma: float = DEFAULT_GAMMA
+    target: Target, *services: Service, tf: TargetDynamics, gamma: float = DEFAULT_GAMMA, encode: bool = False
 ) -> MDP:
     """
     Compute the composition MDP.
 
     :param target: the target service.
     :param services: the community of services.
+    :param tf: the transition function of the target.
     :param gamma: the discount factor.
+    :param encode: if True, encode the services and the target.
     :return: the composition MDP.
     """
+    
+    if encode:
+        target, services, enc_elems = translate_services_and_target_to_integers(target, *services, tf=tf)
+        in_state, in_action, in_und_action = enc_elems
 
-    system_service = build_system_service(*services)
+    system_service = build_system_service(*services)    
+    print("\tSystem service created.")
 
-    initial_state = COMPOSITION_MDP_INITIAL_STATE
     # one action per service (1..n) + the initial action (0)
     actions: Set[Action] = set(range(len(services)))
-    initial_action = COMPOSITION_MDP_INITIAL_ACTION
+    if encode:
+        initial_state = in_state
+        initial_action = in_action
+        undefined_action = in_und_action
+    else:
+        initial_state = COMPOSITION_MDP_INITIAL_STATE
+        initial_action = COMPOSITION_MDP_INITIAL_ACTION
+        undefined_action = COMPOSITION_MDP_UNDEFINED_ACTION
+    
     actions.add(initial_action)
-
     # add an 'undefined' action for sink states
-    actions.add(COMPOSITION_MDP_UNDEFINED_ACTION)
+    actions.add(undefined_action)
 
     transition_function: MDPDynamics = {}
 

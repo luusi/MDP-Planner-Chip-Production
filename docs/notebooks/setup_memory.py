@@ -50,41 +50,41 @@ NETHERLANDS_REWARD = -7.5
 DEFAULT_BROKEN_REWARD = -10.0
 
 # all the atomic actions for PHASE 1
-PICK_BUY_DESIGN = "pick_buy_design"
-PICK_SILICON = "pick_silicon"
-PICK_WAFER = "pick_wafer"
-PICK_BORON = "pick_boron"
-PICK_PHOSPHOR = "pick_phosphor"
-PICK_ALUMINUM = "pick_aluminum"
-PICK_RESIST = "pick_resist"
-PICK_PLASTIC = "pick_plastic"
-PICK_CHEMICALS = "pick_chemicals"
-PICK_COPPER_FRAME = "pick_copper_frame"
+PICK_BUY_DESIGN = "a" #"pick_buy_design"
+PICK_SILICON = "b" #"pick_silicon"
+PICK_WAFER = "c" #"pick_wafer"
+PICK_BORON = "d" #"pick_boron"
+PICK_PHOSPHOR = "e" #"pick_phosphor"
+PICK_ALUMINUM = "f" #"pick_aluminum"
+PICK_RESIST = "g" #"pick_resist"
+PICK_PLASTIC = "h" #"pick_plastic"
+PICK_CHEMICALS = "i" #"pick_chemicals"
+PICK_COPPER_FRAME = "l" #"pick_copper_frame"
 
 # all the atomic actions for PHASE 2
-CLEANING = "cleaning"
-CONFIG_FILM_DEPOSITION = "config_film_deposition"
-CHECKED_FILM_DEPOSITION = "checked_film_deposition"
-FILM_DEPOSITION = "film_deposition"
-CONFIG_RESIST_COATING = "config_resist_coating"
-CHECKED_RESIST_COATING = "checked_resist_coating"
-RESIST_COATING = "resist_coating"
-EXPOSURE = "exposure"
-CHECK_EXPOSURE = "check_exposure"
-CONFIG_DEVELOPMENT = "config_development"
-CHECKED_DEVELOPMENT = "checked_development"
-DEVELOPMENT = "development"
-ETCHING = "etching"
-CHECK_ETCHING = "check_etching"
-CONFIG_IMPURITIES_IMPLANTATION = "config_impurities_implantation"
-CHECKED_IMPURITIES_IMPLANTATION = "checked_impurities_implantation"
-IMPURITIES_IMPLANTATION = "impurities_implantation"
-ACTIVATION = "activation"
-RESIST_STRIPPING = "resist_stripping"
-CHECK_RESIST_STRIPPING = "check_resist_stripping"
-ASSEMBLY = "assembly"
-TESTING = "testing"
-PACKAGING = "packaging"
+CLEANING = "a" #"cleaning"
+CONFIG_FILM_DEPOSITION = "b" #"config_film_deposition"
+CHECKED_FILM_DEPOSITION = "c" #"checked_film_deposition"
+FILM_DEPOSITION = "d" #"film_deposition"
+CONFIG_RESIST_COATING = "e" #"config_resist_coating"
+CHECKED_RESIST_COATING = "f" #"checked_resist_coating"
+RESIST_COATING = "g" #"resist_coating"
+EXPOSURE = "h" #"exposure"
+CHECK_EXPOSURE = "i" #"check_exposure"
+CONFIG_DEVELOPMENT = "j" #"config_development"
+CHECKED_DEVELOPMENT = "k" #"checked_development"
+DEVELOPMENT = "l" #"development"
+ETCHING = "m" #"etching"
+CHECK_ETCHING = "n" #"check_etching"
+CONFIG_IMPURITIES_IMPLANTATION = "o" #"config_impurities_implantation"
+CHECKED_IMPURITIES_IMPLANTATION = "p" #"checked_impurities_implantation"
+IMPURITIES_IMPLANTATION = "q" #"impurities_implantation"
+ACTIVATION = "r" #"activation"
+RESIST_STRIPPING = "s" #"resist_stripping"
+CHECK_RESIST_STRIPPING = "t" #"check_resist_stripping"
+ASSEMBLY = "u" #"assembly"
+TESTING = "v" #"testing"
+PACKAGING = "w" #"packaging"
 
 SYMBOLS_PHASE_1 = [
     PICK_BUY_DESIGN,
@@ -245,83 +245,101 @@ PACKAGING3_SERVICE_NAME = "packaging_human3"                                # hu
 PACKAGING4_SERVICE_NAME = "packaging_human4"                                # human
 PACKAGING5_SERVICE_NAME = "packaging_human5"                                # human
 
+states = {
+    "ready": "0",
+    "broken": "1",
+    "configured": "2",
+    "executing": "3",
+    "repairing": "4",
+    "done": "5",
+    "available": "6"
+}
 
-def build_generic_breakable_service(service_name: str, action_name: str, broken_prob: float, broken_reward: float, action_reward: float):
+actions = {
+    "check": "0",
+    "config": "1",
+    "checked": "2",
+    "restore": "3",
+    "repaired": "4"
+}
+
+def build_generic_breakable_service(service_name: str, actions_name, broken_prob: float, broken_reward: float, action_reward: float):
     assert 0.0 <= broken_prob <= 1.0
     deterministic_prob = 1.0
     success_prob = deterministic_prob - broken_prob
     transitions = {
-        "available": {
-            action_name: ({"done": success_prob, "broken": broken_prob}, action_reward),
+        states["available"]: {
+            actions_name[0]: ({states["done"]: success_prob, states["broken"]: broken_prob}, action_reward),
         },
-        "broken": {
-            f"check_{action_name}": ({"available": 1.0}, broken_reward),
+        states["broken"]: {
+            actions_name[1]: ({states["available"]: 1.0}, broken_reward),
         },
-        "done": {
-            f"check_{action_name}": ({"available": 1.0}, 0.0),
+        states["done"]: {
+            actions_name[1]: ({states["available"]: 1.0}, 0.0),
         }
     }
-    final_states = {"available"}
-    initial_state = "available"
+    final_states = {states["available"]}
+    initial_state = states["available"]
     return build_service_from_transitions(transitions, initial_state, final_states)  # type: ignore
 
-def build_complex_breakable_service(service_name: str, action_name: str, broken_prob: float, unemployable_prob: float, broken_reward: float, action_reward: float) -> Service:
+#[FILM_DEPOSITION, CHECKED_FILM_DEPOSITION, CONFIG_FILM_DEPOSITION]
+def build_complex_breakable_service(service_name: str, actions_name, broken_prob: float, unemployable_prob: float, broken_reward: float, action_reward: float) -> Service:
     assert 0.0 <= broken_prob <= 1.0
     deterministic_prob = 1.0
     configure_success_prob = deterministic_prob - unemployable_prob
     op_success_prob = deterministic_prob - broken_prob
     transitions = {
-        "ready": { # current state
-            f"config_{action_name}": # action
+        states["ready"]: { # current state
+            actions_name[2]: # action
                 (
                     {
-                        "configured": deterministic_prob # next state : prob
+                        states["configured"]: deterministic_prob # next state : prob
                     },
                     0.0
                 ),
         },
-        "configured": {
-            f"checked_{action_name}":
+        states["configured"]: {
+            actions_name[1]:
                 (
                     {
-                    "executing": configure_success_prob,
-                    "broken": unemployable_prob
-                    } if unemployable_prob > 0.0 else {"executing": configure_success_prob},
+                    states["executing"]: configure_success_prob,
+                    states["broken"]: unemployable_prob
+                    } if unemployable_prob > 0.0 else {states["executing"]: configure_success_prob},
                     0.0
                 ),
         },
-        "executing": {
-            action_name: # operation
+        states["executing"]: {
+            actions_name[0]: # operation
                 (
                     {
-                        "ready": op_success_prob,
-                        "broken": broken_prob
-                    } if broken_prob > 0.0 else {"ready": op_success_prob},
+                        states["ready"]: op_success_prob,
+                        states["broken"]: broken_prob
+                    } if broken_prob > 0.0 else {states["ready"]: op_success_prob},
                     action_reward
                 ),
         },
-        "broken": {
-            f"restore_{action_name}":
+        states["broken"]: {
+            actions["restore"] + actions_name[0]:
             (
                 {
-                        "repairing": deterministic_prob
+                    states["repairing"]: deterministic_prob
                 },
                 broken_reward
             ),
         },
-        "repairing": {
-            f"repaired_{action_name}":
+        states["repairing"]: {
+            actions["repaired"] + actions_name[0]:
                 (
                     {
-                        "ready": deterministic_prob
+                        states["ready"]: deterministic_prob
                     },
                     0.0
                 ),
         },
 
     }
-    final_states = {"ready"}
-    initial_state = "ready"
+    final_states = {states["ready"]}
+    initial_state = states["ready"]
     return build_service_from_transitions(transitions, initial_state, final_states)  # type: ignore
 
 def build_generic_service_one_state(
@@ -331,12 +349,12 @@ def build_generic_service_one_state(
 ) -> Service:
     """Build the one state device."""
     transitions = {
-        "ready": {
-            operation_name: ({"ready": 1.0}, action_reward) for operation_name in operation_names
+        states["ready"]: {
+            operation_name: ({states["ready"]: 1.0}, action_reward) for operation_name in operation_names
         },
     }
-    final_states = {"ready"}
-    initial_state = "ready"
+    final_states = {states["ready"]}
+    initial_state = states["ready"]
     return build_service_from_transitions(transitions, initial_state, final_states)  # type: ignore
 
 
@@ -434,38 +452,38 @@ def cleaning_service(name: str, action_reward: float = USA_REWARD) -> Service:
 def film_deposition_service(name: str, broken_prob: float, unemployable_prob: float, broken_reward: float,
                         action_reward: float) -> Service:
     """Build the film deposition device."""
-    return build_complex_breakable_service(name, FILM_DEPOSITION, broken_prob=broken_prob,
+    return build_complex_breakable_service(name, [FILM_DEPOSITION, CHECKED_FILM_DEPOSITION, CONFIG_FILM_DEPOSITION], broken_prob=broken_prob,
                                         unemployable_prob=unemployable_prob, broken_reward=broken_reward,
                                         action_reward=action_reward)
 
 def resist_coating_service(name: str, broken_prob: float, unemployable_prob: float, broken_reward: float,
                             action_reward: float) -> Service:
     """Build the resist coating device."""
-    return build_complex_breakable_service(name, RESIST_COATING, broken_prob=broken_prob,
+    return build_complex_breakable_service(name, [RESIST_COATING, CHECKED_RESIST_COATING, CONFIG_RESIST_COATING], broken_prob=broken_prob,
                                         unemployable_prob=unemployable_prob, broken_reward=broken_reward,
                                         action_reward=action_reward)
 
 def exposure_service(name: str, broken_prob: float, broken_reward: float, action_reward: float) -> Service:
     """Build the exposure device."""
-    return build_generic_breakable_service(name, EXPOSURE, broken_prob=broken_prob, broken_reward=broken_reward,
+    return build_generic_breakable_service(name, [EXPOSURE, CHECK_EXPOSURE], broken_prob=broken_prob, broken_reward=broken_reward,
                                         action_reward=action_reward)
 
 def development_service(name: str, broken_prob: float, unemployable_prob: float, broken_reward: float,
                         action_reward: float) -> Service:
     """Build the development device."""
-    return build_complex_breakable_service(name, DEVELOPMENT, broken_prob=broken_prob,
+    return build_complex_breakable_service(name, [DEVELOPMENT, CHECKED_DEVELOPMENT, CONFIG_DEVELOPMENT], broken_prob=broken_prob,
                                         unemployable_prob=unemployable_prob, broken_reward=broken_reward,
                                         action_reward=action_reward)
 
 def etching_service(name: str, broken_prob: float, broken_reward: float, action_reward: float) -> Service:
     """Build the etching device."""
-    return build_generic_breakable_service(name, ETCHING, broken_prob=broken_prob, broken_reward=broken_reward,
+    return build_generic_breakable_service(name, [ETCHING, CHECK_ETCHING], broken_prob=broken_prob, broken_reward=broken_reward,
                                         action_reward=action_reward)
 
 def impurities_implantation_service(name: str, broken_prob: float, unemployable_prob: float, broken_reward: float,
                                 action_reward: float) -> Service:
     """Build the impurities implantation device."""
-    return build_complex_breakable_service(name, IMPURITIES_IMPLANTATION, broken_prob=broken_prob,
+    return build_complex_breakable_service(name, [IMPURITIES_IMPLANTATION, CHECKED_IMPURITIES_IMPLANTATION, CONFIG_IMPURITIES_IMPLANTATION], broken_prob=broken_prob,
                                         unemployable_prob=unemployable_prob, broken_reward=broken_reward,
                                         action_reward=action_reward)
 
@@ -479,7 +497,7 @@ def activation_service(name: str, action_reward: float = USA_REWARD) -> Service:
 
 def resist_stripping_service(name: str, broken_prob: float, broken_reward: float, action_reward: float) -> Service:
     """Build the resist stripping device."""
-    return build_generic_breakable_service(name, RESIST_STRIPPING, broken_prob=broken_prob, broken_reward=broken_reward,
+    return build_generic_breakable_service(name, [RESIST_STRIPPING, CHECK_RESIST_STRIPPING], broken_prob=broken_prob, broken_reward=broken_reward,
                                         action_reward=action_reward)
 
 def assembly_service(name: str, action_reward: float = USA_REWARD) -> Service:
@@ -612,24 +630,24 @@ service_packaging4 = packaging_service(PACKAGING4_SERVICE_NAME, DEFAULT_USA_REWA
 service_packaging5 = packaging_service(PACKAGING5_SERVICE_NAME, DEFAULT_USA_REWARD-3)
 
 # creare 60 servizi per la fase 2 per testare la size COMPLEX
-transition_function_phase1_automata = {
-    "s0": {"pick_buy_design": ("s1", 1.0, 0),},
-    "s1": {"pick_silicon": ("s2", 1.0, 0),},
-    "s2": {"pick_wafer": ("s3", 1.0, 0),},
-    "s3": {"pick_boron": ("s4", 1.0, 0), },
-    "s4": {"pick_phosphor": ("s5", 1.0, 0), },
-    "s5": {"pick_aluminum": ("s6", 1.0, 0), },
-    "s6": {"pick_resist": ("s7", 1.0, 0), },
-    "s7": {"pick_plastic": ("s8", 1.0, 0), },
-    "s8": {"pick_chemicals": ("s9", 1.0, 0), },
-    "s9": {"pick_copper_frame": ("s0", 1.0, 0), },
-}
+
 def target_service_phase1_automata():
     """Build the target service."""
-    transition_function = transition_function_phase1_automata
+    transition_function = {
+        0: {PICK_BUY_DESIGN: (1, 1.0, 0),},
+        1: {PICK_SILICON: (2, 1.0, 0),},
+        2: {PICK_WAFER: (3, 1.0, 0),},
+        3: {PICK_BORON: (4, 1.0, 0), },
+        4: {PICK_PHOSPHOR: (5, 1.0, 0), },
+        5: {PICK_ALUMINUM: (6, 1.0, 0), },
+        6: {PICK_RESIST: (7, 1.0, 0), },
+        7: {PICK_PLASTIC: (8, 1.0, 0), },
+        8: {PICK_CHEMICALS: (9, 1.0, 0), },
+        9: {PICK_COPPER_FRAME: (0, 1.0, 0), },
+    }
 
-    initial_state = "s0"
-    final_states = {"s0"}
+    initial_state = 0
+    final_states = {0}
 
     return build_target_from_transitions(
         transition_function, initial_state, final_states
@@ -649,37 +667,36 @@ def target_service_phase1_ltlf():
     declare_automaton = from_symbolic_automaton_to_declare_automaton(automaton, set(SYMBOLS_PHASE_1))
     return declare_automaton
     
-transition_function_phase2_automata = {
-    "s0": {"cleaning": ("s1", 1.0, 0), },
-    "s1": {"config_film_deposition": ("s2", 1.0, 0), },
-    "s2": {"checked_film_deposition": ("s3", 1.0, 0), },
-    "s3": {"film_deposition": ("s4", 1.0, 0), },
-    "s4": {"config_resist_coating": ("s5", 1.0, 0), },
-    "s5": {"checked_resist_coating": ("s6", 1.0, 0), },
-    "s6": {"resist_coating": ("s7", 1.0, 0), },
-    "s7": {"exposure": ("s8", 1.0, 0), },
-    "s8": {"check_exposure": ("s9", 1.0, 0), },
-    "s9": {"config_development": ("s10", 1.0, 0), },
-    "s10": {"checked_development": ("s11", 1.0, 0), },
-    "s11": {"development": ("s12", 1.0, 0), },
-    "s12": {"etching": ("s13", 1.0, 0), },
-    "s13": {"check_etching": ("s14", 1.0, 0), },
-    "s14": {"config_impurities_implantation": ("s15", 1.0, 0), },
-    "s15": {"checked_impurities_implantation": ("s16", 1.0, 0), },
-    "s16": {"impurities_implantation": ("s17", 1.0, 0), },
-    "s17": {"activation": ("s18", 1.0, 0), },
-    "s18": {"resist_stripping": ("s19", 1.0, 0), },
-    "s19": {"check_resist_stripping": ("s20", 1.0, 0), },
-    "s20": {"assembly": ("s21", 1.0, 0), },
-    "s21": {"testing": ("s22", 1.0, 0), },
-    "s22": {"packaging": ("s0", 1.0, 0), }
-}
 def target_service_phase2_automata():
     """Build the target service."""
-    transition_function = transition_function_phase2_automata
+    transition_function = {
+        0: {CLEANING: (1, 1.0, 0), },
+        1: {CONFIG_FILM_DEPOSITION: (2, 1.0, 0), },
+        2: {CHECKED_FILM_DEPOSITION: (3, 1.0, 0), },
+        3: {FILM_DEPOSITION: (4, 1.0, 0), },
+        4: {CONFIG_RESIST_COATING: (5, 1.0, 0), },
+        5: {CHECKED_RESIST_COATING: (6, 1.0, 0), },
+        6: {RESIST_COATING: (7, 1.0, 0), },
+        7: {EXPOSURE: (8, 1.0, 0), },
+        8: {CHECK_EXPOSURE: (9, 1.0, 0), },
+        9: {CONFIG_DEVELOPMENT: (10, 1.0, 0), },
+        10: {CHECKED_DEVELOPMENT: (11, 1.0, 0), },
+        11: {DEVELOPMENT: (12, 1.0, 0), },
+        12: {ETCHING: (13, 1.0, 0), },
+        13: {CHECK_ETCHING: (14, 1.0, 0), },
+        14: {CONFIG_IMPURITIES_IMPLANTATION: (15, 1.0, 0), },
+        15: {CHECKED_IMPURITIES_IMPLANTATION: (16, 1.0, 0), },
+        16: {IMPURITIES_IMPLANTATION: (17, 1.0, 0), },
+        17: {ACTIVATION: (18, 1.0, 0), },
+        18: {RESIST_STRIPPING: (19, 1.0, 0), },
+        19: {CHECK_RESIST_STRIPPING: (20, 1.0, 0), },
+        20: {ASSEMBLY: (21, 1.0, 0), },
+        21: {TESTING: (22, 1.0, 0), },
+        22: {PACKAGING: (0, 1.0, 0), }
+    }
 
-    initial_state = "s0"
-    final_states = {"s0"}
+    initial_state = 0
+    final_states = {0}
 
     return build_target_from_transitions(
         transition_function, initial_state, final_states
