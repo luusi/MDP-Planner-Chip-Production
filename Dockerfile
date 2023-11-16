@@ -87,5 +87,7 @@ RUN git clone https://github.com/luusi/MDP-Planner-Chip-Production.git &&\
 
 RUN mkdir -p WORKDIR /home/default/MDP-Planner-Chip-Production/docs/notebooks/experimental_results
 
+EXPOSE 8888
+
 WORKDIR /home/default/MDP-Planner-Chip-Production
 

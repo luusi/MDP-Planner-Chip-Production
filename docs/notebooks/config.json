@@ -1,6 +1,7 @@
 {
     "mode": "automata",
-    "phase": 1,
-    "size": "small",
-    "encode": true
+    "phase": 2,
+    "size": "manageable1",
+    "encode": true,
+    "binary": true
 }

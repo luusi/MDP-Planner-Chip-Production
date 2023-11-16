@@ -1,6 +1,6 @@
 """This module contains the implementation of the service abstraction."""
 
-from collections import deque
+from collections import deque, defaultdict
 from typing import Deque, Set, Tuple
 
 from stochastic_service_composition.types import (
@@ -182,8 +182,11 @@ def build_system_service(*services: Service) -> Service:
     new_initial_state: Tuple[State, ...] = tuple(
         service.initial_state for service in services
     )
-    new_transition_function: MDPDynamics = {}
+    new_transition_function: MDPDynamics = defaultdict(dict)
+    # Dict[State, Dict[Action, Tuple[Dict[State, Prob], Reward]]]
 
+    # coda che contiene elementi del tipo:
+    # ('ready', 'available', 'available', 'available', 'available', 'available', 'ready', 'ready', 'available', 'ready', 'ready', 'ready', 'available', 'ready', 'ready', 'ready', 'ready', 'ready')
     queue: Deque[Tuple[State, ...]] = deque()
     queue.append(new_initial_state)
     to_be_visited = {new_initial_state}
@@ -195,28 +198,32 @@ def build_system_service(*services: Service) -> Service:
 
         new_states.add(current_state)
         #check if system_state is final
-        if all(
-            component_i in services[i].final_states
-            for i, component_i in enumerate(current_state)
-        ):
+        if all(component_i in services[i].final_states for i, component_i in enumerate(current_state)):
             new_final_states.add(current_state)
 
         next_state_template = current_state
+
+        # per ogni servizio, per ogni stato del servizio, per ogni azione del servizio, per ogni stato raggiungibile dall'azione
         for i in range(len(services)):
             current_service: Service = services[i]
             current_service_state = list(next_state_template)[i]
-            for a, (next_service_states, reward) in current_service.transition_function[
-                current_service_state
-            ].items():
+
+            # per ogni [azione, per ogni stato raggiungibile dall'azione e reward] del servizio corrente
+            # es. [('cleaning', ({'ready': 1.0}, -1.0))]
+            # questo ciclo dipende da come è definito il servizio
+            for a, (next_service_states, reward) in current_service.transition_function[current_service_state].items():
                 symbol = (a, i)
                 actions.add(symbol)
-                new_transition_function.setdefault(current_state, {})[symbol] = (
-                    {},
-                    reward,
-                )
+
+                new_transition_function.setdefault(current_state, {})[symbol] = ({}, reward)
+                # {('ready', 'available', 'available', 'available', 'available', 'available', 'ready', 'ready', 'available', 'ready', 'ready', 'ready', 'available', 'ready', 'ready', 'ready', 'ready', 'ready'): {('cleaning', 0): ({}, -1.0)}}
+
+                # per ogni stato raggiungibile dall'azione
+                # es. {'ready': 1.0}
                 for next_service_state, prob in next_service_states.items():
                     # we need to transform it to list temporarily
                     next_state_list = list(next_state_template)
+                    # costruisco nuovo stato del sistem service andando a modificare il next state del servizio i che sto analizzando ora
                     next_state_list[i] = next_service_state
                     next_state = tuple(next_state_list)
                     new_transition_function[current_state][symbol][0][next_state] = prob
@@ -225,9 +232,9 @@ def build_system_service(*services: Service) -> Service:
                         queue.append(next_state)
 
     new_service = Service(
-        states=new_states,
-        actions=actions,
-        final_states=new_final_states,
+        states=(state for state in new_states),
+        actions=(action for action in actions),
+        final_states=(final_state for final_state in new_final_states),
         initial_state=new_initial_state,
         transition_function=new_transition_function,
     )

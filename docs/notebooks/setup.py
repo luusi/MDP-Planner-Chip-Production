@@ -634,7 +634,7 @@ def target_service_phase1_automata():
     return build_target_from_transitions(
         transition_function, initial_state, final_states
     )
-    
+
 def target_service_phase1_ltlf():
     regex_seq = ""
     for symbol_index, symbol in enumerate(SYMBOLS_PHASE_1):
@@ -643,11 +643,9 @@ def target_service_phase1_ltlf():
         regex_seq = regex_seq + (";" if symbol_index != 0 else "") + item
     formula_str = f"<({regex_seq})*>end"
     formula = pylogics.parsers.ldl.parse_ldl(formula_str)
-    automaton = logaut.core.ldl2dfa(formula, backend="lydia")
-    #print("Specification: ", formula_str)
-    #print("Compute declare automaton")
-    declare_automaton = from_symbolic_automaton_to_declare_automaton(automaton, set(SYMBOLS_PHASE_1))
-    return declare_automaton
+    automaton_phase1 = logaut.core.ldl2dfa(formula, backend="lydia")
+    declare_automaton = from_symbolic_automaton_to_declare_automaton(automaton_phase1, set(SYMBOLS_PHASE_1))
+    return declare_automaton, automaton_phase1
     
 transition_function_phase2_automata = {
     "s0": {"cleaning": ("s1", 1.0, 0), },
@@ -693,10 +691,9 @@ def target_service_phase2_ltlf():
         regex_seq = regex_seq + (";" if symbol_index != 0 else "") + item
     formula_str = f"<({regex_seq})*>end"
     formula = pylogics.parsers.ldl.parse_ldl(formula_str)
-    automaton = logaut.core.ldl2dfa(formula, backend="lydia")
-    #print("Specification: ", formula_str)
-    declare_automaton = from_symbolic_automaton_to_declare_automaton(automaton, set(SYMBOLS_PHASE_2_LTLF))
-    return declare_automaton
+    automaton_phase2 = logaut.core.ldl2dfa(formula, backend="lydia")
+    declare_automaton = from_symbolic_automaton_to_declare_automaton(automaton_phase2, set(SYMBOLS_PHASE_2_LTLF))
+    return declare_automaton, automaton_phase2
     
     
 def services_phase2 (dimension):
@@ -978,12 +975,3 @@ all_services_phase1 = [
     # 40
     service_copper_frame_china
 ]
-target_phase1_automata = target_service_phase1_automata()
-target_phase1_ltlf = target_service_phase1_ltlf()
-
-all_services_phase2_small = services_phase2("small")
-all_services_phase2_manageable1 = services_phase2("manageable1")
-all_services_phase2_manageable2 = services_phase2("manageable2")
-all_services_phase2_complex = services_phase2("complex")
-target_phase2_automata = target_service_phase2_automata()
-target_phase2_ltlf = target_service_phase2_ltlf()

@@ -1,0 +1,8 @@
+automata mode
+2 phase
+manageable2 size
+tot_services: 20
+total states: 132
+
+composition elapsed time: 371.846455967 s
+policy elapsed time: 0.262567947 s

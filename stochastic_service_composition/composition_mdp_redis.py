@@ -11,7 +11,13 @@ from stochastic_service_composition.services import Service, build_system_servic
 from stochastic_service_composition.target import Target, build_target_from_transitions
 from stochastic_service_composition.types import Action, State, MDPDynamics, TargetDynamics
 
-from memory_profiler import profile
+import redis
+
+r_states = redis.Redis(host='localhost', port=6379, db=1)
+r_action = redis.Redis(host='localhost', port=6379, db=2)
+r_states_tg = redis.Redis(host='localhost', port=6379, db=3)
+r_states_ss = redis.Redis(host='localhost', port=6379, db=4)
+r_actions_ss = redis.Redis(host='localhost', port=6379, db=5)
 
 COMPOSITION_MDP_INITIAL_STATE = 0
 COMPOSITION_MDP_INITIAL_ACTION = "initial"
@@ -20,134 +26,24 @@ DEFAULT_GAMMA = 0.9
 
 COMPOSITION_MDP_SINK_STATE = -1
 
-def encode_automata(target, *services, tf):
-    n_elem = 0
-    
-    # encode services
-    print("\tStarting encoding services...")
-    new_services : List[Service] = []    
-    dict_act = {}
-    dict_states_ser = {}
-    
-    for service in services:
-        states = service.states
-        for state in states:
-            if state not in dict_states_ser.keys():
-                dict_states_ser[state] = n_elem
-                n_elem += 1
-    
-    for service in services:
-        actions = service.actions
-        for action in actions:
-            if action not in dict_act.keys():
-                dict_act[action] = n_elem
-                n_elem += 1
-        in_action = n_elem
-        n_elem += 1
-        in_und_action = n_elem
-        n_elem += 1
-        
-    for service in services:
-        final_states = service.final_states
-        initial_state = service.initial_state
-        transition_function = service.transition_function 
-        
-        transition_function_ser : MDPDynamics = {}
-        final_states_ser : Set[State] = set()
-        initial_state_ser : State = None
-        
-        # encode final states and initial state
-        for state in final_states:
-            final_states_ser.add(dict_states_ser[state])
-        initial_state_ser = dict_states_ser[initial_state]
-        
-        # encode transition function (from the new created states and actions)
-        # Dict[State, Dict[Action, Tuple[Dict[State, Prob], Reward]]]
-        for state in transition_function:
-            actions_state_ser = {}
-            for action in transition_function[state]:
-                dict_next_state = {}
-                next_states = list(transition_function[state][action][0].keys())
-                for next_state in next_states:
-                    prob = transition_function[state][action][0][next_state]
-                    dict_next_state[dict_states_ser[next_state]] = prob
-                rew = transition_function[state][action][1]
-                actions_state_ser[dict_act[action]] = (dict_next_state, rew)
-            transition_function_ser[dict_states_ser[state]] = actions_state_ser
-                
-        # create an updated service and add it to the list
-        new_service : Service = build_service_from_transitions(transition_function_ser, initial_state_ser, final_states_ser)
-        new_services.append(new_service)
-    print("\tService encoded.")
-    
-    # encode target
-    print("\tStarting encoding target...")
-    
-    dict_states_targ = {}
-    final_states_tar : Set[State] = set()
-    initial_state_targ : State = None
-    transition_function_targ : TargetDynamics = {}
-    
-    # original target
-    states = target.states
-    final_states = target.final_states
-    initial_state = target.initial_state
-    
-    in_state = n_elem
-    n_elem += 1
-    
-    # encode states and actions
-    for state in states:
-        if state not in dict_states_targ:
-            dict_states_targ[state] = n_elem
-            n_elem += 1
-    
-    # encode final states and initial state
-    for state in final_states:
-        final_states_tar.add(dict_states_targ[state])
-    initial_state_targ = dict_states_targ[initial_state]
-    
-    # encode transition function (from the new created states and actions)
-    # Dict[State, Dict[Action, Tuple[State, Prob, Reward]]]
-    for state in tf:
-        actions_state_targ = {}
-        for action in tf[state]:
-            value_action = tf[state][action]
-            state_other = value_action[0]
-            prob = value_action[1]
-            rew = value_action[2]
-            actions_state_targ[dict_act[action]] = (dict_states_targ[state_other], prob, rew)
-        transition_function_targ[dict_states_targ[state]] = actions_state_targ
-    
-    # create an updated target
-    new_target : Target = build_target_from_transitions(transition_function_targ, initial_state_targ, final_states_tar)
-    print("\tTarget encoded.")
-    
-    return new_target, new_services, (in_state, in_action, in_und_action), n_elem
-
-
 def encode_automata_binary(target, *services, tf):
     n_elem = 0
     
     # encode services
     print("\tStarting encoding services...")
     new_services : List[Service] = []    
-    dict_act = {}
-    dict_states_ser = {}
     
     for service in services:
         states = service.states
         for state in states:
-            if state not in dict_states_ser.keys():
-                dict_states_ser[state] = str(n_elem).encode()
-                n_elem += 1
+            r_states.set(state, str(n_elem).encode())
+            n_elem += 1
     
     for service in services:
         actions = service.actions
         for action in actions:
-            if action not in dict_act.keys():
-                dict_act[action] = str(n_elem).encode()
-                n_elem += 1
+            r_action.set(action, str(n_elem).encode())
+            n_elem += 1
         in_action = str(n_elem).encode()
         n_elem += 1
         in_und_action = str(n_elem).encode()
@@ -164,8 +60,8 @@ def encode_automata_binary(target, *services, tf):
         
         # encode final states and initial state
         for state in final_states:
-            final_states_ser.add(dict_states_ser[state])
-        initial_state_ser = dict_states_ser[initial_state]
+            final_states_ser.add(r_states.get(state))
+        initial_state_ser = r_states.get(initial_state)
         
         # encode transition function (from the new created states and actions)
         # Dict[State, Dict[Action, Tuple[Dict[State, Prob], Reward]]]
@@ -176,10 +72,10 @@ def encode_automata_binary(target, *services, tf):
                 next_states = list(transition_function[state][action][0].keys())
                 for next_state in next_states:
                     prob = transition_function[state][action][0][next_state]
-                    dict_next_state[dict_states_ser[next_state]] = prob
+                    dict_next_state[r_states.get(next_state)] = prob
                 rew = transition_function[state][action][1]
-                actions_state_ser[dict_act[action]] = (dict_next_state, rew)
-            transition_function_ser[dict_states_ser[state]] = actions_state_ser
+                actions_state_ser[r_action.get(action)] = (dict_next_state, rew)
+            transition_function_ser[r_states.get(state)] = actions_state_ser
                 
         # create an updated service and add it to the list
         new_service : Service = build_service_from_transitions(transition_function_ser, initial_state_ser, final_states_ser)
@@ -189,7 +85,6 @@ def encode_automata_binary(target, *services, tf):
     # encode target
     print("\tStarting encoding target...")
     
-    dict_states_targ = {}
     final_states_tar : Set[State] = set()
     initial_state_targ : State = None
     transition_function_targ : TargetDynamics = {}
@@ -204,14 +99,13 @@ def encode_automata_binary(target, *services, tf):
     
     # encode states and actions
     for state in states:
-        if state not in dict_states_targ:
-            dict_states_targ[state] = str(n_elem).encode()
-            n_elem += 1
+        r_states_tg.set(state, str(n_elem).encode())
+        n_elem += 1
     
     # encode final states and initial state
     for state in final_states:
-        final_states_tar.add(dict_states_targ[state])
-    initial_state_targ = dict_states_targ[initial_state]
+        final_states_tar.add(r_states_tg.get(state))
+    initial_state_targ = r_states_tg.get(initial_state)
     
     # encode transition function (from the new created states and actions)
     # Dict[State, Dict[Action, Tuple[State, Prob, Reward]]]
@@ -222,8 +116,8 @@ def encode_automata_binary(target, *services, tf):
             state_other = value_action[0]
             prob = value_action[1]
             rew = value_action[2]
-            actions_state_targ[dict_act[action]] = (dict_states_targ[state_other], prob, rew)
-        transition_function_targ[dict_states_targ[state]] = actions_state_targ
+            actions_state_targ[r_action.get(action)] = (r_states_tg.get(state_other), prob, rew)
+        transition_function_targ[r_states_tg.get(state)] = actions_state_targ
     
     # create an updated target
     new_target : Target = build_target_from_transitions(transition_function_targ, initial_state_targ, final_states_tar)
@@ -236,18 +130,15 @@ def encode_transition_function(transition_function: MDPDynamics, n_elems):
     #Dict[State, Dict[Action, Tuple[Dict[State, Prob], Reward]]]
 
     # encode states and actions
-    dict_states = {}
-    dict_act = {}
-
     # STATI
     for state in transition_function.keys():
-        dict_states[state] = str(n_elems).encode()
+        r_states_ss.set(state, str(n_elems).encode())
         n_elems += 1
 
     # AZIONI
     for state in transition_function.keys():
         for action in transition_function[state].keys():
-            dict_act[action] = str(n_elems).encode()
+            r_actions_ss.set(action, str(n_elems).encode())
             n_elems += 1
 
     new_transition_function : MDPDynamics = {}
@@ -258,10 +149,10 @@ def encode_transition_function(transition_function: MDPDynamics, n_elems):
             current_next_states = transition_function[state][action][0]
             for next_state in current_next_states:
                 prob = transition_function[state][action][0][next_state]
-                dict_next_state[dict_states[next_state]] = prob
+                dict_next_state[r_states_ss.get(next_state)] = prob
             rew = transition_function[state][action][1]
-            dict_actions[dict_act[action]] = (dict_next_state, rew)
-        new_transition_function[dict_states[state]] = dict_actions
+            dict_actions[r_actions_ss.get(action)] = (dict_next_state, rew)
+        new_transition_function[r_states_ss.get(state)] = dict_actions
 
     return new_transition_function
 
@@ -280,10 +171,7 @@ def composition_mdp(
     :return: the composition MDP.
     """
     
-    if encode and not binary:
-        target, services, enc_elems, n_elem = encode_automata(target, *services, tf=tf)
-        in_state, in_action, in_und_action = enc_elems
-    elif encode and binary:
+    if encode and binary:
         print("binary")
         target, services, enc_elems, n_elem = encode_automata_binary(target, *services, tf=tf)
         in_state, in_action, in_und_action = enc_elems

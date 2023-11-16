@@ -1,0 +1,8 @@
+ltlf mode
+2 phase
+small size
+tot_services: 14
+total states: 833466
+
+composition elapsed time: 359.841916524 s
+policy elapsed time: 2028.033286878 s

@@ -15,6 +15,7 @@ mode = config_json['mode']
 phase = config_json['phase']
 size = config_json['size']
 encode = config_json['encode']
+binary = config_json['binary']
 
 if phase == 1:
     file_name = f"experimental_results/time_profiler_{mode}_phase{phase}.txt"
@@ -27,12 +28,12 @@ else:
 
 @profile(stream=fp_compMDP)
 def execute_composition_automata(target, services, tf, encode):
-    mdp = composition_mdp(target, *services, tf=tf, gamma=0.9, encode=encode)
+    mdp = composition_mdp(target, *services, tf=tf, gamma=0.1, encode=encode, binary=binary)
     return mdp
 
 @profile(stream=fp_compMDP)
-def execute_composition_ltlf(declare_automaton, services, encode):
-    mdp = comp_mdp(declare_automaton, services, gamma=0.9)
+def execute_composition_ltlf(declare_automaton, services, automaton, encode):
+    mdp = comp_mdp(declare_automaton, services, automaton=automaton, gamma=0.9, encode=encode)
     return mdp
 
 @profile(stream=fp_DPAnalytic)
@@ -49,25 +50,19 @@ def main():
         all_services = all_services_phase1
         
         if mode == "automata":
-            target = target_phase1_automata
+            target = target_service_phase1_automata()
             tf = transition_function_phase1_automata
         elif mode == "ltlf":
-            target = target_phase1_ltlf
+            target, automaton = target_service_phase1_ltlf()
     elif phase == 2:
-        if size == "small":
-            all_services = all_services_phase2_small
-        elif size == "manageable1":
-            all_services = all_services_phase2_manageable1
-        elif size == "manageable2":
-            all_services = all_services_phase2_manageable2
-        elif size == "complex":
-            all_services = all_services_phase2_complex
+        assert size in ["small", "manageable1", "manageable2", "complex"]
+        all_services = services_phase2(size)
             
         if mode == "automata":
-            target = target_phase2_automata
+            target = target_service_phase2_automata()
             tf = transition_function_phase2_automata
         elif mode == "ltlf":
-            target = target_phase2_ltlf
+            target, automaton = target_service_phase2_ltlf()
             
     print("N_services: ", len(all_services))
     
@@ -98,7 +93,7 @@ def main():
             f.write(to_write)
     elif mode == "ltlf":
         now = time.time_ns()
-        mdp = execute_composition_ltlf(target, all_services, encode)
+        mdp = execute_composition_ltlf(target, all_services, automaton, encode)
         elapsed1 = (time.time_ns() - now) / 10 ** 9
         states = len(mdp.all_states)
         with open(file_name, "a") as f:
@@ -119,10 +114,10 @@ def main():
     
             
 if __name__ == '__main__':
-    #try:
+    try:
         main()
-    #except Exception as e:
-    #    print(e)
-    #    with open(file_name, "a+") as f:
-    #        to_write = f"Esecuzione fallita: {e}"
-    #        f.write(to_write)
+    except Exception as e:
+        print(e)
+        with open(file_name, "a+") as f:
+            to_write = f"Esecuzione fallita: {e}"
+            f.write(to_write)

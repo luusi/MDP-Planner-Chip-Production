@@ -1,0 +1,4 @@
+ltlf mode
+2 phase
+manageable2 size
+tot_services: 20

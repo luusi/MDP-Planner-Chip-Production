@@ -1,0 +1,4 @@
+automata mode
+2 phase
+manageable1 size
+tot_services: 17
