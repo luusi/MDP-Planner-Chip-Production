@@ -7,4 +7,5 @@ nohup.out
 
 *.log
 *.dat
+*.txt
 fil-result

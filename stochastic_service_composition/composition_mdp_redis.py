@@ -13,11 +13,11 @@ from stochastic_service_composition.types import Action, State, MDPDynamics, Tar
 
 import redis
 
-r_states = redis.Redis(host='localhost', port=6379, db=1)
-r_action = redis.Redis(host='localhost', port=6379, db=2)
-r_states_tg = redis.Redis(host='localhost', port=6379, db=3)
-r_states_ss = redis.Redis(host='localhost', port=6379, db=4)
-r_actions_ss = redis.Redis(host='localhost', port=6379, db=5)
+r_states = redis.Redis(host='redis', port=6379, db=1)
+r_action = redis.Redis(host='redis', port=6379, db=2)
+r_states_tg = redis.Redis(host='redis', port=6379, db=3)
+r_states_ss = redis.Redis(host='redis', port=6379, db=4)
+r_actions_ss = redis.Redis(host='redis', port=6379, db=5)
 
 COMPOSITION_MDP_INITIAL_STATE = 0
 COMPOSITION_MDP_INITIAL_ACTION = "initial"
@@ -132,7 +132,7 @@ def encode_transition_function(transition_function: MDPDynamics, n_elems):
     # encode states and actions
     # STATI
     for state in transition_function.keys():
-        r_states_ss.set(state, str(n_elems).encode())
+        r_states_ss.set(str(state).encode(), str(n_elems).encode())
         n_elems += 1
 
     # AZIONI
@@ -149,10 +149,10 @@ def encode_transition_function(transition_function: MDPDynamics, n_elems):
             current_next_states = transition_function[state][action][0]
             for next_state in current_next_states:
                 prob = transition_function[state][action][0][next_state]
-                dict_next_state[r_states_ss.get(next_state)] = prob
+                dict_next_state[r_states_ss.get(str(next_state).encode())] = prob
             rew = transition_function[state][action][1]
             dict_actions[r_actions_ss.get(action)] = (dict_next_state, rew)
-        new_transition_function[r_states_ss.get(state)] = dict_actions
+        new_transition_function[r_states_ss.get(str(state).encode())] = dict_actions
 
     return new_transition_function
 

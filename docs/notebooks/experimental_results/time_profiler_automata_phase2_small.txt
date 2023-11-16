@@ -1,8 +1,0 @@
-automata mode
-2 phase
-small size
-tot_services: 14
-total states: 873
-
-composition elapsed time: 81.107219474 s
-policy elapsed time: 0.111124478 s

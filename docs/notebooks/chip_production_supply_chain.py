@@ -3,7 +3,7 @@
 import time, json
 from memory_profiler import profile
 from stochastic_service_composition.declare_utils import *
-from stochastic_service_composition.composition_mdp import composition_mdp
+from stochastic_service_composition.composition_mdp_redis import composition_mdp
 from stochastic_service_composition.composition_mdp import comp_mdp
 from mdp_dp_rl.algorithms.dp.dp_analytic import DPAnalytic
 from docs.notebooks.setup import *
@@ -114,10 +114,11 @@ def main():
     
             
 if __name__ == '__main__':
-    try:
+    '''try:
         main()
     except Exception as e:
         print(e)
         with open(file_name, "a+") as f:
             to_write = f"Esecuzione fallita: {e}"
-            f.write(to_write)
+            f.write(to_write)'''
+    main()
