@@ -83,6 +83,8 @@ RUN wget https://github.com/whitemech/lydia/releases/download/v0.1.3/lydia &&\
 # install MDP-Planner-Chip-Production
 RUN git clone https://github.com/iaiamomo/MDP-Planner-Chip-Production.git &&\
     cd MDP-Planner-Chip-Production &&\
-    pip install -e .
+    sudo pip install -e .
+
+RUN sudo mkdir /home/default/MDP-Planner-Chip-Production/docs/notebooks/experimental_results
 
 WORKDIR /home/default/MDP-Planner-Chip-Production

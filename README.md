@@ -23,6 +23,8 @@ cd docs/notebooks
 python3 chip_production_supply_chain.py 
 ```
 
+**Please note:** the configuration file conf.json contains the basic information needed to run the experiments. The JSON key ``mode`` accept the values ``[automata, ltlf]``, the key ``phase`` accepts ``[1,2]`` values (representing the assortment and manufacturing phases respectively), and the key ``size`` accepts ``[small, manageable1, manageable2, complex]`` values (related to the number of involved actors).
+
 ### From the source code
 
 We assume the review uses a UNIX-like machine and that has Python 3.8 installed.
@@ -195,18 +197,9 @@ Chosen service:  9 Chosen action:  etching {'available': {'etching': ({'done': 0
 **************************************************
 ```
 
-
 In fact,  from the calculation of the optimal policy we observe that:
 - the planner when performs the action `film_deposition` preferred using service `service_film_deposition1` (service `1`) because this service had a more convenient cost respect to `service_film_deposition2`;
 - the planner when performs the action `resist_coating` preferred using service `service_resist_coating1` (service `3`) because this service had a more convenient cost respect to `service_resist_coating2`;
 - the planner when performs the action `exposure` preferred using service `service_exposure1` (service `5`) because this service had a more convenient cost and less probability to break respect to `service_exposure2`;
 - the planner when performs the action `development` preferred using service `service_development1` (service `7`) because this service had a more convenient cost respect to `service_development2`;
 - the planner when performs the action `etching` preferred using service `service_etching1` (service `9`) because this service had a more convenient cost and less probability to break respect to `service_etching2`.
-
-
-
-
-
-
-
-
