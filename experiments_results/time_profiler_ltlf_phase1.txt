@@ -1,0 +1,6 @@
+Mode: ltlf
+Phase: 1
+Tot_services: 41
+MDP states: 10
+Composition elapsed time: 0.091818558 s
+Policy elapsed time: 0.053940174 s

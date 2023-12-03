@@ -1,0 +1,10 @@
+Filename: /home/default/MDP-Planner-Chip-Production/docs/notebooks/chip_production_supply_chain.py
+
+Line #    Mem usage    Increment  Occurrences   Line Contents
+=============================================================
+    33    121.3 MiB    121.3 MiB           1   @profile(stream=open(fp_compMDP, "w+"))
+    34                                         def execute_composition_ltlf(declare_automaton, services):
+    35   5259.9 MiB   5138.7 MiB           1       mdp = comp_mdp(declare_automaton, services, gamma=0.9)
+    36   5259.9 MiB      0.0 MiB           1       return mdp
+
+

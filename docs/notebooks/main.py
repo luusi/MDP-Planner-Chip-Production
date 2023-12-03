@@ -7,7 +7,11 @@ from stochastic_service_composition.composition_mdp import composition_mdp
 from stochastic_service_composition.composition_mdp import comp_mdp
 from mdp_dp_rl.algorithms.dp.dp_analytic import DPAnalytic
 from docs.notebooks.setup import *
+import os
 
+# create folder if not exists
+if not os.path.exists('experimental_results'):
+    os.makedirs('experimental_results')
 
 config_json = json.load(open('config.json', 'r'))
 mode = config_json['mode']
@@ -32,6 +36,7 @@ def execute_composition_automata(target, services):
 # LTLf
 @profile(stream=open(fp_compMDP, "w+"))
 def execute_composition_ltlf(declare_automaton, services):
+    print("Composition MDP computing...")
     mdp = comp_mdp(declare_automaton, services, gamma=0.9)
     return mdp
 
@@ -43,9 +48,9 @@ def execute_policy(mdp):
     return opt_policy
     
 def main():
-    to_write = f"Mode: {mode}\nPhase: {phase}\n" if phase == 1 else f"Mode: {mode}\nPhase: {phase}\nSize: {size}\n"
+    to_write = f"Mode: {mode}\nPhase: {phase}\n" if phase == 1 else f"Mode: {mode}\nPhase: {phase}\nSize: {size}"
     with open(file_name, "w+") as f:
-        f.write(to_write)
+        f.write(f"{to_write}\n")
     print(to_write)
 
     
@@ -57,9 +62,9 @@ def main():
         all_services = services_phase2(size)
         target = target_service_phase2_automata() if mode == "automata" else target_service_phase2_ltlf()
 
-    to_write = f"Tot_services: {len(all_services)}\n"
+    to_write = f"Tot_services: {len(all_services)}"
     with open(file_name, "a") as f:
-        f.write(to_write)
+        f.write(f"{to_write}\n")
     print(to_write)
     
     print("Services created.\nStarting composition...")
@@ -103,9 +108,10 @@ def main():
     print("Done.")
             
 if __name__ == '__main__':
-    try:
+    main()
+    '''try:
         main()
     except Exception as e:
         with open(file_name, "w+") as f:
             to_write = f"Esecuzione fallita: {e}"
-            f.write(to_write)
+            f.write(to_write)'''
