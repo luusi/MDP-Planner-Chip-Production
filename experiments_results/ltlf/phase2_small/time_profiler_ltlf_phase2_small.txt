@@ -1,7 +1,0 @@
-Mode: ltlf
-Phase: 2
-Size: small
-Tot_services: 14
-MDP states: 833466
-Composition elapsed time: 363.809092793 s
-Policy elapsed time: 1850.21855088 s

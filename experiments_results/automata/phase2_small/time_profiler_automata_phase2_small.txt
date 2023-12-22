@@ -1,7 +1,0 @@
-Mode: automata
-Phase: 2
-Size: small
-Tot_services: 14
-MDP states: 873
-Composition elapsed time: 134.680510051 s
-Policy elapsed time: 1.436751391 s
