@@ -1,0 +1,3 @@
+Mode: automata
+Size: small
+Tot_services: 38

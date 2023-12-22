@@ -1,5 +1,5 @@
 {
     "mode": "automata",
-    "phase": 1,
-    "size": "manageable1"
+    "phase": 2,
+    "size": "small"
 }
