@@ -1,5 +1,5 @@
 {
-    "mode": "automata",
+    "mode": "ltlf",
     "phase": 2,
     "size": "small"
 }

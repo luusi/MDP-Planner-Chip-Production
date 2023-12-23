@@ -73,84 +73,6 @@ DICING = "dic"
 CLASSIC_PACKAGING = "pac"  
 THERMAL_PACKAGING = "pac_t"     #for cooling of GPU
 
-ALL_SYMBOLS = [
-    PICK_DESIGN,
-    PICK_SILICON,
-    PICK_IMPURITIES,
-    PICK_RESIST,
-    PICK_CHEMICALS,
-    MASK_CREATION,
-    PHOTOLITOGRAPHY,
-    ETCHING,
-    DEPOSITION,
-    ION_IMPLANTATION,
-    PROCESSING,
-    TESTING,
-    TESTING_GRAPHICS,
-    QUALITY,
-    QUALITY_GRAPHICS,
-    DICING,
-    CLASSIC_PACKAGING,
-    THERMAL_PACKAGING
-]
-
-ALL_SYMBOLS_SET = set(ALL_SYMBOLS)
-
-
-# declare process specification
-declare_constraints = [
-    exactly_once(PICK_DESIGN),
-    exactly_once(PICK_SILICON),
-    exactly_once(PICK_IMPURITIES),
-    exactly_once(PICK_RESIST),
-    exactly_once(PICK_CHEMICALS),
-    exactly_once(MASK_CREATION),
-    exactly_once(PHOTOLITOGRAPHY),
-    exactly_once(ETCHING),
-    exactly_once(DEPOSITION),
-    exactly_once(ION_IMPLANTATION),
-    exactly_once(PROCESSING),
-    exactly_once(DICING),
-    
-    absence_2(TESTING),
-    absence_2(TESTING_GRAPHICS),
-    absence_2(QUALITY),
-    absence_2(QUALITY_GRAPHICS),
-    absence_2(THERMAL_PACKAGING),
-    absence_2(CLASSIC_PACKAGING),
-    
-    alt_succession(PICK_DESIGN, MASK_CREATION),
-    alt_succession(PICK_SILICON, MASK_CREATION),
-    alt_succession(PICK_IMPURITIES, MASK_CREATION),
-    alt_succession(PICK_RESIST, MASK_CREATION),
-    alt_succession(PICK_CHEMICALS, MASK_CREATION),
-    
-    alt_succession(MASK_CREATION, PHOTOLITOGRAPHY),
-    alt_succession(PHOTOLITOGRAPHY, ETCHING),
-    alt_succession(ETCHING, DEPOSITION),
-    alt_succession(DEPOSITION, ION_IMPLANTATION),
-    alt_succession(ION_IMPLANTATION, PROCESSING),
-    
-    alt_precedence(PROCESSING, TESTING),
-    alt_precedence(PROCESSING, TESTING_GRAPHICS),
-    
-    alt_succession(TESTING, QUALITY),
-    alt_succession(TESTING_GRAPHICS, QUALITY_GRAPHICS),
-    
-    alt_response(QUALITY, DICING),
-    alt_response(QUALITY_GRAPHICS, DICING),
-    precedence_or(QUALITY, QUALITY_GRAPHICS, DICING),
-    
-    alt_precedence(DICING, CLASSIC_PACKAGING),
-    alt_precedence(DICING, THERMAL_PACKAGING),
-    
-    not_coexistence(TESTING, TESTING_GRAPHICS),
-    not_coexistence(QUALITY, QUALITY_GRAPHICS),
-    not_coexistence(CLASSIC_PACKAGING, THERMAL_PACKAGING),
-    
-    build_declare_assumption(ALL_SYMBOLS_SET)
-]
-
 
 # service names
 DESIGN_SERVICE_NAME_USA = "p_d_usa"
@@ -319,7 +241,7 @@ def build_complex_breakable_service(service_name: str, action_name: str, broken_
     return build_service_from_transitions(transitions, initial_state, final_states)  # type: ignore
 
 
-def process_services(dimension):
+def process_services(mode, dimension):
     '''Builds all the services for the given dimension of the problem.'''
     all_services = [
         build_generic_service_one_state(DESIGN_SERVICE_NAME_USA, {PICK_DESIGN}, USA_REWARD),
@@ -350,7 +272,7 @@ def process_services(dimension):
         build_generic_service_one_state(CHEMICALS_SERVICE_NAME_USA, {PICK_CHEMICALS}, USA_REWARD),
         build_generic_service_one_state(CHEMICALS_SERVICE_NAME_CANADA, {PICK_CHEMICALS}, CANADA_REWARD),
     ]
-    if dimension == "small":
+    if mode == "automata" and dimension == "small":
         other_services = [
             build_complex_breakable_service(MASK_CREATION1_SERVICE_NAME, MASK_CREATION, DEFAULT_BROKEN_PROB, DEFAULT_UNEMPLOYABLE_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD),
             build_complex_breakable_service(MASK_CREATION2_SERVICE_NAME, MASK_CREATION, DEFAULT_BROKEN_PROB, DEFAULT_UNEMPLOYABLE_PROB, DEFAULT_BROKEN_REWARD, HIGH_USA_REWARD),
@@ -359,61 +281,37 @@ def process_services(dimension):
 
             build_generic_breakable_service(ETCHING1_SERVICE_NAME, ETCHING, DEFAULT_BROKEN_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD),
 
-            build_generic_breakable_service(DEPOSITION1_SERVICE_NAME, DEPOSITION, DEFAULT_BROKEN_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD),
-
             build_generic_breakable_service(ION_IMPLANTATION1_SERVICE_NAME, ION_IMPLANTATION, DEFAULT_BROKEN_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD),
 
-            build_generic_breakable_service(PROCESSING1_SERVICE_NAME, PROCESSING, DEFAULT_BROKEN_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD),
-
             build_generic_breakable_service(TESTING1_SERVICE_NAME, TESTING, DEFAULT_BROKEN_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD),
-
-            build_generic_breakable_service(TESTING_GRAPHICS1_SERVICE_NAME, TESTING_GRAPHICS, DEFAULT_BROKEN_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD),
-
-            build_generic_breakable_service(QUALITY1_SERVICE_NAME, QUALITY, DEFAULT_BROKEN_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD),
-
-            build_generic_breakable_service(QUALITY_GRAPHICS1_SERVICE_NAME, QUALITY_GRAPHICS, DEFAULT_BROKEN_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD),
 
             build_complex_breakable_service(DICING1_SERVICE_NAME, DICING, DEFAULT_BROKEN_PROB, DEFAULT_UNEMPLOYABLE_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD),
             build_complex_breakable_service(DICING2_SERVICE_NAME, DICING, DEFAULT_BROKEN_PROB, DEFAULT_UNEMPLOYABLE_PROB, DEFAULT_BROKEN_REWARD, HIGH_USA_REWARD),
 
             build_generic_breakable_service(PACKAGING1_SERVICE_NAME, CLASSIC_PACKAGING, DEFAULT_BROKEN_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD),
-
-            build_generic_breakable_service(THERMAL_PACKAGING1_SERVICE_NAME, THERMAL_PACKAGING, DEFAULT_BROKEN_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD),
         ]
-    elif dimension == "medium":
+    elif mode == "automata" and dimension == "medium":
         other_services = [
             build_complex_breakable_service(MASK_CREATION1_SERVICE_NAME, MASK_CREATION, DEFAULT_BROKEN_PROB, DEFAULT_UNEMPLOYABLE_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD),
             build_complex_breakable_service(MASK_CREATION2_SERVICE_NAME, MASK_CREATION, DEFAULT_BROKEN_PROB, DEFAULT_UNEMPLOYABLE_PROB, DEFAULT_BROKEN_REWARD, HIGH_USA_REWARD),
 
             build_generic_breakable_service(PHOTOLITOGRAPHY1_SERVICE_NAME, PHOTOLITOGRAPHY, DEFAULT_BROKEN_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD),
 
-            build_generic_breakable_service(ETCHING1_SERVICE_NAME, ETCHING, DEFAULT_BROKEN_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD),
+            build_complex_breakable_service(ETCHING1_SERVICE_NAME, ETCHING, DEFAULT_BROKEN_PROB, DEFAULT_UNEMPLOYABLE_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD),
+            build_complex_breakable_service(ETCHING2_SERVICE_NAME, ETCHING, DEFAULT_BROKEN_PROB, DEFAULT_UNEMPLOYABLE_PROB, DEFAULT_BROKEN_REWARD, HIGH_USA_REWARD),
 
-            build_generic_breakable_service(DEPOSITION1_SERVICE_NAME, DEPOSITION, DEFAULT_BROKEN_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD),
-
-            build_generic_breakable_service(ION_IMPLANTATION1_SERVICE_NAME, ION_IMPLANTATION, DEFAULT_BROKEN_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD),
-
-            build_complex_breakable_service(PROCESSING1_SERVICE_NAME, PROCESSING, DEFAULT_BROKEN_PROB, DEFAULT_UNEMPLOYABLE_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD),
-            build_complex_breakable_service(PROCESSING2_SERVICE_NAME, PROCESSING, DEFAULT_BROKEN_PROB, DEFAULT_UNEMPLOYABLE_PROB, DEFAULT_BROKEN_REWARD, HIGH_USA_REWARD),
+            build_complex_breakable_service(ION_IMPLANTATION1_SERVICE_NAME, ION_IMPLANTATION, DEFAULT_BROKEN_PROB, DEFAULT_UNEMPLOYABLE_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD),
+            build_complex_breakable_service(ION_IMPLANTATION2_SERVICE_NAME, ION_IMPLANTATION, DEFAULT_BROKEN_PROB, DEFAULT_UNEMPLOYABLE_PROB, DEFAULT_BROKEN_REWARD, HIGH_USA_REWARD),
 
             build_complex_breakable_service(TESTING1_SERVICE_NAME, TESTING, DEFAULT_BROKEN_PROB, DEFAULT_UNEMPLOYABLE_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD),
             build_complex_breakable_service(TESTING2_SERVICE_NAME, TESTING, DEFAULT_BROKEN_PROB, DEFAULT_UNEMPLOYABLE_PROB, DEFAULT_BROKEN_REWARD, HIGH_USA_REWARD),
 
-            build_generic_breakable_service(TESTING_GRAPHICS1_SERVICE_NAME, TESTING_GRAPHICS, DEFAULT_BROKEN_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD),
-
-            build_complex_breakable_service(QUALITY1_SERVICE_NAME, QUALITY, DEFAULT_BROKEN_PROB, DEFAULT_UNEMPLOYABLE_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD),
-            build_complex_breakable_service(QUALITY2_SERVICE_NAME, QUALITY, DEFAULT_BROKEN_PROB, DEFAULT_UNEMPLOYABLE_PROB, DEFAULT_BROKEN_REWARD, HIGH_USA_REWARD),
-
-            build_generic_breakable_service(QUALITY_GRAPHICS1_SERVICE_NAME, QUALITY_GRAPHICS, DEFAULT_BROKEN_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD),
-
             build_complex_breakable_service(DICING1_SERVICE_NAME, DICING, DEFAULT_BROKEN_PROB, DEFAULT_UNEMPLOYABLE_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD),
             build_complex_breakable_service(DICING2_SERVICE_NAME, DICING, DEFAULT_BROKEN_PROB, DEFAULT_UNEMPLOYABLE_PROB, DEFAULT_BROKEN_REWARD, HIGH_USA_REWARD),
 
             build_generic_breakable_service(PACKAGING1_SERVICE_NAME, CLASSIC_PACKAGING, DEFAULT_BROKEN_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD),
-
-            build_generic_breakable_service(THERMAL_PACKAGING1_SERVICE_NAME, THERMAL_PACKAGING, DEFAULT_BROKEN_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD),
         ]
-    elif dimension == "large":
+    elif mode == "automata" and dimension == "large":
         other_services = [
             build_complex_breakable_service(MASK_CREATION1_SERVICE_NAME, MASK_CREATION, DEFAULT_BROKEN_PROB, DEFAULT_UNEMPLOYABLE_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD),
             build_complex_breakable_service(MASK_CREATION2_SERVICE_NAME, MASK_CREATION, DEFAULT_BROKEN_PROB, DEFAULT_UNEMPLOYABLE_PROB, DEFAULT_BROKEN_REWARD, HIGH_USA_REWARD),
@@ -424,14 +322,78 @@ def process_services(dimension):
             build_complex_breakable_service(ETCHING1_SERVICE_NAME, ETCHING, DEFAULT_BROKEN_PROB, DEFAULT_UNEMPLOYABLE_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD),
             build_complex_breakable_service(ETCHING2_SERVICE_NAME, ETCHING, DEFAULT_BROKEN_PROB, DEFAULT_UNEMPLOYABLE_PROB, DEFAULT_BROKEN_REWARD, HIGH_USA_REWARD),
 
-            build_complex_breakable_service(DEPOSITION1_SERVICE_NAME, DEPOSITION, DEFAULT_BROKEN_PROB, DEFAULT_UNEMPLOYABLE_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD),
-            build_complex_breakable_service(DEPOSITION2_SERVICE_NAME, DEPOSITION, DEFAULT_BROKEN_PROB, DEFAULT_UNEMPLOYABLE_PROB, DEFAULT_BROKEN_REWARD, HIGH_USA_REWARD),
+            build_complex_breakable_service(ION_IMPLANTATION1_SERVICE_NAME, ION_IMPLANTATION, DEFAULT_BROKEN_PROB, DEFAULT_UNEMPLOYABLE_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD),
+            build_complex_breakable_service(ION_IMPLANTATION2_SERVICE_NAME, ION_IMPLANTATION, DEFAULT_BROKEN_PROB, DEFAULT_UNEMPLOYABLE_PROB, DEFAULT_BROKEN_REWARD, HIGH_USA_REWARD),
+
+            build_complex_breakable_service(TESTING1_SERVICE_NAME, TESTING, DEFAULT_BROKEN_PROB, DEFAULT_UNEMPLOYABLE_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD),
+            build_complex_breakable_service(TESTING2_SERVICE_NAME, TESTING, DEFAULT_BROKEN_PROB, DEFAULT_UNEMPLOYABLE_PROB, DEFAULT_BROKEN_REWARD, HIGH_USA_REWARD),
+
+            build_complex_breakable_service(DICING1_SERVICE_NAME, DICING, DEFAULT_BROKEN_PROB, DEFAULT_UNEMPLOYABLE_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD),
+            build_complex_breakable_service(DICING2_SERVICE_NAME, DICING, DEFAULT_BROKEN_PROB, DEFAULT_UNEMPLOYABLE_PROB, DEFAULT_BROKEN_REWARD, HIGH_USA_REWARD),
+
+            build_complex_breakable_service(PACKAGING1_SERVICE_NAME, CLASSIC_PACKAGING, DEFAULT_BROKEN_PROB, DEFAULT_UNEMPLOYABLE_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD),
+            build_complex_breakable_service(PACKAGING2_SERVICE_NAME, CLASSIC_PACKAGING, DEFAULT_BROKEN_PROB, DEFAULT_UNEMPLOYABLE_PROB, DEFAULT_BROKEN_REWARD, HIGH_USA_REWARD),
+        ]
+    elif mode == "ltlf" and dimension == "small":
+        other_services = [
+            build_complex_breakable_service(MASK_CREATION1_SERVICE_NAME, MASK_CREATION, DEFAULT_BROKEN_PROB, DEFAULT_UNEMPLOYABLE_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD),
+            build_complex_breakable_service(MASK_CREATION2_SERVICE_NAME, MASK_CREATION, DEFAULT_BROKEN_PROB, DEFAULT_UNEMPLOYABLE_PROB, DEFAULT_BROKEN_REWARD, HIGH_USA_REWARD),
+
+            build_generic_breakable_service(PHOTOLITOGRAPHY1_SERVICE_NAME, PHOTOLITOGRAPHY, DEFAULT_BROKEN_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD),
+
+            build_generic_breakable_service(ETCHING1_SERVICE_NAME, ETCHING, DEFAULT_BROKEN_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD),
+
+            build_generic_breakable_service(ION_IMPLANTATION1_SERVICE_NAME, ION_IMPLANTATION, DEFAULT_BROKEN_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD),
+
+            build_generic_breakable_service(TESTING1_SERVICE_NAME, TESTING, DEFAULT_BROKEN_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD),
+
+            build_generic_breakable_service(TESTING_GRAPHICS1_SERVICE_NAME, TESTING_GRAPHICS, DEFAULT_BROKEN_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD),
+
+            build_complex_breakable_service(DICING1_SERVICE_NAME, DICING, DEFAULT_BROKEN_PROB, DEFAULT_UNEMPLOYABLE_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD),
+            build_complex_breakable_service(DICING2_SERVICE_NAME, DICING, DEFAULT_BROKEN_PROB, DEFAULT_UNEMPLOYABLE_PROB, DEFAULT_BROKEN_REWARD, HIGH_USA_REWARD),
+
+            build_generic_breakable_service(PACKAGING1_SERVICE_NAME, CLASSIC_PACKAGING, DEFAULT_BROKEN_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD),
+
+            build_generic_breakable_service(THERMAL_PACKAGING1_SERVICE_NAME, THERMAL_PACKAGING, DEFAULT_BROKEN_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD)
+        ]
+    elif mode == "ltlf" and dimension == "medium":
+        other_services = [
+            build_complex_breakable_service(MASK_CREATION1_SERVICE_NAME, MASK_CREATION, DEFAULT_BROKEN_PROB, DEFAULT_UNEMPLOYABLE_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD),
+            build_complex_breakable_service(MASK_CREATION2_SERVICE_NAME, MASK_CREATION, DEFAULT_BROKEN_PROB, DEFAULT_UNEMPLOYABLE_PROB, DEFAULT_BROKEN_REWARD, HIGH_USA_REWARD),
+
+            build_generic_breakable_service(PHOTOLITOGRAPHY1_SERVICE_NAME, PHOTOLITOGRAPHY, DEFAULT_BROKEN_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD),
+
+            build_complex_breakable_service(ETCHING1_SERVICE_NAME, ETCHING, DEFAULT_BROKEN_PROB, DEFAULT_UNEMPLOYABLE_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD),
+            build_complex_breakable_service(ETCHING2_SERVICE_NAME, ETCHING, DEFAULT_BROKEN_PROB, DEFAULT_UNEMPLOYABLE_PROB, DEFAULT_BROKEN_REWARD, HIGH_USA_REWARD),
 
             build_complex_breakable_service(ION_IMPLANTATION1_SERVICE_NAME, ION_IMPLANTATION, DEFAULT_BROKEN_PROB, DEFAULT_UNEMPLOYABLE_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD),
             build_complex_breakable_service(ION_IMPLANTATION2_SERVICE_NAME, ION_IMPLANTATION, DEFAULT_BROKEN_PROB, DEFAULT_UNEMPLOYABLE_PROB, DEFAULT_BROKEN_REWARD, HIGH_USA_REWARD),
 
-            build_complex_breakable_service(PROCESSING1_SERVICE_NAME, PROCESSING, DEFAULT_BROKEN_PROB, DEFAULT_UNEMPLOYABLE_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD),
-            build_complex_breakable_service(PROCESSING2_SERVICE_NAME, PROCESSING, DEFAULT_BROKEN_PROB, DEFAULT_UNEMPLOYABLE_PROB, DEFAULT_BROKEN_REWARD, HIGH_USA_REWARD),
+            build_complex_breakable_service(TESTING1_SERVICE_NAME, TESTING, DEFAULT_BROKEN_PROB, DEFAULT_UNEMPLOYABLE_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD),
+            build_complex_breakable_service(TESTING2_SERVICE_NAME, TESTING, DEFAULT_BROKEN_PROB, DEFAULT_UNEMPLOYABLE_PROB, DEFAULT_BROKEN_REWARD, HIGH_USA_REWARD),
+
+            build_generic_breakable_service(TESTING_GRAPHICS1_SERVICE_NAME, TESTING_GRAPHICS, DEFAULT_BROKEN_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD),
+
+            build_complex_breakable_service(DICING1_SERVICE_NAME, DICING, DEFAULT_BROKEN_PROB, DEFAULT_UNEMPLOYABLE_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD),
+            build_complex_breakable_service(DICING2_SERVICE_NAME, DICING, DEFAULT_BROKEN_PROB, DEFAULT_UNEMPLOYABLE_PROB, DEFAULT_BROKEN_REWARD, HIGH_USA_REWARD),
+
+            build_generic_breakable_service(PACKAGING1_SERVICE_NAME, CLASSIC_PACKAGING, DEFAULT_BROKEN_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD),
+
+            build_generic_breakable_service(THERMAL_PACKAGING1_SERVICE_NAME, THERMAL_PACKAGING, DEFAULT_BROKEN_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD)
+        ]
+    elif mode == "ltlf" and dimension == "large":
+        other_services = [
+            build_complex_breakable_service(MASK_CREATION1_SERVICE_NAME, MASK_CREATION, DEFAULT_BROKEN_PROB, DEFAULT_UNEMPLOYABLE_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD),
+            build_complex_breakable_service(MASK_CREATION2_SERVICE_NAME, MASK_CREATION, DEFAULT_BROKEN_PROB, DEFAULT_UNEMPLOYABLE_PROB, DEFAULT_BROKEN_REWARD, HIGH_USA_REWARD),
+
+            build_complex_breakable_service(PHOTOLITOGRAPHY1_SERVICE_NAME, PHOTOLITOGRAPHY, DEFAULT_BROKEN_PROB, DEFAULT_UNEMPLOYABLE_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD),
+            build_complex_breakable_service(PHOTOLITOGRAPHY2_SERVICE_NAME, PHOTOLITOGRAPHY, DEFAULT_BROKEN_PROB, DEFAULT_UNEMPLOYABLE_PROB, DEFAULT_BROKEN_REWARD, HIGH_USA_REWARD),
+
+            build_complex_breakable_service(ETCHING1_SERVICE_NAME, ETCHING, DEFAULT_BROKEN_PROB, DEFAULT_UNEMPLOYABLE_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD),
+            build_complex_breakable_service(ETCHING2_SERVICE_NAME, ETCHING, DEFAULT_BROKEN_PROB, DEFAULT_UNEMPLOYABLE_PROB, DEFAULT_BROKEN_REWARD, HIGH_USA_REWARD),
+
+            build_complex_breakable_service(ION_IMPLANTATION1_SERVICE_NAME, ION_IMPLANTATION, DEFAULT_BROKEN_PROB, DEFAULT_UNEMPLOYABLE_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD),
+            build_complex_breakable_service(ION_IMPLANTATION2_SERVICE_NAME, ION_IMPLANTATION, DEFAULT_BROKEN_PROB, DEFAULT_UNEMPLOYABLE_PROB, DEFAULT_BROKEN_REWARD, HIGH_USA_REWARD),
 
             build_complex_breakable_service(TESTING1_SERVICE_NAME, TESTING, DEFAULT_BROKEN_PROB, DEFAULT_UNEMPLOYABLE_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD),
             build_complex_breakable_service(TESTING2_SERVICE_NAME, TESTING, DEFAULT_BROKEN_PROB, DEFAULT_UNEMPLOYABLE_PROB, DEFAULT_BROKEN_REWARD, HIGH_USA_REWARD),
@@ -439,20 +401,14 @@ def process_services(dimension):
             build_complex_breakable_service(TESTING_GRAPHICS1_SERVICE_NAME, TESTING_GRAPHICS, DEFAULT_BROKEN_PROB, DEFAULT_UNEMPLOYABLE_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD),
             build_complex_breakable_service(TESTING_GRAPHICS2_SERVICE_NAME, TESTING_GRAPHICS, DEFAULT_BROKEN_PROB, DEFAULT_UNEMPLOYABLE_PROB, DEFAULT_BROKEN_REWARD, HIGH_USA_REWARD),
 
-            build_complex_breakable_service(QUALITY1_SERVICE_NAME, QUALITY, DEFAULT_BROKEN_PROB, DEFAULT_UNEMPLOYABLE_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD),
-            build_complex_breakable_service(QUALITY2_SERVICE_NAME, QUALITY, DEFAULT_BROKEN_PROB, DEFAULT_UNEMPLOYABLE_PROB, DEFAULT_BROKEN_REWARD, HIGH_USA_REWARD),
-
-            build_complex_breakable_service(QUALITY_GRAPHICS1_SERVICE_NAME, QUALITY_GRAPHICS, DEFAULT_BROKEN_PROB, DEFAULT_UNEMPLOYABLE_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD),
-            build_complex_breakable_service(QUALITY_GRAPHICS2_SERVICE_NAME, QUALITY_GRAPHICS, DEFAULT_BROKEN_PROB, DEFAULT_UNEMPLOYABLE_PROB, DEFAULT_BROKEN_REWARD, HIGH_USA_REWARD),
-
             build_complex_breakable_service(DICING1_SERVICE_NAME, DICING, DEFAULT_BROKEN_PROB, DEFAULT_UNEMPLOYABLE_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD),
             build_complex_breakable_service(DICING2_SERVICE_NAME, DICING, DEFAULT_BROKEN_PROB, DEFAULT_UNEMPLOYABLE_PROB, DEFAULT_BROKEN_REWARD, HIGH_USA_REWARD),
 
             build_complex_breakable_service(PACKAGING1_SERVICE_NAME, CLASSIC_PACKAGING, DEFAULT_BROKEN_PROB, DEFAULT_UNEMPLOYABLE_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD),
             build_complex_breakable_service(PACKAGING2_SERVICE_NAME, CLASSIC_PACKAGING, DEFAULT_BROKEN_PROB, DEFAULT_UNEMPLOYABLE_PROB, DEFAULT_BROKEN_REWARD, HIGH_USA_REWARD),
 
-            build_complex_breakable_service(THERMAL_PACKAGING1_SERVICE_NAME, THERMAL_PACKAGING, DEFAULT_BROKEN_PROB, DEFAULT_UNEMPLOYABLE_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD),
-            build_complex_breakable_service(THERMAL_PACKAGING2_SERVICE_NAME, THERMAL_PACKAGING, DEFAULT_BROKEN_PROB, DEFAULT_UNEMPLOYABLE_PROB, DEFAULT_BROKEN_REWARD, HIGH_USA_REWARD),
+            build_complex_breakable_service(THERMAL_PACKAGING1_SERVICE_NAME, THERMAL_PACKAGING, DEFAULT_BROKEN_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD),
+            build_complex_breakable_service(THERMAL_PACKAGING2_SERVICE_NAME, THERMAL_PACKAGING, DEFAULT_BROKEN_PROB, DEFAULT_BROKEN_REWARD, HIGH_USA_REWARD)
         ]
     res_services = all_services + other_services
     return res_services
@@ -472,33 +428,25 @@ def target_service_automata(dimension):
             "s5": {f"con_{MASK_CREATION}": ("s6", 1.0, 0), },
             "s6": {f"che_{MASK_CREATION}": ("s7", 1.0, 0), },
             "s7": {MASK_CREATION: ("s8", 1.0, 0), },
-            
+
             "s8": {PHOTOLITOGRAPHY: ("s9", 1.0, 0), },
             "s9": {f"ch_{PHOTOLITOGRAPHY}": ("s10", 1.0, 0), },
-            
+
             "s10": {ETCHING: ("s11", 1.0, 0), },
             "s11": {f"ch_{ETCHING}": ("s12", 1.0, 0), },
-            
-            "s12": {DEPOSITION: ("s13", 1.0, 0), },
-            "s13": {f"ch_{DEPOSITION}": ("s14", 1.0, 0), },
-            
-            "s14": {ION_IMPLANTATION: ("s15", 1.0, 0), },
-            "s15": {f"ch_{ION_IMPLANTATION}": ("s16", 1.0, 0), },
-            
-            "s16": {PROCESSING: ("s17", 1.0, 0), },
-            "s17": {f"ch_{PROCESSING}": ("s18", 1.0, 0), },
-            
-            "s18": {TESTING: ("s19", 1.0, 0), },
-            "s19": {f"ch_{TESTING}": ("s20", 1.0, 0), },
-            
-            "s20": {QUALITY: ("s21", 1.0, 0), },
-            "s21": {f"ch_{QUALITY}": ("s22", 1.0, 0), },
-            
-            "s22": {f"con_{DICING}": ("s23", 1.0, 0), },
-            "s23": {f"che_{DICING}": ("s24", 1.0, 0), },
-            "s24": {DICING: ("s25", 1.0, 0), },
-            
-            "s25": {CLASSIC_PACKAGING: ("s26", 1.0, 0), }
+
+            "s12": {ION_IMPLANTATION: ("s13", 1.0, 0), },
+            "s13": {f"ch_{ION_IMPLANTATION}": ("s14", 1.0, 0), },
+
+            "s14": {TESTING: ("s15", 1.0, 0), },
+            "s15": {f"ch_{TESTING}": ("s16", 1.0, 0), },
+
+            "s16": {f"con_{DICING}": ("s17", 1.0, 0), },
+            "s17": {f"che_{DICING}": ("s18", 1.0, 0), },
+            "s18": {DICING: ("s19", 1.0, 0), },
+
+            "s19": {CLASSIC_PACKAGING: ("s20", 1.0, 0), },
+            "s20": {f"ch_{CLASSIC_PACKAGING}": ("s0", 1.0, 0), }
         }
     elif dimension == "medium":
         transition_function = {
@@ -509,38 +457,30 @@ def target_service_automata(dimension):
             "s4": {PICK_CHEMICALS: ("s5", 1.0, 0), },
 
             "s5": {f"con_{MASK_CREATION}": ("s6", 1.0, 0), },
-            "s6": {f"ch_{MASK_CREATION}": ("s7", 1.0, 0), },
+            "s6": {f"che_{MASK_CREATION}": ("s7", 1.0, 0), },
             "s7": {MASK_CREATION: ("s8", 1.0, 0), },
-            
+
             "s8": {PHOTOLITOGRAPHY: ("s9", 1.0, 0), },
             "s9": {f"ch_{PHOTOLITOGRAPHY}": ("s10", 1.0, 0), },
-            
-            "s10": {ETCHING: ("s11", 1.0, 0), },
-            "s11": {f"ch_{ETCHING}": ("s12", 1.0, 0), },
-            
-            "s12": {DEPOSITION: ("s13", 1.0, 0), },
-            "s13": {f"ch_{DEPOSITION}": ("s14", 1.0, 0), },
-            
-            "s14": {ION_IMPLANTATION: ("s15", 1.0, 0), },
-            "s15": {f"ch_{ION_IMPLANTATION}": ("s16", 1.0, 0), },
-            
-            "s16": {f"con_{PROCESSING}": ("s17", 1.0, 0), },
-            "s17": {f"ch_{PROCESSING}": ("s18", 1.0, 0), },
-            "s18": {PROCESSING: ("s19", 1.0, 0), },
-            
-            "s19": {f"con_{TESTING}": ("s20", 1.0, 0), },
-            "s20": {f"ch_{TESTING}": ("s21", 1.0, 0), },
-            "s21": {TESTING: ("s22", 1.0, 0), },
-            
-            "s22": {f"con_{QUALITY}": ("s23", 1.0, 0), },
-            "s23": {f"ch_{QUALITY}": ("s24", 1.0, 0), },
-            "s24": {QUALITY: ("s25", 1.0, 0), },
-            
-            "s25": {f"con_{DICING}": ("s26", 1.0, 0), },
-            "s26": {f"ch_{DICING}": ("s27", 1.0, 0), },
-            "s27": {DICING: ("s28", 1.0, 0), },
-            
-            "s29": {CLASSIC_PACKAGING: ("s30", 1.0, 0), }
+
+            "s10": {f"con_{ETCHING}": ("s11", 1.0, 0), },
+            "s11": {f"che_{ETCHING}": ("s12", 1.0, 0), },
+            "s12": {ETCHING: ("s13", 1.0, 0), },
+
+            "s13": {f"con_{ION_IMPLANTATION}": ("s14", 1.0, 0), },
+            "s14": {f"che_{ION_IMPLANTATION}": ("s15", 1.0, 0), },
+            "s15": {ION_IMPLANTATION: ("s16", 1.0, 0), },
+
+            "s16": {f"con_{TESTING}": ("s17", 1.0, 0), },
+            "s17": {f"che_{TESTING}": ("s18", 1.0, 0), },
+            "s18": {TESTING: ("s19", 1.0, 0), },
+
+            "s19": {f"con_{DICING}": ("s20", 1.0, 0), },
+            "s20": {f"che_{DICING}": ("s21", 1.0, 0), },
+            "s21": {DICING: ("s22", 1.0, 0), },
+
+            "s22": {CLASSIC_PACKAGING: ("s23", 1.0, 0), },
+            "s23": {f"ch_{CLASSIC_PACKAGING}": ("s0", 1.0, 0), }
         }
     elif dimension == "large":
         transition_function = {
@@ -562,25 +502,13 @@ def target_service_automata(dimension):
             "s12": {f"ch_{ETCHING}": ("s13", 1.0, 0), },
             "s13": {ETCHING: ("s14", 1.0, 0), },
             
-            "s14": {f"con_{DEPOSITION}": ("s15", 1.0, 0), },
-            "s15": {f"ch_{DEPOSITION}": ("s16", 1.0, 0), },
-            "s16": {DEPOSITION: ("s17", 1.0, 0), },
-            
             "s17": {f"con_{ION_IMPLANTATION}": ("s18", 1.0, 0), },
             "s18": {f"ch_{ION_IMPLANTATION}": ("s19", 1.0, 0), },
             "s19": {ION_IMPLANTATION: ("s20", 1.0, 0), },
             
-            "s20": {f"con_{PROCESSING}": ("s21", 1.0, 0), },
-            "s21": {f"ch_{PROCESSING}": ("s22", 1.0, 0), },
-            "s22": {PROCESSING: ("s23", 1.0, 0), },
-            
             "s23": {f"con_{TESTING}": ("s24", 1.0, 0), },
             "s24": {f"ch_{TESTING}": ("s25", 1.0, 0), },
             "s25": {TESTING: ("s26", 1.0, 0), },
-            
-            "s26": {f"con_{QUALITY}": ("s27", 1.0, 0), },
-            "s27": {f"ch_{QUALITY}": ("s28", 1.0, 0), },
-            "s28": {QUALITY: ("s29", 1.0, 0), },
             
             "s29": {f"con_{DICING}": ("s30", 1.0, 0), },
             "s30": {f"ch_{DICING}": ("s31", 1.0, 0), },
@@ -588,7 +516,7 @@ def target_service_automata(dimension):
             
             "s23": {f"con_{CLASSIC_PACKAGING}": ("s24", 1.0, 0), },
             "s24": {f"ch_{CLASSIC_PACKAGING}": ("s25", 1.0, 0), },
-            "s25": {CLASSIC_PACKAGING: ("s26", 1.0, 0), }
+            "s25": {CLASSIC_PACKAGING: ("s0", 1.0, 0), }
         }
 
     initial_state = "s0"
@@ -597,6 +525,72 @@ def target_service_automata(dimension):
     return build_target_from_transitions(
         transition_function, initial_state, final_states
     )
+
+
+ALL_SYMBOLS = [
+    PICK_DESIGN,
+    PICK_SILICON,
+    PICK_IMPURITIES,
+    PICK_RESIST,
+    PICK_CHEMICALS,
+    MASK_CREATION,
+    PHOTOLITOGRAPHY,
+    ETCHING,
+    ION_IMPLANTATION,
+    TESTING,
+    TESTING_GRAPHICS,
+    DICING,
+    CLASSIC_PACKAGING,
+    THERMAL_PACKAGING
+]
+
+ALL_SYMBOLS_SET = set(ALL_SYMBOLS)
+
+
+# declare process specification
+declare_constraints = [
+    exactly_once(PICK_DESIGN),
+    exactly_once(PICK_SILICON),
+    exactly_once(PICK_IMPURITIES),
+    exactly_once(PICK_RESIST),
+    exactly_once(PICK_CHEMICALS),
+    exactly_once(MASK_CREATION),
+    exactly_once(PHOTOLITOGRAPHY),
+    exactly_once(ETCHING),
+    exactly_once(ION_IMPLANTATION),
+    exactly_once(DICING),
+    
+    absence_2(TESTING),
+    absence_2(TESTING_GRAPHICS),
+    absence_2(THERMAL_PACKAGING),
+    absence_2(CLASSIC_PACKAGING),
+    
+    alt_succession(PICK_DESIGN, MASK_CREATION),
+    alt_succession(PICK_SILICON, MASK_CREATION),
+    alt_succession(PICK_IMPURITIES, MASK_CREATION),
+    alt_succession(PICK_RESIST, MASK_CREATION),
+    alt_succession(PICK_CHEMICALS, MASK_CREATION),
+    
+    alt_succession(MASK_CREATION, PHOTOLITOGRAPHY),
+    alt_succession(PHOTOLITOGRAPHY, ETCHING),
+    alt_succession(ETCHING, ION_IMPLANTATION),
+    
+    alt_precedence(ION_IMPLANTATION, TESTING),
+    alt_precedence(ION_IMPLANTATION, TESTING_GRAPHICS),
+    
+    alt_response(TESTING, DICING),
+    alt_response(TESTING_GRAPHICS, DICING),
+    precedence_or(TESTING, TESTING_GRAPHICS, DICING),
+    
+    alt_precedence(DICING, CLASSIC_PACKAGING),
+    alt_precedence(DICING, THERMAL_PACKAGING),
+    
+    not_coexistence(TESTING, TESTING_GRAPHICS),
+    not_coexistence(QUALITY, QUALITY_GRAPHICS),
+    not_coexistence(CLASSIC_PACKAGING, THERMAL_PACKAGING),
+    
+    build_declare_assumption(ALL_SYMBOLS_SET)
+]
 
 
 def target_service_ltlf():

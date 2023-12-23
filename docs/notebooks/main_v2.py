@@ -7,8 +7,10 @@ from stochastic_service_composition.declare_utils import *
 from stochastic_service_composition.composition_mdp import composition_mdp
 from stochastic_service_composition.composition_mdp import comp_mdp
 from mdp_dp_rl.algorithms.dp.dp_analytic import DPAnalytic
+from docs.notebooks.utils import print_policy_data
 from docs.notebooks.setup_v2 import *
 import os
+
 
 # create folder if not exists
 if not os.path.exists('experimental_results'):
@@ -51,7 +53,7 @@ def main():
         f.write(f"{to_write}\n")
     print(to_write)
 
-    all_services = process_services(size)
+    all_services = process_services(mode, size)
     target = target_service_automata(size) if mode == "automata" else target_service_ltlf()
 
     to_write = f"Tot_services: {len(all_services)}"
@@ -73,11 +75,12 @@ def main():
         print("Number of states: ", states)
         print("Composition MDP computed.\nStarting computing policy...")
         now = time.time_ns()
-        execute_policy(mdp)
+        opt_policy = execute_policy(mdp)
         elapsed2 = (time.time_ns() - now) / 10 ** 9
         with open(file_name, "a") as f:
             to_write = f"Policy elapsed time: {elapsed2} s\n"
             f.write(to_write)
+        print_policy_data(opt_policy, file_name=file_name)
     # LTLf
     elif mode == "ltlf":
         now = time.time_ns()
@@ -90,11 +93,12 @@ def main():
         print("Number of states: ", states)
         print("Composition MDP computed.\nStarting computing policy...")
         now = time.time_ns()
-        execute_policy(mdp)
+        opt_policy = execute_policy(mdp)
         elapsed2 = (time.time_ns() - now) / 10 ** 9
         with open(file_name, "a") as f:
             to_write = f"Policy elapsed time: {elapsed2} s\n"
             f.write(to_write)
+        print_policy_data(opt_policy, file_name=file_name)
     
     print("Policy computed.")
     print("Done.")

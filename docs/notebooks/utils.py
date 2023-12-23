@@ -73,11 +73,13 @@ def print_policy_data(policy: Policy):
 
 
 @print_policy_data.register(DetPolicy)
-def print_policy_data(policy: DetPolicy):
-    print("Policy:")
-    for state, action_probs in policy.policy_data.items():
-        unique_action = list(action_probs)[0]
-        print(f"State={state},\tAction={unique_action}")
+def print_policy_data(policy: DetPolicy, file_name):
+    with open(file_name, "a") as f:
+        f.write("Policy:")
+        for state, action_probs in policy.policy_data.items():
+            unique_action = list(action_probs)[0]
+            f.write(f"State={state},\tAction={unique_action}")
+    return
 
 
 def print_value_function(value_function: VFDictType):
