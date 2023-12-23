@@ -8,7 +8,6 @@ from stochastic_service_composition.composition_mdp import composition_mdp
 from stochastic_service_composition.composition_mdp import comp_mdp
 from mdp_dp_rl.algorithms.dp.dp_analytic import DPAnalytic
 from docs.notebooks.utils import print_policy_data
-from docs.notebooks.setup_v3 import *
 import os
 
 
@@ -20,6 +19,14 @@ config_json = json.load(open('config.json', 'r'))
 mode = config_json['mode']
 phase = config_json['phase']
 size = config_json['size']
+setup = config_json['setup']
+
+if setup == "v1":
+    from docs.notebooks.setup import *
+elif setup == "v2":
+    from docs.notebooks.setup_v2 import *
+elif setup == "v3":
+    from docs.notebooks.setup_v3 import *
 
 now = datetime.now().strftime("%d_%m_%Y-%H_%M_%S")
 
@@ -80,7 +87,6 @@ def main():
         with open(file_name, "a") as f:
             to_write = f"Policy elapsed time: {elapsed2} s\n"
             f.write(to_write)
-        print_policy_data(opt_policy, file_name=file_name)
     # LTLf
     elif mode == "ltlf":
         now = time.time_ns()
@@ -98,16 +104,18 @@ def main():
         with open(file_name, "a") as f:
             to_write = f"Policy elapsed time: {elapsed2} s\n"
             f.write(to_write)
-        print_policy_data(opt_policy, file_name=file_name)
     
     print("Policy computed.")
+
+    print("Writing policy...")
+    print_policy_data(opt_policy, file_name=file_name)
+
     print("Done.")
             
 if __name__ == '__main__':
-    main()
-    '''try:
+    try:
         main()
     except Exception as e:
         with open(file_name, "w+") as f:
             to_write = f"Esecuzione fallita: {e}"
-            f.write(to_write)'''
+            f.write(to_write)
