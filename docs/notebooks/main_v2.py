@@ -8,7 +8,7 @@ from stochastic_service_composition.composition_mdp import composition_mdp
 from stochastic_service_composition.composition_mdp import comp_mdp
 from mdp_dp_rl.algorithms.dp.dp_analytic import DPAnalytic
 from docs.notebooks.utils import print_policy_data
-from docs.notebooks.setup_v2 import *
+from docs.notebooks.setup_v3 import *
 import os
 
 
