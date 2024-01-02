@@ -37,7 +37,7 @@ def execute_composition_automata(target, services):
 @profile(stream=open(fp_compMDP, "w+"))
 def execute_composition_ltlf(declare_automaton, services):
     print("Composition MDP computing...")
-    mdp = comp_mdp(declare_automaton, services, gamma=0.9)
+    mdp = comp_mdp(declare_automaton, services, gamma=0.1)
     return mdp
 
 # POLICY

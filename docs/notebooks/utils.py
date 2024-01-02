@@ -78,7 +78,7 @@ def print_policy_data(policy: DetPolicy, file_name):
         f.write("Policy:")
         for state, action_probs in policy.policy_data.items():
             unique_action = list(action_probs)[0]
-            f.write(f"State={state},\tAction={unique_action}")
+            f.write(f"State={state},\tAction={unique_action}\n")
     return
 
 

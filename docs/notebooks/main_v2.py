@@ -8,6 +8,7 @@ from stochastic_service_composition.composition_mdp import composition_mdp
 from stochastic_service_composition.composition_mdp import comp_mdp
 from mdp_dp_rl.algorithms.dp.dp_analytic import DPAnalytic
 from docs.notebooks.utils import print_policy_data
+from docs.notebooks.setup_v2 import *
 import os
 
 
@@ -19,32 +20,25 @@ config_json = json.load(open('config.json', 'r'))
 mode = config_json['mode']
 phase = config_json['phase']
 size = config_json['size']
-setup = config_json['setup']
-
-if setup == "v1":
-    from docs.notebooks.setup import *
-elif setup == "v2":
-    from docs.notebooks.setup_v2 import *
-elif setup == "v3":
-    from docs.notebooks.setup_v3 import *
+gamma = config_json['gamma']
 
 now = datetime.now().strftime("%d_%m_%Y-%H_%M_%S")
 
-file_name = f"experimental_results/{now}_time_profiler_{mode}.txt"
-fp_compMDP = f"experimental_results/{now}_memory_profiler_composition_{mode}.log"
-fp_DPAnalytic = f"experimental_results/{now}_memory_profiler_policy_{mode}.log"
+file_name = f"experimental_results/{now}_time_profiler_{mode}_{gamma}.txt"
+fp_compMDP = f"experimental_results/{now}_memory_profiler_composition_{mode}_{gamma}.log"
+fp_DPAnalytic = f"experimental_results/{now}_memory_profiler_policy_{mode}_{gamma}.log"
 
 # AUTOMATA
 @profile(stream=open(fp_compMDP, "w+"))
 def execute_composition_automata(target, services):
-    mdp = composition_mdp(target, *services, gamma=0.9)
+    mdp = composition_mdp(target, *services, gamma=gamma)
     return mdp
 
 # LTLf
 @profile(stream=open(fp_compMDP, "w+"))
 def execute_composition_ltlf(declare_automaton, services):
     print("Composition MDP computing...")
-    mdp = comp_mdp(declare_automaton, services, gamma=0.9)
+    mdp = comp_mdp(declare_automaton, services, gamma=gamma)
     return mdp
 
 # POLICY
@@ -55,7 +49,7 @@ def execute_policy(mdp):
     return opt_policy
     
 def main():
-    to_write = f"Mode: {mode}\nSize: {size}"
+    to_write = f"Mode: {mode}\nSize: {size}\nGamma: {gamma}"
     with open(file_name, "w+") as f:
         f.write(f"{to_write}\n")
     print(to_write)

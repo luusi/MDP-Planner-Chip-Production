@@ -1,6 +1,6 @@
 {
-    "setup": "v2",
-    "mode": "automata",
-    "phase": 2,
-    "size": "medium"
+    "mode": "ltlf",
+    "size": "small",
+    "gamma": 0.1,
+    "phase": 2
 }
