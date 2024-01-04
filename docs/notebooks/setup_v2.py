@@ -376,7 +376,7 @@ def process_services(mode, dimension):
     return res_services
 
 
-def target_service_automata(dimension):
+def target_service_automata():
     '''Builds the target service automaton for the given dimension of the problem.'''
     # we need to distinguished the different dimensions because of the service setup (different services models for different dimensions)
     transition_function = {

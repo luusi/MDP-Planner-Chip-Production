@@ -1,6 +1,7 @@
 {
-    "mode": "ltlf",
+    "mode": "automata",
     "size": "small",
     "gamma": 0.1,
-    "phase": 2
+    "phase": 2,
+    "serialize": true
 }
