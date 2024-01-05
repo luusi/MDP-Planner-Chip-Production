@@ -8,7 +8,7 @@ from stochastic_service_composition.composition_mdp import composition_mdp
 from stochastic_service_composition.composition_mdp import comp_mdp
 from mdp_dp_rl.algorithms.dp.dp_analytic import DPAnalytic
 from docs.notebooks.utils import print_policy_data
-from docs.notebooks.setup_v2 import *
+#from docs.notebooks.setup_v2 import *
 import os
 import pickle
 
@@ -19,16 +19,21 @@ if not os.path.exists('experimental_results'):
 
 config_json = json.load(open('config.json', 'r'))
 mode = config_json['mode']
-phase = config_json['phase']
 size = config_json['size']
 gamma = config_json['gamma']
 serialize = config_json['serialize']
 
+version = config_json['version']
+if version == "v2":
+    from docs.notebooks.setup_v2 import *
+elif version == "v3":
+    from docs.notebooks.setup_v3 import *
+
 now = datetime.now().strftime("%d_%m_%Y-%H_%M_%S")
 
-file_name = f"experimental_results/{now}_time_profiler_{mode}_{gamma}.txt"
-fp_compMDP = f"experimental_results/{now}_memory_profiler_composition_{mode}_{gamma}.log"
-fp_DPAnalytic = f"experimental_results/{now}_memory_profiler_policy_{mode}_{gamma}.log"
+file_name = f"experimental_results/{now}_time_profiler_{mode}_{size}_{gamma}_{version}.txt"
+fp_compMDP = f"experimental_results/{now}_memory_profiler_composition_{mode}_{size}_{gamma}_{version}.log"
+fp_DPAnalytic = f"experimental_results/{now}_memory_profiler_policy_{mode}_{size}_{gamma}_{version}.log"
 
 # AUTOMATA
 @profile(stream=open(fp_compMDP, "w+"))
@@ -51,7 +56,7 @@ def execute_policy(mdp):
     return opt_policy
     
 def main():
-    to_write = f"Mode: {mode}\nSize: {size}\nGamma: {gamma}"
+    to_write = f"Mode: {mode}\nSize: {size}\nGamma: {gamma}\nSerialize: {serialize}\nVersion: {version}"
     with open(file_name, "w+") as f:
         f.write(f"{to_write}\n")
     print(to_write)
@@ -69,10 +74,10 @@ def main():
     # AUTOMATA
     if mode == "automata":
         # check if the pickle file exists and has size > 0
-        if serialize and os.path.isfile(f'mdp_{mode}_{size}.pkl') and os.path.getsize(f'mdp_{mode}_{size}.pkl') > 0:
+        if serialize and os.path.isfile(f'mdp_{mode}_{size}_{version}.pkl') and os.path.getsize(f'mdp_{mode}_{size}_{version}.pkl') > 0:
             print("MDP already computed. Importing from pickle file...")
             #import the mdp from the pickle file
-            with open(f'mdp_{mode}_{size}.pkl', 'rb') as f:
+            with open(f'mdp_{mode}_{size}_{version}.pkl', 'rb') as f:
                 mdp = pickle.load(f)
             elapsed1 = 0
         else:
@@ -83,7 +88,7 @@ def main():
             if serialize:
                 #save mdp into a pickle file
                 try:
-                    with open(f'mdp_{mode}_{size}.pkl', 'wb') as f:
+                    with open(f'mdp_{mode}_{size}_{version}.pkl', 'wb') as f:
                         pickle.dump(mdp, f, pickle.HIGHEST_PROTOCOL)
                 except Exception as e:
                     print(e)
@@ -102,10 +107,10 @@ def main():
     # LTLf
     elif mode == "ltlf":
         # check if the pickle file exists and has size > 0
-        if serialize and os.path.isfile(f'mdp_{mode}_{size}.pkl') and os.path.getsize(f'mdp_{mode}_{size}.pkl') > 0:
+        if serialize and os.path.isfile(f'mdp_{mode}_{size}_{version}.pkl') and os.path.getsize(f'mdp_{mode}_{size}_{version}.pkl') > 0:
             print("MDP already computed. Importing from pickle file...")
             #import the mdp from the pickle file
-            with open(f'mdp_{mode}_{size}.pkl', 'rb') as f:
+            with open(f'mdp_{mode}_{size}_{version}.pkl', 'rb') as f:
                 mdp = pickle.load(f)
             elapsed1 = 0
         else:
@@ -116,7 +121,7 @@ def main():
             if serialize:
                 #save mdp into a pickle file
                 try:
-                    with open(f'mdp_{mode}_{size}.pkl', 'wb') as f:
+                    with open(f'mdp_{mode}_{size}_{version}.pkl', 'wb') as f:
                         pickle.dump(mdp, f, pickle.HIGHEST_PROTOCOL)
                 except Exception as e:
                     print(e)

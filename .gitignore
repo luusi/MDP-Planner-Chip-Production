@@ -6,3 +6,5 @@ __pycache__
 nohup.out
 experimental_results
 *.pkl
+*.dot
+*.svg
