@@ -51,6 +51,7 @@ def execute_composition_ltlf(declare_automaton, services):
 # POLICY
 @profile(stream=open(fp_DPAnalytic, "w+"))
 def execute_policy(mdp):
+    mdp.gamma = gamma
     opn = DPAnalytic(mdp, 1e-4)
     opt_policy = opn.get_optimal_policy_vi()
     return opt_policy
@@ -140,8 +141,8 @@ def main():
     
     print("Policy computed.")
 
-    print("Writing policy...")
-    print_policy_data(opt_policy, file_name=file_name)
+    #print("Writing policy...")
+    #print_policy_data(opt_policy, file_name=file_name)
 
     print("Done.")
             
