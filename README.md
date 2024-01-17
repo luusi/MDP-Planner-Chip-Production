@@ -2,6 +2,26 @@
 
 Implementation of a tool to compose Industral API via Markov Decision Processes.
 
+## How to debug
+Modify [config.json](docs/notebooks/config.json). It is the configuration file containing basic information needed to run the experiments.
+```json
+{
+    "mode": "automata"    <type of the target, accepted values are ["automata", "ltlf"]>,
+    "size": "small"       <size of the case study, accepted values are ["small", "medium", "large"]>,
+    "gamma": 0.9,         # i don't think you need to change this
+    "phase": 2,           # in this case study it is not used, you can skip this
+    "serialize": false,   <if you want to save the composition in a pickle file, accepted value are [true, false]>,
+    "version": "v3"       # do not change this. It refers to the version of the setup.py file
+}
+```
+
+To run the code:
+```sh
+cd docs/notebooks
+python main_v2.py
+```
+
+
 ## How to replicate the experiments
 The experiments can be replicated either using Docker or from source code. We suggest to use Docker.
 

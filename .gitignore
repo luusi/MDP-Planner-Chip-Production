@@ -8,3 +8,4 @@ experimental_results
 *.pkl
 *.dot
 *.svg
+extract_lines.py

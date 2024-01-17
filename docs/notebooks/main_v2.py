@@ -8,7 +8,6 @@ from stochastic_service_composition.composition_mdp import composition_mdp
 from stochastic_service_composition.composition_mdp import comp_mdp
 from mdp_dp_rl.algorithms.dp.dp_analytic import DPAnalytic
 from docs.notebooks.utils import print_policy_data
-#from docs.notebooks.setup_v2 import *
 import os
 import pickle
 
@@ -28,6 +27,8 @@ if version == "v2":
     from docs.notebooks.setup_v2 import *
 elif version == "v3":
     from docs.notebooks.setup_v3 import *
+elif version == "v4":
+    from docs.notebooks.setup_v4 import *
 
 now = datetime.now().strftime("%d_%m_%Y-%H_%M_%S")
 
