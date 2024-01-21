@@ -85,7 +85,5 @@ RUN git clone https://github.com/luusi/MDP-Planner-Chip-Production.git &&\
     cd MDP-Planner-Chip-Production &&\
     sudo pip install -e .
 
-RUN mkdir -p WORKDIR /home/default/MDP-Planner-Chip-Production/docs/notebooks/experimental_results
-
 WORKDIR /home/default/MDP-Planner-Chip-Production
 

@@ -1,5 +1,8 @@
 {
     "mode": "automata",
-    "phase": 1,
-    "size": "small"
+    "size": "large",
+    "gamma": 0.9,
+    "phase": 2,
+    "serialize": true,
+    "version": "v3"
 }

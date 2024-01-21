@@ -507,6 +507,7 @@ def packaging_service(name: str, action_reward: float = USA_REWARD) -> Service:
     )
 
 # PHASE 1
+'''
 service_design_usa = design_service(DESIGN_SERVICE_NAME_USA, USA_REWARD)
 service_design_uk = design_service(DESIGN_SERVICE_NAME_UK, UK_REWARD)
 service_design_china = design_service(DESIGN_SERVICE_NAME_CHINA, CHINA_REWARD)
@@ -548,8 +549,10 @@ service_copper_frame_usa = copper_frame_warehouse_service(COPPER_FRAME_SERVICE_N
 service_copper_frame_china = copper_frame_warehouse_service(COPPER_FRAME_SERVICE_NAME_CHINA, CHINA_REWARD)
 service_copper_frame_peru = copper_frame_warehouse_service(COPPER_FRAME_SERVICE_NAME_PERU, PERU_REWARD)
 service_copper_frame_chile = copper_frame_warehouse_service(COPPER_FRAME_SERVICE_NAME_CHILE, CHILE_REWARD)
+'''
 
 # PHASE 2
+'''
 service_cleaning1 = cleaning_service(CLEANING1_SERVICE_NAME, DEFAULT_USA_REWARD)
 service_cleaning2 = cleaning_service(CLEANING2_SERVICE_NAME, HIGH_USA_REWARD)
 service_cleaning3 = cleaning_service(CLEANING3_SERVICE_NAME, DEFAULT_USA_REWARD-1)
@@ -610,7 +613,7 @@ service_packaging2 = packaging_service(PACKAGING2_SERVICE_NAME, HIGH_USA_REWARD)
 service_packaging3 = packaging_service(PACKAGING3_SERVICE_NAME, DEFAULT_USA_REWARD-1)
 service_packaging4 = packaging_service(PACKAGING4_SERVICE_NAME, DEFAULT_USA_REWARD-2)
 service_packaging5 = packaging_service(PACKAGING5_SERVICE_NAME, DEFAULT_USA_REWARD-3)
-
+'''
 # creare 60 servizi per la fase 2 per testare la size COMPLEX
 
 def target_service_phase1_automata():
@@ -644,8 +647,6 @@ def target_service_phase1_ltlf():
     formula_str = f"<({regex_seq})*>end"
     formula = pylogics.parsers.ldl.parse_ldl(formula_str)
     automaton = logaut.core.ldl2dfa(formula, backend="lydia")
-    #print("Specification: ", formula_str)
-    #print("Compute declare automaton")
     declare_automaton = from_symbolic_automaton_to_declare_automaton(automaton, set(SYMBOLS_PHASE_1))
     return declare_automaton
     
@@ -693,7 +694,6 @@ def target_service_phase2_ltlf():
     formula_str = f"<({regex_seq})*>end"
     formula = pylogics.parsers.ldl.parse_ldl(formula_str)
     automaton = logaut.core.ldl2dfa(formula, backend="lydia")
-    #print("Specification: ", formula_str)
     declare_automaton = from_symbolic_automaton_to_declare_automaton(automaton, set(SYMBOLS_PHASE_2_LTLF))
     return declare_automaton
     
@@ -702,192 +702,180 @@ def services_phase2 (dimension):
     if dimension == "small":
         all_services = [
             # 0
-            service_cleaning1,
+            cleaning_service(CLEANING1_SERVICE_NAME, DEFAULT_USA_REWARD),
             # 1
-            service_film_deposition1,
+            film_deposition_service(FILM_DEPOSITION1_SERVICE_NAME, DEFAULT_BROKEN_PROB, DEFAULT_UNEMPLOYABLE_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD),
             # 2
-            service_resist_coating1,
+            film_deposition_service(FILM_DEPOSITION2_SERVICE_NAME, DEFAULT_BROKEN_PROB, DEFAULT_UNEMPLOYABLE_PROB, DEFAULT_BROKEN_REWARD, HIGH_USA_REWARD),
             # 3
-            service_exposure1,
+            resist_coating_service(RESIST_COATING1_SERVICE_NAME, DEFAULT_BROKEN_PROB, DEFAULT_UNEMPLOYABLE_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD),
             # 4
-            service_exposure2,
+            exposure_service(EXPOSURE1_SERVICE_NAME, DEFAULT_BROKEN_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD),
             # 5
-            service_development1,
+            development_service(DEVELOPMENT1_SERVICE_NAME, DEFAULT_BROKEN_PROB, DEFAULT_UNEMPLOYABLE_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD),
             # 6
-            service_etching1,
+            etching_service(ETCHING1_SERVICE_NAME, DEFAULT_BROKEN_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD),
             # 7
-            service_impurities_implantation1,
+            etching_service(ETCHING2_SERVICE_NAME, BROKEN_PROB, DEFAULT_BROKEN_REWARD, HIGH_USA_REWARD),
             # 8
-            service_activation1,
+            impurities_implantation_service(IMPURITIES_IMPLANTATION1_SERVICE_NAME, DEFAULT_BROKEN_PROB, DEFAULT_UNEMPLOYABLE_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD),
             # 9
-            service_resist_stripping1,
+            activation_service(ACTIVATION1_SERVICE_NAME, DEFAULT_USA_REWARD),
             # 10
-            service_resist_stripping2,
+            resist_stripping_service(RESIST_STRIPPING1_SERVICE_NAME, DEFAULT_BROKEN_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD),
             # 11
-            service_assembly1,
+            assembly_service(ASSEMBLY1_SERVICE_NAME, DEFAULT_USA_REWARD),
             # 12
-            service_testing1,
+            testing_service(TESTING1_SERVICE_NAME, DEFAULT_USA_REWARD),
             # 13
-            service_packaging1
+            packaging_service(PACKAGING1_SERVICE_NAME, DEFAULT_USA_REWARD)
         ]
     elif dimension == "manageable1":
         all_services = [
             # 0
-            service_cleaning1,
+            cleaning_service(CLEANING1_SERVICE_NAME, DEFAULT_USA_REWARD),
             # 1
-            service_film_deposition1,
+            film_deposition_service(FILM_DEPOSITION1_SERVICE_NAME, DEFAULT_BROKEN_PROB, DEFAULT_UNEMPLOYABLE_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD),
             # 2
-            service_film_deposition2,
+            film_deposition_service(FILM_DEPOSITION2_SERVICE_NAME, DEFAULT_BROKEN_PROB, DEFAULT_UNEMPLOYABLE_PROB, DEFAULT_BROKEN_REWARD, HIGH_USA_REWARD),
             # 3
-            service_resist_coating1,
+            resist_coating_service(RESIST_COATING1_SERVICE_NAME, DEFAULT_BROKEN_PROB, DEFAULT_UNEMPLOYABLE_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD),
             # 4
-            service_resist_coating2,
+            resist_coating_service(RESIST_COATING2_SERVICE_NAME, DEFAULT_BROKEN_PROB, DEFAULT_UNEMPLOYABLE_PROB, DEFAULT_BROKEN_REWARD, HIGH_USA_REWARD),
             # 5
-            service_exposure1,
+            exposure_service(EXPOSURE1_SERVICE_NAME, DEFAULT_BROKEN_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD),
             # 6
-            service_exposure2,
+            exposure_service(EXPOSURE2_SERVICE_NAME, BROKEN_PROB, DEFAULT_BROKEN_REWARD, HIGH_USA_REWARD),
             # 7
-            service_development1,
+            development_service(DEVELOPMENT1_SERVICE_NAME, DEFAULT_BROKEN_PROB, DEFAULT_UNEMPLOYABLE_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD),
             # 8
-            service_development2,
+            development_service(DEVELOPMENT2_SERVICE_NAME, BROKEN_PROB, DEFAULT_UNEMPLOYABLE_PROB, DEFAULT_BROKEN_REWARD, HIGH_USA_REWARD),
             # 9
-            service_etching1,
+            etching_service(ETCHING1_SERVICE_NAME, DEFAULT_BROKEN_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD),
             # 10
-            service_impurities_implantation1,
+            etching_service(ETCHING2_SERVICE_NAME, BROKEN_PROB, DEFAULT_BROKEN_REWARD, HIGH_USA_REWARD),
             # 11
-            service_activation1,
+            impurities_implantation_service(IMPURITIES_IMPLANTATION1_SERVICE_NAME, DEFAULT_BROKEN_PROB, DEFAULT_UNEMPLOYABLE_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD),
             # 12
-            service_resist_stripping1,
+            activation_service(ACTIVATION1_SERVICE_NAME, DEFAULT_USA_REWARD),
             # 13
-            service_resist_stripping2,
+            resist_stripping_service(RESIST_STRIPPING1_SERVICE_NAME, DEFAULT_BROKEN_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD),
             # 14
-            service_assembly1,
+            assembly_service(ASSEMBLY1_SERVICE_NAME, DEFAULT_USA_REWARD),
             # 15
-            service_testing1,
+            testing_service(TESTING1_SERVICE_NAME, DEFAULT_USA_REWARD),
             # 16
-            service_packaging1
+            packaging_service(PACKAGING1_SERVICE_NAME, DEFAULT_USA_REWARD)
         ]
     elif dimension == "manageable2":
         all_services = [
             # 0
-            service_cleaning1,
+            cleaning_service(CLEANING1_SERVICE_NAME, DEFAULT_USA_REWARD),
             # 1
-            service_film_deposition1,
+            cleaning_service(CLEANING2_SERVICE_NAME, HIGH_USA_REWARD),
             # 2
-            service_film_deposition2,
+            film_deposition_service(FILM_DEPOSITION1_SERVICE_NAME, DEFAULT_BROKEN_PROB, DEFAULT_UNEMPLOYABLE_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD),
             # 3
-            service_resist_coating1,
+            film_deposition_service(FILM_DEPOSITION2_SERVICE_NAME, DEFAULT_BROKEN_PROB, DEFAULT_UNEMPLOYABLE_PROB, DEFAULT_BROKEN_REWARD, HIGH_USA_REWARD),
             # 4
-            service_resist_coating2,
+            resist_coating_service(RESIST_COATING1_SERVICE_NAME, DEFAULT_BROKEN_PROB, DEFAULT_UNEMPLOYABLE_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD),
             # 5
-            service_exposure1,
+            resist_coating_service(RESIST_COATING2_SERVICE_NAME, DEFAULT_BROKEN_PROB, DEFAULT_UNEMPLOYABLE_PROB, DEFAULT_BROKEN_REWARD, HIGH_USA_REWARD),
             # 6
-            service_exposure2,
+            exposure_service(EXPOSURE1_SERVICE_NAME, DEFAULT_BROKEN_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD),
             # 7
-            service_development1,
+            exposure_service(EXPOSURE2_SERVICE_NAME, BROKEN_PROB, DEFAULT_BROKEN_REWARD, HIGH_USA_REWARD),
             # 8
-            service_development2,
+            development_service(DEVELOPMENT1_SERVICE_NAME, DEFAULT_BROKEN_PROB, DEFAULT_UNEMPLOYABLE_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD),
             # 9
-            service_etching1,
+            development_service(DEVELOPMENT2_SERVICE_NAME, BROKEN_PROB, DEFAULT_UNEMPLOYABLE_PROB, DEFAULT_BROKEN_REWARD, HIGH_USA_REWARD),
             # 10
-            service_etching2,
+            etching_service(ETCHING1_SERVICE_NAME, DEFAULT_BROKEN_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD),
             # 11
-            service_impurities_implantation1,
+            etching_service(ETCHING2_SERVICE_NAME, BROKEN_PROB, DEFAULT_BROKEN_REWARD, HIGH_USA_REWARD),
             # 12
-            service_impurities_implantation2,
+            impurities_implantation_service(IMPURITIES_IMPLANTATION1_SERVICE_NAME, DEFAULT_BROKEN_PROB, DEFAULT_UNEMPLOYABLE_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD),
             # 13
-            service_activation1,
+            activation_service(ACTIVATION1_SERVICE_NAME, DEFAULT_USA_REWARD),
             # 14
-            service_resist_stripping1,
+            activation_service(ACTIVATION2_SERVICE_NAME, HIGH_USA_REWARD),
             # 15
-            service_resist_stripping2,
+            resist_stripping_service(RESIST_STRIPPING1_SERVICE_NAME, DEFAULT_BROKEN_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD),
             # 16
-            service_assembly1,
+            resist_stripping_service(RESIST_STRIPPING2_SERVICE_NAME, BROKEN_PROB, DEFAULT_BROKEN_REWARD, HIGH_USA_REWARD),
             # 17
-            service_assembly2,
+            assembly_service(ASSEMBLY1_SERVICE_NAME, DEFAULT_USA_REWARD),
             # 18
-            service_testing1,
+            assembly_service(ASSEMBLY2_SERVICE_NAME, HIGH_USA_REWARD),
             # 19
-            service_testing2,
+            testing_service(TESTING1_SERVICE_NAME, DEFAULT_USA_REWARD),
             # 20
-            service_packaging1,
+            testing_service(TESTING2_SERVICE_NAME, HIGH_USA_REWARD),
             # 21
-            service_packaging2
+            packaging_service(PACKAGING1_SERVICE_NAME, DEFAULT_USA_REWARD)
         ]
     elif dimension == "complex":
         all_services = [
-            # 0
-            service_cleaning1,
-            service_cleaning2,
-            service_cleaning3,
-            service_cleaning4,
-            service_cleaning5,            
-            # 6
-            service_film_deposition1,
-            service_film_deposition2,
-            service_film_deposition3,
-            service_film_deposition4,
-            service_film_deposition5,
-            # 11
-            service_resist_coating1,
-            service_resist_coating2,
-            service_resist_coating3,
-            service_resist_coating4,
-            service_resist_coating5,
-            # 16
-            service_exposure1,
-            service_exposure2,
-            service_exposure3,
-            service_exposure4,
-            service_exposure5,
-            # 21
-            service_development1,
-            service_development2,
-            service_development3,
-            service_development4,
-            service_development5,
-            # 26
-            service_etching1,
-            service_etching2,
-            service_etching3,
-            service_etching4,
-            service_etching5,
-            # 31
-            service_impurities_implantation1,
-            service_impurities_implantation2,
-            service_impurities_implantation3,
-            service_impurities_implantation4,
-            service_impurities_implantation5,
-            # 36
-            service_activation1,
-            service_activation2,
-            service_activation3,
-            service_activation4,
-            service_activation5,
-            # 41
-            service_resist_stripping1,
-            service_resist_stripping2,
-            service_resist_stripping3,
-            service_resist_stripping4,
-            service_resist_stripping5,
-            # 46
-            service_assembly1,
-            service_assembly2,
-            service_assembly3,
-            service_assembly4,
-            service_assembly5,
-            # 51
-            service_testing1,
-            service_testing2,
-            service_testing3,
-            service_testing4,
-            service_testing5,
-            # 56
-            service_packaging1,
-            service_packaging2,
-            service_packaging3,
-            service_packaging4,
-            service_packaging5
+            cleaning_service(CLEANING1_SERVICE_NAME, DEFAULT_USA_REWARD),
+            cleaning_service(CLEANING2_SERVICE_NAME, HIGH_USA_REWARD),
+            cleaning_service(CLEANING3_SERVICE_NAME, DEFAULT_USA_REWARD-1),
+            cleaning_service(CLEANING4_SERVICE_NAME, DEFAULT_USA_REWARD-2),
+            cleaning_service(CLEANING5_SERVICE_NAME, DEFAULT_USA_REWARD-3),
+            film_deposition_service(FILM_DEPOSITION1_SERVICE_NAME, DEFAULT_BROKEN_PROB, DEFAULT_UNEMPLOYABLE_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD),
+            film_deposition_service(FILM_DEPOSITION2_SERVICE_NAME, DEFAULT_BROKEN_PROB, DEFAULT_UNEMPLOYABLE_PROB, DEFAULT_BROKEN_REWARD, HIGH_USA_REWARD),
+            film_deposition_service(FILM_DEPOSITION3_SERVICE_NAME, DEFAULT_BROKEN_PROB, DEFAULT_UNEMPLOYABLE_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD-1),
+            film_deposition_service(FILM_DEPOSITION4_SERVICE_NAME, DEFAULT_BROKEN_PROB, DEFAULT_UNEMPLOYABLE_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD-2),
+            film_deposition_service(FILM_DEPOSITION5_SERVICE_NAME, DEFAULT_BROKEN_PROB, DEFAULT_UNEMPLOYABLE_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD-3),
+            resist_coating_service(RESIST_COATING1_SERVICE_NAME, DEFAULT_BROKEN_PROB, DEFAULT_UNEMPLOYABLE_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD),
+            resist_coating_service(RESIST_COATING2_SERVICE_NAME, DEFAULT_BROKEN_PROB, DEFAULT_UNEMPLOYABLE_PROB, DEFAULT_BROKEN_REWARD, HIGH_USA_REWARD),
+            resist_coating_service(RESIST_COATING3_SERVICE_NAME, DEFAULT_BROKEN_PROB, DEFAULT_UNEMPLOYABLE_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD-1),
+            resist_coating_service(RESIST_COATING4_SERVICE_NAME, DEFAULT_BROKEN_PROB, DEFAULT_UNEMPLOYABLE_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD-2),
+            resist_coating_service(RESIST_COATING5_SERVICE_NAME, DEFAULT_BROKEN_PROB, DEFAULT_UNEMPLOYABLE_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD-3),
+            exposure_service(EXPOSURE1_SERVICE_NAME, DEFAULT_BROKEN_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD),
+            exposure_service(EXPOSURE2_SERVICE_NAME, BROKEN_PROB, DEFAULT_BROKEN_REWARD, HIGH_USA_REWARD),
+            exposure_service(EXPOSURE3_SERVICE_NAME, DEFAULT_BROKEN_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD-1),
+            exposure_service(EXPOSURE4_SERVICE_NAME, DEFAULT_BROKEN_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD-2),
+            exposure_service(EXPOSURE5_SERVICE_NAME, DEFAULT_BROKEN_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD-3),
+            development_service(DEVELOPMENT1_SERVICE_NAME, DEFAULT_BROKEN_PROB, DEFAULT_UNEMPLOYABLE_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD),
+            development_service(DEVELOPMENT2_SERVICE_NAME, BROKEN_PROB, DEFAULT_UNEMPLOYABLE_PROB, DEFAULT_BROKEN_REWARD, HIGH_USA_REWARD),
+            development_service(DEVELOPMENT3_SERVICE_NAME, DEFAULT_BROKEN_PROB, DEFAULT_UNEMPLOYABLE_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD-1),
+            development_service(DEVELOPMENT4_SERVICE_NAME, DEFAULT_BROKEN_PROB, DEFAULT_UNEMPLOYABLE_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD-2),
+            development_service(DEVELOPMENT5_SERVICE_NAME, DEFAULT_BROKEN_PROB, DEFAULT_UNEMPLOYABLE_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD-3),
+            etching_service(ETCHING1_SERVICE_NAME, DEFAULT_BROKEN_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD),
+            etching_service(ETCHING2_SERVICE_NAME, BROKEN_PROB, DEFAULT_BROKEN_REWARD, HIGH_USA_REWARD),
+            etching_service(ETCHING3_SERVICE_NAME, DEFAULT_BROKEN_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD-1),
+            etching_service(ETCHING4_SERVICE_NAME, DEFAULT_BROKEN_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD-2),
+            etching_service(ETCHING5_SERVICE_NAME, DEFAULT_BROKEN_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD-3),            
+            impurities_implantation_service(IMPURITIES_IMPLANTATION1_SERVICE_NAME, DEFAULT_BROKEN_PROB, DEFAULT_UNEMPLOYABLE_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD),
+            impurities_implantation_service(IMPURITIES_IMPLANTATION2_SERVICE_NAME, BROKEN_PROB, DEFAULT_UNEMPLOYABLE_PROB, DEFAULT_BROKEN_REWARD, HIGH_USA_REWARD),
+            impurities_implantation_service(IMPURITIES_IMPLANTATION3_SERVICE_NAME, DEFAULT_BROKEN_PROB, DEFAULT_UNEMPLOYABLE_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD-1),
+            impurities_implantation_service(IMPURITIES_IMPLANTATION4_SERVICE_NAME, DEFAULT_BROKEN_PROB, DEFAULT_UNEMPLOYABLE_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD-2),
+            impurities_implantation_service(IMPURITIES_IMPLANTATION5_SERVICE_NAME, DEFAULT_BROKEN_PROB, DEFAULT_UNEMPLOYABLE_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD-3),
+            activation_service(ACTIVATION1_SERVICE_NAME, DEFAULT_USA_REWARD),
+            activation_service(ACTIVATION2_SERVICE_NAME, HIGH_USA_REWARD),
+            activation_service(ACTIVATION3_SERVICE_NAME, DEFAULT_USA_REWARD-1),
+            activation_service(ACTIVATION4_SERVICE_NAME, DEFAULT_USA_REWARD-2),
+            activation_service(ACTIVATION5_SERVICE_NAME, DEFAULT_USA_REWARD-3),            
+            resist_stripping_service(RESIST_STRIPPING1_SERVICE_NAME, DEFAULT_BROKEN_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD),
+            resist_stripping_service(RESIST_STRIPPING2_SERVICE_NAME, BROKEN_PROB, DEFAULT_BROKEN_REWARD, HIGH_USA_REWARD),
+            resist_stripping_service(RESIST_STRIPPING3_SERVICE_NAME, DEFAULT_BROKEN_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD-1),
+            resist_stripping_service(RESIST_STRIPPING4_SERVICE_NAME, DEFAULT_BROKEN_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD-2),
+            resist_stripping_service(RESIST_STRIPPING5_SERVICE_NAME, DEFAULT_BROKEN_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD-3),            
+            assembly_service(ASSEMBLY1_SERVICE_NAME, DEFAULT_USA_REWARD),
+            assembly_service(ASSEMBLY2_SERVICE_NAME, HIGH_USA_REWARD),
+            assembly_service(ASSEMBLY3_SERVICE_NAME, DEFAULT_USA_REWARD-1),
+            assembly_service(ASSEMBLY4_SERVICE_NAME, DEFAULT_USA_REWARD-2),
+            assembly_service(ASSEMBLY5_SERVICE_NAME, DEFAULT_USA_REWARD-3),
+            testing_service(TESTING1_SERVICE_NAME, DEFAULT_USA_REWARD),
+            testing_service(TESTING2_SERVICE_NAME, HIGH_USA_REWARD),
+            testing_service(TESTING3_SERVICE_NAME, DEFAULT_USA_REWARD-1),
+            testing_service(TESTING4_SERVICE_NAME, DEFAULT_USA_REWARD-2),
+            testing_service(TESTING5_SERVICE_NAME, DEFAULT_USA_REWARD-3),            
+            packaging_service(PACKAGING1_SERVICE_NAME, DEFAULT_USA_REWARD),
+            packaging_service(PACKAGING2_SERVICE_NAME, HIGH_USA_REWARD),
+            packaging_service(PACKAGING3_SERVICE_NAME, DEFAULT_USA_REWARD-1),
+            packaging_service(PACKAGING4_SERVICE_NAME, DEFAULT_USA_REWARD-2),
+            packaging_service(PACKAGING5_SERVICE_NAME, DEFAULT_USA_REWARD-3),
         ]
         return
     
@@ -895,94 +883,86 @@ def services_phase2 (dimension):
 
 all_services_phase1 = [
     # 0
-    service_design_usa,
+    design_service(DESIGN_SERVICE_NAME_USA, USA_REWARD),
     # 1
-    service_design_uk,
+    design_service(DESIGN_SERVICE_NAME_UK, UK_REWARD),
     # 2
-    service_design_china,
+    design_service(DESIGN_SERVICE_NAME_CHINA, CHINA_REWARD),
     # 3
-    service_design_taiwan,
+    design_service(DESIGN_SERVICE_NAME_TAIWAN, TAIWAN_REWARD),
     # 4
-    service_silicon_china,
+    silicon_warehouse_service(SILICON_SERVICE_NAME_CHINA, CHINA_REWARD),
     # 5
-    service_silicon_russia,
+    silicon_warehouse_service(SILICON_SERVICE_NAME_RUSSIA, RUSSIA_REWARD + WAR_REWARD),
     # 6
-    service_silicon_norway,
+    silicon_warehouse_service(SILICON_SERVICE_NAME_NORWAY, NORWAY_REWARD),
     # 7
-    service_silicon_usa,
+    silicon_warehouse_service(SILICON_SERVICE_NAME_USA, USA_REWARD),
     # 8
-    service_silicon_brazil,
+    silicon_warehouse_service(SILICON_SERVICE_NAME_BRAZIL, BRAZIL_REWARD),
     # 9
-    service_silicon_france,
+    silicon_warehouse_service(SILICON_SERVICE_NAME_FRANCE, FRANCE_REWARD),
     # 10
-    service_silicon_malaysia,
+    silicon_warehouse_service(SILICON_SERVICE_NAME_MALAYSIA, MALAYSIA_REWARD),
     # 11
-    service_wafer_japan,
+    wafer_warehouse_service(WAFER_SERVICE_NAME_JAPAN, JAPAN_REWARD),
     # 12
-    service_wafer_south_korea,
+    wafer_warehouse_service(WAFER_SERVICE_NAME_SOUTH_KOREA, SOUTH_KOREA),
     # 13
-    service_boron_turkey,
+    boron_warehouse_service(BORON_SERVICE_NAME_TURKEY, TURKEY_REWARD),
     # 14
-    service_boron_usa,
+    boron_warehouse_service(BORON_SERVICE_NAME_USA, USA_REWARD),
     # 15
-    service_boron_kazakhstan,
+    boron_warehouse_service(BORON_SERVICE_NAME_KAZAKHSTAN, KAZAKHSTAN_REWARD),
     # 16
-    service_boron_chile,
+    boron_warehouse_service(BORON_SERVICE_NAME_CHILE, CHILE_REWARD),
     # 17
-    service_boron_china,
+    boron_warehouse_service(BORON_SERVICE_NAME_CHINA, CHINA_REWARD),
     # 18
-    service_boron_bolivia,
+    boron_warehouse_service(BORON_SERVICE_NAME_BOLIVIA, BOLIVIA_REWARD),
     # 19
-    service_boron_argentina,
+    boron_warehouse_service(BORON_SERVICE_NAME_ARGENTINA, ARGENTINA_REWARD),
     # 20
-    service_boron_russia,
+    boron_warehouse_service(BORON_SERVICE_NAME_RUSSIA, RUSSIA_REWARD + WAR_REWARD),
     # 21
-    service_phosphor_morocco,
+    phosphor_warehouse_service(PHOSPHOR_SERVICE_NAME_MOROCCO, MOROCCO_REWARD),
     # 22
-    service_phosphor_china,
+    phosphor_warehouse_service(PHOSPHOR_SERVICE_NAME_CHINA, CHINA_REWARD),
     # 23
-    service_phosphor_usa,
+    phosphor_warehouse_service(PHOSPHOR_SERVICE_NAME_USA, USA_REWARD),
     # 24
-    service_aluminum_brazil,
+    aluminum_warehouse_service(ALUMINUM_SERVICE_NAME_BRAZIL, BRAZIL_REWARD),
     # 25
-    service_aluminum_india,
+    aluminum_warehouse_service(ALUMINUM_SERVICE_NAME_INDIA, INDIA_REWARD),
     # 26
-    service_aluminum_australia,
+    aluminum_warehouse_service(ALUMINUM_SERVICE_NAME_AUSTRALIA, AUSTRALIA_REWARD),
     # 27
-    service_resist_switzerland,
+    resist_warehouse_service(RESIST_SERVICE_NAME_SWITZERLAND, SWITZERLAND_REWARD),
     # 28
-    service_resist_usa,
+    resist_warehouse_service(RESIST_SERVICE_NAME_USA, USA_REWARD),
     # 29
-    service_resist_austria,
+    resist_warehouse_service(RESIST_SERVICE_NAME_AUSTRIA, AUSTRIA_REWARD),
     # 30
-    service_resist_belgium,
+    resist_warehouse_service(RESIST_SERVICE_NAME_BELGIUM, BELGIUM_REWARD),
     # 31
-    service_resist_canada,
+    resist_warehouse_service(RESIST_SERVICE_NAME_CANADA, CANADA_REWARD),
     # 32
-    service_resist_india,
+    resist_warehouse_service(RESIST_SERVICE_NAME_INDIA, INDIA_REWARD),
     # 33
-    service_plastic_india,
+    plastic_warehouse_service(PLASTIC_SERVICE_NAME_INDIA, INDIA_REWARD),
     # 34
-    service_plastic_china,
+    plastic_warehouse_service(PLASTIC_SERVICE_NAME_CHINA, CHINA_REWARD),
     # 35
-    service_chemicals_usa,
+    chemicals_warehouse_service(CHEMICALS_SERVICE_NAME_USA, USA_REWARD),
     # 36
-    service_chemicals_canada,
+    chemicals_warehouse_service(CHEMICALS_SERVICE_NAME_CANADA, CANADA_REWARD),
     # 37
-    service_copper_frame_usa,
+    copper_frame_warehouse_service(COPPER_FRAME_SERVICE_NAME_USA, USA_REWARD),
     # 38
-    service_copper_frame_chile,
+    copper_frame_warehouse_service(COPPER_FRAME_SERVICE_NAME_CHILE, CHILE_REWARD),
     # 39
-    service_copper_frame_peru,
+    copper_frame_warehouse_service(COPPER_FRAME_SERVICE_NAME_PERU, PERU_REWARD),
     # 40
-    service_copper_frame_china
+    copper_frame_warehouse_service(COPPER_FRAME_SERVICE_NAME_CHINA, CHINA_REWARD)
 ]
-target_phase1_automata = target_service_phase1_automata()
-target_phase1_ltlf = target_service_phase1_ltlf()
 
-all_services_phase2_small = services_phase2("small")
-all_services_phase2_manageable1 = services_phase2("manageable1")
-all_services_phase2_manageable2 = services_phase2("manageable2")
-all_services_phase2_complex = services_phase2("complex")
-target_phase2_automata = target_service_phase2_automata()
-target_phase2_ltlf = target_service_phase2_ltlf()
