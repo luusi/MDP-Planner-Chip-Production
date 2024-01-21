@@ -1,2 +1,0 @@
-docs
-stochastic_service_composition
