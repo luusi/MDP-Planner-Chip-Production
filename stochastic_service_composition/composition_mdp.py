@@ -119,7 +119,9 @@ def composition_mdp(
         # TODO check correctness
         # if next state distribution is empty, add loops
 
-    return MDP(transition_function, gamma)
+    result = MDP(transition_function, gamma)
+    setattr(result, "initial_state", initial_state)
+    return result
 
 
 def comp_mdp(

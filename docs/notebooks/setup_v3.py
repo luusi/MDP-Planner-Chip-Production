@@ -141,7 +141,7 @@ def build_generic_service_one_state(
     }
     final_states = {"re"}
     initial_state = "re"
-    return build_service_from_transitions(transitions, initial_state, final_states)  # type: ignore
+    return build_service_from_transitions(transitions, initial_state, final_states, service_name=service_name)  # type: ignore
 
 
 def build_generic_breakable_service(service_name: str, action_name: str, broken_prob: float, broken_reward: float, action_reward: float):
@@ -162,7 +162,7 @@ def build_generic_breakable_service(service_name: str, action_name: str, broken_
     }
     final_states = {"av"}
     initial_state = "av"
-    return build_service_from_transitions(transitions, initial_state, final_states)  # type: ignore
+    return build_service_from_transitions(transitions, initial_state, final_states, service_name=service_name)  # type: ignore
 
 
 def build_complex_breakable_service(service_name: str, action_name: str, broken_prob: float, unemployable_prob: float, broken_reward: float, action_reward: float) -> Service:
@@ -223,7 +223,7 @@ def build_complex_breakable_service(service_name: str, action_name: str, broken_
     }
     final_states = {"re"}
     initial_state = "re"
-    return build_service_from_transitions(transitions, initial_state, final_states)  # type: ignore
+    return build_service_from_transitions(transitions, initial_state, final_states, service_name=service_name)  # type: ignore
 
 
 def process_services(mode, dimension):
@@ -231,40 +231,40 @@ def process_services(mode, dimension):
     if mode == "automata" and dimension == "small":
         all_services = [
             build_generic_service_one_state(DESIGN_SERVICE_NAME_USA, {PICK_DESIGN}, USA_REWARD),
-            #build_generic_service_one_state(DESIGN_SERVICE_NAME_CHINA, {PICK_DESIGN}, CHINA_REWARD),
-
-            build_generic_service_one_state(SILICON_SERVICE_NAME_USA, {PICK_SILICON}, USA_REWARD),
-            #build_generic_service_one_state(SILICON_SERVICE_NAME_BRAZIL, {PICK_SILICON}, BRAZIL_REWARD),
-            #build_generic_service_one_state(SILICON_SERVICE_NAME_CHINA, {PICK_SILICON}, CHINA_REWARD),
-        
-            build_generic_service_one_state(IMPURITIES_SERVICE_NAME_USA, {PICK_IMPURITIES}, USA_REWARD),
-            #build_generic_service_one_state(IMPURITIES_SERVICE_NAME_CHILE, {PICK_IMPURITIES}, CHILE_REWARD),
-
-            build_generic_service_one_state(RESIST_SERVICE_NAME_USA, {PICK_RESIST}, USA_REWARD),
-            #build_generic_service_one_state(RESIST_SERVICE_NAME_CANADA, {PICK_RESIST}, CANADA_REWARD),
-
-            build_generic_service_one_state(CHEMICALS_SERVICE_NAME_USA, {PICK_CHEMICALS}, USA_REWARD),
-            #build_generic_service_one_state(CHEMICALS_SERVICE_NAME_CANADA, {PICK_CHEMICALS}, CANADA_REWARD),
-
+            # #build_generic_service_one_state(DESIGN_SERVICE_NAME_CHINA, {PICK_DESIGN}, CHINA_REWARD),
+            #
+            # build_generic_service_one_state(SILICON_SERVICE_NAME_USA, {PICK_SILICON}, USA_REWARD),
+            # #build_generic_service_one_state(SILICON_SERVICE_NAME_BRAZIL, {PICK_SILICON}, BRAZIL_REWARD),
+            # #build_generic_service_one_state(SILICON_SERVICE_NAME_CHINA, {PICK_SILICON}, CHINA_REWARD),
+            #
+            # build_generic_service_one_state(IMPURITIES_SERVICE_NAME_USA, {PICK_IMPURITIES}, USA_REWARD),
+            # #build_generic_service_one_state(IMPURITIES_SERVICE_NAME_CHILE, {PICK_IMPURITIES}, CHILE_REWARD),
+            #
+            # build_generic_service_one_state(RESIST_SERVICE_NAME_USA, {PICK_RESIST}, USA_REWARD),
+            # #build_generic_service_one_state(RESIST_SERVICE_NAME_CANADA, {PICK_RESIST}, CANADA_REWARD),
+            #
+            # build_generic_service_one_state(CHEMICALS_SERVICE_NAME_USA, {PICK_CHEMICALS}, USA_REWARD),
+            # #build_generic_service_one_state(CHEMICALS_SERVICE_NAME_CANADA, {PICK_CHEMICALS}, CANADA_REWARD),
+            #
             build_complex_breakable_service(MASK_CREATION1_SERVICE_NAME, MASK_CREATION, DEFAULT_BROKEN_PROB, DEFAULT_UNEMPLOYABLE_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD),
-            #build_complex_breakable_service(MASK_CREATION2_SERVICE_NAME, MASK_CREATION, DEFAULT_BROKEN_PROB, DEFAULT_UNEMPLOYABLE_PROB, DEFAULT_BROKEN_REWARD, HIGH_USA_REWARD),
-
-            build_generic_breakable_service(PHOTOLITOGRAPHY1_SERVICE_NAME, PHOTOLITOGRAPHY, DEFAULT_BROKEN_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD),
-
-            build_generic_breakable_service(ION_IMPLANTATION1_SERVICE_NAME, ION_IMPLANTATION, DEFAULT_BROKEN_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD),
-
-            build_generic_breakable_service(TESTING1_SERVICE_NAME, TESTING, DEFAULT_BROKEN_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD),
-
-            build_generic_breakable_service(TESTING_QUALITY1_SERVICE_NAME, TESTING_QUALITY, DEFAULT_BROKEN_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD),
-
-            build_complex_breakable_service(QUALITY1_SERVICE_NAME, QUALITY, DEFAULT_BROKEN_PROB, DEFAULT_UNEMPLOYABLE_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD),
-
-            build_complex_breakable_service(DICING1_SERVICE_NAME, DICING, DEFAULT_BROKEN_PROB, DEFAULT_UNEMPLOYABLE_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD),
-            #build_complex_breakable_service(DICING2_SERVICE_NAME, DICING, DEFAULT_BROKEN_PROB, DEFAULT_UNEMPLOYABLE_PROB, DEFAULT_BROKEN_REWARD, HIGH_USA_REWARD),
-
-            build_generic_breakable_service(PACKAGING1_SERVICE_NAME, CLASSIC_PACKAGING, DEFAULT_BROKEN_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD),
-
-            build_generic_breakable_service(THERMAL_PACKAGING1_SERVICE_NAME, THERMAL_PACKAGING, DEFAULT_BROKEN_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD)
+            # #build_complex_breakable_service(MASK_CREATION2_SERVICE_NAME, MASK_CREATION, DEFAULT_BROKEN_PROB, DEFAULT_UNEMPLOYABLE_PROB, DEFAULT_BROKEN_REWARD, HIGH_USA_REWARD),
+            #
+            # build_generic_breakable_service(PHOTOLITOGRAPHY1_SERVICE_NAME, PHOTOLITOGRAPHY, DEFAULT_BROKEN_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD),
+            #
+            # build_generic_breakable_service(ION_IMPLANTATION1_SERVICE_NAME, ION_IMPLANTATION, DEFAULT_BROKEN_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD),
+            #
+            # build_generic_breakable_service(TESTING1_SERVICE_NAME, TESTING, DEFAULT_BROKEN_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD),
+            #
+            # build_generic_breakable_service(TESTING_QUALITY1_SERVICE_NAME, TESTING_QUALITY, DEFAULT_BROKEN_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD),
+            #
+            # build_complex_breakable_service(QUALITY1_SERVICE_NAME, QUALITY, DEFAULT_BROKEN_PROB, DEFAULT_UNEMPLOYABLE_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD),
+            #
+            # build_complex_breakable_service(DICING1_SERVICE_NAME, DICING, DEFAULT_BROKEN_PROB, DEFAULT_UNEMPLOYABLE_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD),
+            # #build_complex_breakable_service(DICING2_SERVICE_NAME, DICING, DEFAULT_BROKEN_PROB, DEFAULT_UNEMPLOYABLE_PROB, DEFAULT_BROKEN_REWARD, HIGH_USA_REWARD),
+            #
+            # build_generic_breakable_service(PACKAGING1_SERVICE_NAME, CLASSIC_PACKAGING, DEFAULT_BROKEN_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD),
+            #
+            # build_generic_breakable_service(THERMAL_PACKAGING1_SERVICE_NAME, THERMAL_PACKAGING, DEFAULT_BROKEN_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD)
         ]
     elif mode == "automata" and dimension == "medium":
         all_services = [
@@ -509,35 +509,32 @@ def process_services(mode, dimension):
     return all_services
 
 
+
 def target_service_automata():
     '''Builds the target service automaton for the given dimension of the problem.'''
     # we need to distinguished the different dimensions because of the service setup (different services models for different dimensions)
     transition_function = {
-        "s0": {PICK_DESIGN: ("s1", 1.0, 0), },
-        "s1": {PICK_SILICON: ("s2", 1.0, 0), },
-        "s2": {PICK_IMPURITIES: ("s3", 1.0, 0), },
-        "s3": {PICK_RESIST: ("s4", 1.0, 0), },
-        "s4": {PICK_CHEMICALS: ("s5", 1.0, 0), },
-
+        "s0": {PICK_DESIGN: ("s5", 1.0, 0), },
         "s5": {f"con_{MASK_CREATION}": ("s6", 1.0, 0), },
         "s6": {f"che_{MASK_CREATION}": ("s7", 1.0, 0), },
-        "s7": {MASK_CREATION: ("s8", 1.0, 0), },
-
-        "s8": {PHOTOLITOGRAPHY: ("s9", 1.0, 0), },
-        "s9": {f"ch_{PHOTOLITOGRAPHY}": ("s10", 1.0, 0), },
-
-        "s10": {ION_IMPLANTATION: ("s11", 1.0, 0), },
-        "s11": {f"ch_{ION_IMPLANTATION}": ("s12", 1.0, 0), },
-
-        "s12": {TESTING: ("s13", 1.0, 0), },
-        "s13": {f"ch_{TESTING}": ("s14", 1.0, 0), },
-
-        "s14": {f"con_{DICING}": ("s15", 1.0, 0), },
-        "s15": {f"che_{DICING}": ("s16", 1.0, 0), },
-        "s16": {DICING: ("s17", 1.0, 0), },
-
-        "s17": {CLASSIC_PACKAGING: ("s18", 1.0, 0), },
-        "s18": {f"ch_{CLASSIC_PACKAGING}": ("s0", 1.0, 0), }
+        # "s7": {MASK_CREATION: ("s8", 1.0, 0), },
+        "s7": {MASK_CREATION: ("s0", 1.0, 0), },
+        #
+        # "s8": {PHOTOLITOGRAPHY: ("s9", 1.0, 0), },
+        # "s9": {f"ch_{PHOTOLITOGRAPHY}": ("s10", 1.0, 0), },
+        #
+        # "s10": {ION_IMPLANTATION: ("s11", 1.0, 0), },
+        # "s11": {f"ch_{ION_IMPLANTATION}": ("s12", 1.0, 0), },
+        #
+        # "s12": {TESTING: ("s13", 1.0, 0), },
+        # "s13": {f"ch_{TESTING}": ("s14", 1.0, 0), },
+        #
+        # "s14": {f"con_{DICING}": ("s15", 1.0, 0), },
+        # "s15": {f"che_{DICING}": ("s16", 1.0, 0), },
+        # "s16": {DICING: ("s17", 1.0, 0), },
+        #
+        # "s17": {CLASSIC_PACKAGING: ("s18", 1.0, 0), },
+        # "s18": {f"ch_{CLASSIC_PACKAGING}": ("s0", 1.0, 0), }
     }
 
     initial_state = "s0"
