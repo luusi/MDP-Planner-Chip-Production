@@ -184,11 +184,11 @@ COPPER_FRAME_SERVICE_NAME_PERU = "copper_frame_peru"                        # wa
 COPPER_FRAME_SERVICE_NAME_CHILE = "copper_frame_chile"                      # warehouse
 
 # phase2
-CLEANING1_SERVICE_NAME = "cleaning_human1"                                  # human
-CLEANING2_SERVICE_NAME = "cleaning_human2"                                  # human
-CLEANING3_SERVICE_NAME = "cleaning_human3"                                  # human
-CLEANING4_SERVICE_NAME = "cleaning_human4"                                  # human
-CLEANING5_SERVICE_NAME = "cleaning_human5"                                  # human
+CLEANING1_SERVICE_NAME = "cleaning_human1"                                    # human
+CLEANING2_SERVICE_NAME = "cleaning_human2"                                    # human
+CLEANING3_SERVICE_NAME = "cleaning_human3"                                    # human
+CLEANING4_SERVICE_NAME = "cleaning_human4"                                    # human
+CLEANING5_SERVICE_NAME = "cleaning_human5"                                    # human
 FILM_DEPOSITION1_SERVICE_NAME = "film_deposition_machine1"                  # machine
 FILM_DEPOSITION2_SERVICE_NAME = "film_deposition_machine2"                  # machine
 FILM_DEPOSITION3_SERVICE_NAME = "film_deposition_machine3"                  # machine
@@ -214,16 +214,16 @@ ETCHING2_SERVICE_NAME = "etching_machine2"                                  # ma
 ETCHING3_SERVICE_NAME = "etching_machine3"                                  # machine
 ETCHING4_SERVICE_NAME = "etching_machine4"                                  # machine
 ETCHING5_SERVICE_NAME = "etching_machine5"                                  # machine
-IMPURITIES_IMPLANTATION1_SERVICE_NAME = "impurities_implantation_machine1"  # machine
-IMPURITIES_IMPLANTATION2_SERVICE_NAME = "impurities_implantation_machine2"  # machine
-IMPURITIES_IMPLANTATION3_SERVICE_NAME = "impurities_implantation_machine3"  # machine
-IMPURITIES_IMPLANTATION4_SERVICE_NAME = "impurities_implantation_machine4"  # machine
-IMPURITIES_IMPLANTATION5_SERVICE_NAME = "impurities_implantation_machine5"  # machine
-ACTIVATION1_SERVICE_NAME = "activation_human1"                              # human
-ACTIVATION2_SERVICE_NAME = "activation_human2"                              # human
-ACTIVATION3_SERVICE_NAME = "activation_human3"                              # human
-ACTIVATION4_SERVICE_NAME = "activation_human4"                              # human
-ACTIVATION5_SERVICE_NAME = "activation_human5"                              # human
+IMPURITIES_IMPLANTATION1_SERVICE_NAME = "impurities_implantation_machine1"    # machine
+IMPURITIES_IMPLANTATION2_SERVICE_NAME = "impurities_implantation_machine2"    # machine
+IMPURITIES_IMPLANTATION3_SERVICE_NAME = "impurities_implantation_machine3"    # machine
+IMPURITIES_IMPLANTATION4_SERVICE_NAME = "impurities_implantation_machine4"    # machine
+IMPURITIES_IMPLANTATION5_SERVICE_NAME = "impurities_implantation_machine5"    # machine
+ACTIVATION1_SERVICE_NAME = "activation_human1"                                # human
+ACTIVATION2_SERVICE_NAME = "activation_human2"                                # human
+ACTIVATION3_SERVICE_NAME = "activation_human3"                                # human
+ACTIVATION4_SERVICE_NAME = "activation_human4"                                # human
+ACTIVATION5_SERVICE_NAME = "activation_human5"                                # human
 RESIST_STRIPPING1_SERVICE_NAME = "resist_stripping_machine1"                # machine
 RESIST_STRIPPING2_SERVICE_NAME = "resist_stripping_machine2"                # machine
 RESIST_STRIPPING3_SERVICE_NAME = "resist_stripping_machine3"                # machine
@@ -234,16 +234,16 @@ ASSEMBLY2_SERVICE_NAME = "assembly_human2"                                  # hu
 ASSEMBLY3_SERVICE_NAME = "assembly_human3"                                  # human
 ASSEMBLY4_SERVICE_NAME = "assembly_human4"                                  # human
 ASSEMBLY5_SERVICE_NAME = "assembly_human5"                                  # human
-TESTING1_SERVICE_NAME = "testing_human1"                                    # human
-TESTING2_SERVICE_NAME = "testing_human2"                                    # human
-TESTING3_SERVICE_NAME = "testing_human3"                                    # human
-TESTING4_SERVICE_NAME = "testing_human4"                                    # human
-TESTING5_SERVICE_NAME = "testing_human5"                                    # human
-PACKAGING1_SERVICE_NAME = "packaging_human1"                                # human
-PACKAGING2_SERVICE_NAME = "packaging_human2"                                # human
-PACKAGING3_SERVICE_NAME = "packaging_human3"                                # human
-PACKAGING4_SERVICE_NAME = "packaging_human4"                                # human
-PACKAGING5_SERVICE_NAME = "packaging_human5"                                # human
+TESTING1_SERVICE_NAME = "testing_human1"                                      # human
+TESTING2_SERVICE_NAME = "testing_human2"                                      # human
+TESTING3_SERVICE_NAME = "testing_human3"                                      # human
+TESTING4_SERVICE_NAME = "testing_human4"                                      # human
+TESTING5_SERVICE_NAME = "testing_human5"                                      # human
+PACKAGING1_SERVICE_NAME = "packaging_human1"                                  # human
+PACKAGING2_SERVICE_NAME = "packaging_human2"                                  # human
+PACKAGING3_SERVICE_NAME = "packaging_human3"                                  # human
+PACKAGING4_SERVICE_NAME = "packaging_human4"                                  # human
+PACKAGING5_SERVICE_NAME = "packaging_human5"                                  # human
 
 
 def build_generic_breakable_service(service_name: str, action_name: str, broken_prob: float, broken_reward: float, action_reward: float):
@@ -612,21 +612,21 @@ service_packaging4 = packaging_service(PACKAGING4_SERVICE_NAME, DEFAULT_USA_REWA
 service_packaging5 = packaging_service(PACKAGING5_SERVICE_NAME, DEFAULT_USA_REWARD-3)
 
 # creare 60 servizi per la fase 2 per testare la size COMPLEX
-transition_function_phase1_automata = {
-    "s0": {"pick_buy_design": ("s1", 1.0, 0),},
-    "s1": {"pick_silicon": ("s2", 1.0, 0),},
-    "s2": {"pick_wafer": ("s3", 1.0, 0),},
-    "s3": {"pick_boron": ("s4", 1.0, 0), },
-    "s4": {"pick_phosphor": ("s5", 1.0, 0), },
-    "s5": {"pick_aluminum": ("s6", 1.0, 0), },
-    "s6": {"pick_resist": ("s7", 1.0, 0), },
-    "s7": {"pick_plastic": ("s8", 1.0, 0), },
-    "s8": {"pick_chemicals": ("s9", 1.0, 0), },
-    "s9": {"pick_copper_frame": ("s0", 1.0, 0), },
-}
+
 def target_service_phase1_automata():
     """Build the target service."""
-    transition_function = transition_function_phase1_automata
+    transition_function = {
+        "s0": {"pick_buy_design": ("s1", 1.0, 0),},
+        "s1": {"pick_silicon": ("s2", 1.0, 0),},
+        "s2": {"pick_wafer": ("s3", 1.0, 0),},
+        "s3": {"pick_boron": ("s4", 1.0, 0), },
+        "s4": {"pick_phosphor": ("s5", 1.0, 0), },
+        "s5": {"pick_aluminum": ("s6", 1.0, 0), },
+        "s6": {"pick_resist": ("s7", 1.0, 0), },
+        "s7": {"pick_plastic": ("s8", 1.0, 0), },
+        "s8": {"pick_chemicals": ("s9", 1.0, 0), },
+        "s9": {"pick_copper_frame": ("s0", 1.0, 0), },
+    }
 
     initial_state = "s0"
     final_states = {"s0"}
@@ -634,7 +634,7 @@ def target_service_phase1_automata():
     return build_target_from_transitions(
         transition_function, initial_state, final_states
     )
-
+    
 def target_service_phase1_ltlf():
     regex_seq = ""
     for symbol_index, symbol in enumerate(SYMBOLS_PHASE_1):
@@ -643,38 +643,39 @@ def target_service_phase1_ltlf():
         regex_seq = regex_seq + (";" if symbol_index != 0 else "") + item
     formula_str = f"<({regex_seq})*>end"
     formula = pylogics.parsers.ldl.parse_ldl(formula_str)
-    automaton_phase1 = logaut.core.ldl2dfa(formula, backend="lydia")
-    declare_automaton = from_symbolic_automaton_to_declare_automaton(automaton_phase1, set(SYMBOLS_PHASE_1))
-    return declare_automaton, automaton_phase1
+    automaton = logaut.core.ldl2dfa(formula, backend="lydia")
+    #print("Specification: ", formula_str)
+    #print("Compute declare automaton")
+    declare_automaton = from_symbolic_automaton_to_declare_automaton(automaton, set(SYMBOLS_PHASE_1))
+    return declare_automaton
     
-transition_function_phase2_automata = {
-    "s0": {"cleaning": ("s1", 1.0, 0), },
-    "s1": {"config_film_deposition": ("s2", 1.0, 0), },
-    "s2": {"checked_film_deposition": ("s3", 1.0, 0), },
-    "s3": {"film_deposition": ("s4", 1.0, 0), },
-    "s4": {"config_resist_coating": ("s5", 1.0, 0), },
-    "s5": {"checked_resist_coating": ("s6", 1.0, 0), },
-    "s6": {"resist_coating": ("s7", 1.0, 0), },
-    "s7": {"exposure": ("s8", 1.0, 0), },
-    "s8": {"check_exposure": ("s9", 1.0, 0), },
-    "s9": {"config_development": ("s10", 1.0, 0), },
-    "s10": {"checked_development": ("s11", 1.0, 0), },
-    "s11": {"development": ("s12", 1.0, 0), },
-    "s12": {"etching": ("s13", 1.0, 0), },
-    "s13": {"check_etching": ("s14", 1.0, 0), },
-    "s14": {"config_impurities_implantation": ("s15", 1.0, 0), },
-    "s15": {"checked_impurities_implantation": ("s16", 1.0, 0), },
-    "s16": {"impurities_implantation": ("s17", 1.0, 0), },
-    "s17": {"activation": ("s18", 1.0, 0), },
-    "s18": {"resist_stripping": ("s19", 1.0, 0), },
-    "s19": {"check_resist_stripping": ("s20", 1.0, 0), },
-    "s20": {"assembly": ("s21", 1.0, 0), },
-    "s21": {"testing": ("s22", 1.0, 0), },
-    "s22": {"packaging": ("s0", 1.0, 0), }
-}
 def target_service_phase2_automata():
     """Build the target service."""
-    transition_function = transition_function_phase2_automata
+    transition_function = {
+        "s0": {"cleaning": ("s1", 1.0, 0), },
+        "s1": {"config_film_deposition": ("s2", 1.0, 0), },
+        "s2": {"checked_film_deposition": ("s3", 1.0, 0), },
+        "s3": {"film_deposition": ("s4", 1.0, 0), },
+        "s4": {"config_resist_coating": ("s5", 1.0, 0), },
+        "s5": {"checked_resist_coating": ("s6", 1.0, 0), },
+        "s6": {"resist_coating": ("s7", 1.0, 0), },
+        "s7": {"exposure": ("s8", 1.0, 0), },
+        "s8": {"check_exposure": ("s9", 1.0, 0), },
+        "s9": {"config_development": ("s10", 1.0, 0), },
+        "s10": {"checked_development": ("s11", 1.0, 0), },
+        "s11": {"development": ("s12", 1.0, 0), },
+        "s12": {"etching": ("s13", 1.0, 0), },
+        "s13": {"check_etching": ("s14", 1.0, 0), },
+        "s14": {"config_impurities_implantation": ("s15", 1.0, 0), },
+        "s15": {"checked_impurities_implantation": ("s16", 1.0, 0), },
+        "s16": {"impurities_implantation": ("s17", 1.0, 0), },
+        "s17": {"activation": ("s18", 1.0, 0), },
+        "s18": {"resist_stripping": ("s19", 1.0, 0), },
+        "s19": {"check_resist_stripping": ("s20", 1.0, 0), },
+        "s20": {"assembly": ("s21", 1.0, 0), },
+        "s21": {"testing": ("s22", 1.0, 0), },
+        "s22": {"packaging": ("s0", 1.0, 0), }
+    }
 
     initial_state = "s0"
     final_states = {"s0"}
@@ -691,9 +692,10 @@ def target_service_phase2_ltlf():
         regex_seq = regex_seq + (";" if symbol_index != 0 else "") + item
     formula_str = f"<({regex_seq})*>end"
     formula = pylogics.parsers.ldl.parse_ldl(formula_str)
-    automaton_phase2 = logaut.core.ldl2dfa(formula, backend="lydia")
-    declare_automaton = from_symbolic_automaton_to_declare_automaton(automaton_phase2, set(SYMBOLS_PHASE_2_LTLF))
-    return declare_automaton, automaton_phase2
+    automaton = logaut.core.ldl2dfa(formula, backend="lydia")
+    #print("Specification: ", formula_str)
+    declare_automaton = from_symbolic_automaton_to_declare_automaton(automaton, set(SYMBOLS_PHASE_2_LTLF))
+    return declare_automaton
     
     
 def services_phase2 (dimension):
@@ -704,23 +706,23 @@ def services_phase2 (dimension):
             # 1
             service_film_deposition1,
             # 2
-            service_film_deposition2,
-            # 3
             service_resist_coating1,
-            # 4
+            # 3
             service_exposure1,
+            # 4
+            service_exposure2,
             # 5
             service_development1,
             # 6
             service_etching1,
             # 7
-            service_etching2,
-            # 8
             service_impurities_implantation1,
-            # 9
+            # 8
             service_activation1,
-            # 10
+            # 9
             service_resist_stripping1,
+            # 10
+            service_resist_stripping2,
             # 11
             service_assembly1,
             # 12
@@ -751,13 +753,13 @@ def services_phase2 (dimension):
             # 9
             service_etching1,
             # 10
-            service_etching2,
-            # 11
             service_impurities_implantation1,
-            # 12
+            # 11
             service_activation1,
-            # 13
+            # 12
             service_resist_stripping1,
+            # 13
+            service_resist_stripping2,
             # 14
             service_assembly1,
             # 15
@@ -770,47 +772,47 @@ def services_phase2 (dimension):
             # 0
             service_cleaning1,
             # 1
-            service_cleaning2,
-            # 2
             service_film_deposition1,
-            # 3
+            # 2
             service_film_deposition2,
-            # 4
+            # 3
             service_resist_coating1,
-            # 5
+            # 4
             service_resist_coating2,
-            # 6
+            # 5
             service_exposure1,
-            # 7
+            # 6
             service_exposure2,
-            # 8
+            # 7
             service_development1,
-            # 9
+            # 8
             service_development2,
-            # 10
+            # 9
             service_etching1,
-            # 11
+            # 10
             service_etching2,
-            # 12
+            # 11
             service_impurities_implantation1,
+            # 12
+            service_impurities_implantation2,
             # 13
             service_activation1,
             # 14
-            service_activation2,
-            # 15
             service_resist_stripping1,
-            # 16
+            # 15
             service_resist_stripping2,
-            # 17
+            # 16
             service_assembly1,
-            # 18
+            # 17
             service_assembly2,
-            # 19
+            # 18
             service_testing1,
-            # 20
+            # 19
             service_testing2,
+            # 20
+            service_packaging1,
             # 21
-            service_packaging1
+            service_packaging2
         ]
     elif dimension == "complex":
         all_services = [
@@ -975,3 +977,12 @@ all_services_phase1 = [
     # 40
     service_copper_frame_china
 ]
+target_phase1_automata = target_service_phase1_automata()
+target_phase1_ltlf = target_service_phase1_ltlf()
+
+all_services_phase2_small = services_phase2("small")
+all_services_phase2_manageable1 = services_phase2("manageable1")
+all_services_phase2_manageable2 = services_phase2("manageable2")
+all_services_phase2_complex = services_phase2("complex")
+target_phase2_automata = target_service_phase2_automata()
+target_phase2_ltlf = target_service_phase2_ltlf()

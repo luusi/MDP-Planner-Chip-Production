@@ -83,12 +83,9 @@ RUN wget https://github.com/whitemech/lydia/releases/download/v0.1.3/lydia &&\
 # install MDP-Planner-Chip-Production
 RUN git clone https://github.com/luusi/MDP-Planner-Chip-Production.git &&\
     cd MDP-Planner-Chip-Production &&\
-    sudo pip install -e . &&\
-    sudo pip install redis
+    sudo pip install -e .
 
 RUN mkdir -p WORKDIR /home/default/MDP-Planner-Chip-Production/docs/notebooks/experimental_results
-
-EXPOSE 8888
 
 WORKDIR /home/default/MDP-Planner-Chip-Production
 
