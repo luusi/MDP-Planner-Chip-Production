@@ -11,6 +11,7 @@ from docs.notebooks.utils import print_policy_data
 import os
 import pickle
 
+from stochastic_service_composition.rendering import mdp_to_graphviz, target_to_graphviz, service_to_graphviz
 
 # create folder if not exists
 if not os.path.exists('experimental_results'):
@@ -37,7 +38,7 @@ fp_compMDP = f"experimental_results/{now}_memory_profiler_composition_{mode}_{si
 fp_DPAnalytic = f"experimental_results/{now}_memory_profiler_policy_{mode}_{size}_{gamma}_{version}.log"
 
 # AUTOMATA
-@profile(stream=open(fp_compMDP, "w+"))
+# @profile(stream=open(fp_compMDP, "w+"))
 def execute_composition_automata(target, services):
     mdp = composition_mdp(target, *services, gamma=gamma)
     return mdp
@@ -50,7 +51,7 @@ def execute_composition_ltlf(declare_automaton, services):
     return mdp
 
 # POLICY
-@profile(stream=open(fp_DPAnalytic, "w+"))
+# @profile(stream=open(fp_DPAnalytic, "w+"))
 def execute_policy(mdp):
     mdp.gamma = gamma
     opn = DPAnalytic(mdp, 1e-4)
@@ -65,6 +66,9 @@ def main():
 
     all_services = process_services(mode, size)
     target = target_service_automata() if mode == "automata" else target_service_ltlf()
+    target_to_graphviz(target).render("target.dot")
+    for service in all_services:
+        service_to_graphviz(service).render(service.service_name + ".dot")
 
     to_write = f"Tot_services: {len(all_services)}"
     with open(file_name, "a") as f:
@@ -106,6 +110,16 @@ def main():
         with open(file_name, "a") as f:
             to_write = f"Policy elapsed time: {elapsed2} s\n"
             f.write(to_write)
+
+        # print mdp and automata
+        services_index = dict(enumerate(all_services))
+        def _act2str(a):
+            result = services_index.get(a, None)
+            if result is None:
+                return a
+            return result.service_name
+        mdp_graph = mdp_to_graphviz(mdp, action2str=_act2str)
+        mdp_graph.render("mdp-automata.dot")
     # LTLf
     elif mode == "ltlf":
         # check if the pickle file exists and has size > 0

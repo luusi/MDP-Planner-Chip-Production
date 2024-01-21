@@ -138,6 +138,7 @@ def build_service_from_transitions(
     transition_function: MDPDynamics,
     initial_state: State,
     final_states: Set[State],
+    service_name: str | None = None
 ) -> Service:
     """
     Initialize a service from transitions, initial state and final states.
@@ -164,7 +165,9 @@ def build_service_from_transitions(
     ), f"the following final states are not in the transition function: {unreachable_final_states}"
     assert initial_state in states, "initial state not in the set of states"
 
-    return Service(states, actions, final_states, initial_state, transition_function)
+    result = Service(states, actions, final_states, initial_state, transition_function)
+    setattr(result, "service_name", service_name)
+    return result
 
 
 def build_system_service(*services: Service) -> Service:
