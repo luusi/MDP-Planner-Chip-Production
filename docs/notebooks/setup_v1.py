@@ -686,7 +686,6 @@ def target_service_phase2_automata():
     )
     
 def target_service_phase2_ltlf():
-    formula_str = "<"
     regex_seq = ""
     for symbol_index, symbol in enumerate(SYMBOLS_PHASE_2_LTLF):
         all_but_symbol = set(SYMBOLS_PHASE_2_LTLF).difference({symbol})
@@ -966,3 +965,4 @@ all_services_phase1 = [
     # 40
     copper_frame_warehouse_service(COPPER_FRAME_SERVICE_NAME_CHINA, CHINA_REWARD)
 ]
+
