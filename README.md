@@ -12,11 +12,11 @@ The configuration file [config.json](docs/notebooks/config.json) containing basi
 ```json
 {
     "mode": "automata",   //type of the target, accepted values are ["automata", "ltlf"]
-    "size": "small",      //size of the case study, accepted values are ["small", "medium", "large"]>
+    "size": "small",      //size of the case study, accepted values are ["small", "medium", "large"]
     "gamma": 0.9,         //gamma value for policy computation
     "phase": 2,           //in this case study such value is not used, you can skip this
     "serialize": false,   //if you want to save the composition in a pickle file, accepted value are [true, false], you can skip this
-    "version": "v4",      //version of the case study, you can skip this
+    "version": "v5",      //version of the case study, you can skip this
 }
 ```
 
@@ -35,7 +35,7 @@ The configuration file [config.json](docs/notebooks/config.json) containing basi
 3. Start the controller:
   ```sh
   cd docs/notebooks
-  python3 main_v2.py 
+  python3 main.py 
   ```
 
 ### From the source code
@@ -68,6 +68,6 @@ Then:
 - Run the Controller
   ```sh
   cd docs/notebook
-  python main_v2.py
+  python main.py
   ```
 
