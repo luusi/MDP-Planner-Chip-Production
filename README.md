@@ -2,7 +2,7 @@
 
 Implementation of a tool to compose Industral API of the manufacturing actorsvia Markov Decision Processes.
 
-Results of the experiments can be found in [chip_experimental_results](chip_experimental_results). Some results referring to the computation of the composition MDP can be null as we serializa the MDP in a pickle file so we do not have to recompute it each time.
+Results of the experiments can be found in [chip_experimental_results](chip_experimental_results). Some results referring to the computation of the composition MDP can be null as we serialize the MDP in a pickle file so we do not have to recompute it each time.
 
 ## How to replicate the experiments
 The experiments can be replicated either using Docker or from source code. We suggest to use Docker.
