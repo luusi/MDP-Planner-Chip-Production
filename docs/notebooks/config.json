@@ -1,8 +1,8 @@
 {
-    "mode": "ltlf",
-    "size": "large",
-    "gamma": 0.1,
+    "mode": "automata",
+    "size": "xlarge",
+    "gamma": 0.9,
     "phase": 2,
     "serialize": true,
-    "version": "v6"
+    "version": "v5"
 }

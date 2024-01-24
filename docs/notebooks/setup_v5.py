@@ -94,6 +94,7 @@ RESIST_SERVICE_NAME_CANADA = "p_r_ca"
 
 CHEMICALS_SERVICE_NAME_USA = "chemicals_usa"
 CHEMICALS_SERVICE_NAME_CANADA = "chemicals_ca"
+CHEMICALS_SERVICE_NAME_CHINA = "chemicals_ch"
 
 MASK_CREATION1_SERVICE_NAME = "cr_m_1"
 
@@ -105,18 +106,24 @@ ION_IMPLANTATION2_SERVICE_NAME = "ion_i_m_2"
 
 TESTING1_SERVICE_NAME = "tes_m_1"
 TESTING2_SERVICE_NAME = "tes_m_2"
+TESTING3_SERVICE_NAME = "tes_m_3"
 
 SMART_TESTING1_SERVICE_NAME = "sma_tes_m_1"
+SMART_TESTING2_SERVICE_NAME = "sma_tes_m_2"
 
 QUALITY1_SERVICE_NAME = "qua_m_1"
+QUALITY2_SERVICE_NAME = "qua_m_2"
 
 DICING1_SERVICE_NAME = "dic_m_1"
 DICING2_SERVICE_NAME = "dic_m_2"
 
 PACKAGING1_SERVICE_NAME = "pac_m_1"
 PACKAGING2_SERVICE_NAME = "pac_m_2"
+PACKAGING3_SERVICE_NAME = "pac_m_3"
 
 PACKAGING_COOLING1_SERVICE_NAME = "pac_cool_m_1"
+PACKAGING_COOLING2_SERVICE_NAME = "pac_cool_m_2"
+PACKAGING_COOLING3_SERVICE_NAME = "pac_cool_m_3"
 
 
 def build_generic_service_one_state(
@@ -322,6 +329,58 @@ def process_services(mode, dimension):
 
                 build_generic_service_one_state(PACKAGING_COOLING1_SERVICE_NAME, {PACKAGING_COOLING}, DEFAULT_USA_REWARD)
             ]
+        elif dimension == "xlarge": # 35
+            all_services = [
+                # raw materials -> 14
+                build_generic_service_one_state(DESIGN_SERVICE_NAME_USA, {PICK_DESIGN}, DEFAULT_USA_REWARD),
+                build_generic_service_one_state(DESIGN_SERVICE_NAME_UK, {PICK_DESIGN}, UK_REWARD),
+                build_generic_service_one_state(DESIGN_SERVICE_NAME_CHINA, {PICK_DESIGN}, CHINA_REWARD),
+
+                build_generic_service_one_state(SILICON_SERVICE_NAME_BRAZIL, {PICK_SILICON}, BRAZIL_REWARD),
+                build_generic_service_one_state(SILICON_SERVICE_NAME_CHINA, {PICK_SILICON}, CHINA_REWARD), #
+                build_generic_service_one_state(SILICON_SERVICE_NAME_RUSSIA, {PICK_SILICON}, RUSSIA_REWARD),
+                build_generic_service_one_state(SILICON_SERVICE_NAME_USA, {PICK_SILICON}, DEFAULT_USA_REWARD),
+
+                build_generic_service_one_state(IMPURITIES_SERVICE_NAME_USA, {PICK_IMPURITIES}, DEFAULT_USA_REWARD),
+                build_generic_service_one_state(IMPURITIES_SERVICE_NAME_CHILE, {PICK_IMPURITIES}, CHILE_REWARD),
+                build_generic_service_one_state(IMPURITIES_SERVICE_NAME_BRAZIL, {PICK_IMPURITIES}, BRAZIL_REWARD),
+
+                build_generic_service_one_state(RESIST_SERVICE_NAME_USA, {PICK_RESIST}, DEFAULT_USA_REWARD),
+                build_generic_service_one_state(RESIST_SERVICE_NAME_BELGIUM, {PICK_RESIST}, BELGIUM_REWARD),
+                build_generic_service_one_state(RESIST_SERVICE_NAME_AUSTRIA, {PICK_RESIST}, AUSTRIA_REWARD),
+
+                build_generic_service_one_state(CHEMICALS_SERVICE_NAME_USA, {PICK_CHEMICALS}, DEFAULT_USA_REWARD),
+                build_generic_service_one_state(CHEMICALS_SERVICE_NAME_CANADA, {PICK_CHEMICALS}, CANADA_REWARD),
+                build_generic_service_one_state(CHEMICALS_SERVICE_NAME_CHINA, {PICK_CHEMICALS}, CANADA_REWARD), #
+                # manufacturing -> 14
+                build_generic_breakable_service(MASK_CREATION1_SERVICE_NAME, MASK_CREATION, DEFAULT_BROKEN_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD),
+
+                build_generic_breakable_service(PHOTOLITOGRAPHY1_SERVICE_NAME, PHOTOLITOGRAPHY, DEFAULT_BROKEN_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD),
+                build_generic_breakable_service(PHOTOLITOGRAPHY2_SERVICE_NAME, PHOTOLITOGRAPHY, DEFAULT_BROKEN_PROB, DEFAULT_BROKEN_REWARD, HIGH_DEFAULT_USA_REWARD),
+
+                build_generic_breakable_service(ION_IMPLANTATION1_SERVICE_NAME, ION_IMPLANTATION, DEFAULT_BROKEN_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD),
+                build_generic_breakable_service(ION_IMPLANTATION2_SERVICE_NAME, ION_IMPLANTATION, DEFAULT_BROKEN_PROB, DEFAULT_BROKEN_REWARD, HIGH_DEFAULT_USA_REWARD),
+
+                build_generic_service_one_state(TESTING1_SERVICE_NAME, {TESTING}, DEFAULT_USA_REWARD),
+                build_generic_service_one_state(TESTING2_SERVICE_NAME, {TESTING}, HIGH_DEFAULT_USA_REWARD),
+                build_generic_service_one_state(TESTING3_SERVICE_NAME, {TESTING}, HIGH_DEFAULT_USA_REWARD), #
+
+                build_generic_breakable_service(SMART_TESTING1_SERVICE_NAME, SMART_TESTING, DEFAULT_BROKEN_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD),
+
+                build_generic_breakable_service(QUALITY1_SERVICE_NAME, QUALITY, DEFAULT_BROKEN_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD),
+                build_generic_breakable_service(QUALITY2_SERVICE_NAME, QUALITY, DEFAULT_BROKEN_PROB, DEFAULT_BROKEN_REWARD, HIGH_DEFAULT_USA_REWARD), #
+
+                build_generic_breakable_service(DICING1_SERVICE_NAME, DICING, DEFAULT_BROKEN_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD),
+                build_generic_breakable_service(DICING2_SERVICE_NAME, DICING, DEFAULT_BROKEN_PROB, DEFAULT_BROKEN_REWARD, HIGH_DEFAULT_USA_REWARD),
+
+                build_generic_service_one_state(PACKAGING1_SERVICE_NAME, {PACKAGING}, DEFAULT_USA_REWARD),
+                build_generic_service_one_state(PACKAGING2_SERVICE_NAME, {PACKAGING}, HIGH_DEFAULT_USA_REWARD),
+                build_generic_service_one_state(PACKAGING3_SERVICE_NAME, {PACKAGING}, HIGH_DEFAULT_USA_REWARD), #
+
+                build_generic_service_one_state(PACKAGING_COOLING1_SERVICE_NAME, {PACKAGING_COOLING}, DEFAULT_USA_REWARD),
+                build_generic_service_one_state(PACKAGING_COOLING2_SERVICE_NAME, {PACKAGING_COOLING}, HIGH_DEFAULT_USA_REWARD), #
+                build_generic_service_one_state(PACKAGING_COOLING3_SERVICE_NAME, {PACKAGING_COOLING}, HIGH_DEFAULT_USA_REWARD) #
+            ]
     elif mode == "ltlf":
         if dimension == "small": # 14 services
             all_services = [
@@ -388,7 +447,7 @@ def process_services(mode, dimension):
                 build_generic_service_one_state(DESIGN_SERVICE_NAME_CHINA, {PICK_DESIGN}, CHINA_REWARD),
 
                 build_generic_service_one_state(SILICON_SERVICE_NAME_BRAZIL, {PICK_SILICON}, BRAZIL_REWARD),
-                build_generic_service_one_state(SILICON_SERVICE_NAME_CHINA, {PICK_SILICON}, CHINA_REWARD),
+                build_generic_service_one_state(SILICON_SERVICE_NAME_USA, {PICK_SILICON}, DEFAULT_USA_REWARD),
                 build_generic_service_one_state(SILICON_SERVICE_NAME_RUSSIA, {PICK_SILICON}, RUSSIA_REWARD),
 
                 build_generic_service_one_state(IMPURITIES_SERVICE_NAME_USA, {PICK_IMPURITIES}, DEFAULT_USA_REWARD),
@@ -425,13 +484,64 @@ def process_services(mode, dimension):
 
                 build_generic_service_one_state(PACKAGING_COOLING1_SERVICE_NAME, {PACKAGING_COOLING}, DEFAULT_USA_REWARD)
             ]
+        elif dimension == "xlarge": # 35
+            all_services = [
+                # raw materials -> 14
+                build_generic_service_one_state(DESIGN_SERVICE_NAME_USA, {PICK_DESIGN}, DEFAULT_USA_REWARD),
+                build_generic_service_one_state(DESIGN_SERVICE_NAME_UK, {PICK_DESIGN}, UK_REWARD),
+                build_generic_service_one_state(DESIGN_SERVICE_NAME_CHINA, {PICK_DESIGN}, CHINA_REWARD),
+
+                build_generic_service_one_state(SILICON_SERVICE_NAME_BRAZIL, {PICK_SILICON}, BRAZIL_REWARD),
+                build_generic_service_one_state(SILICON_SERVICE_NAME_CHINA, {PICK_SILICON}, CHINA_REWARD), #
+                build_generic_service_one_state(SILICON_SERVICE_NAME_RUSSIA, {PICK_SILICON}, RUSSIA_REWARD),
+                build_generic_service_one_state(SILICON_SERVICE_NAME_USA, {PICK_SILICON}, DEFAULT_USA_REWARD),
+
+                build_generic_service_one_state(IMPURITIES_SERVICE_NAME_USA, {PICK_IMPURITIES}, DEFAULT_USA_REWARD),
+                build_generic_service_one_state(IMPURITIES_SERVICE_NAME_CHILE, {PICK_IMPURITIES}, CHILE_REWARD),
+                build_generic_service_one_state(IMPURITIES_SERVICE_NAME_BRAZIL, {PICK_IMPURITIES}, BRAZIL_REWARD),
+
+                build_generic_service_one_state(RESIST_SERVICE_NAME_USA, {PICK_RESIST}, DEFAULT_USA_REWARD),
+                build_generic_service_one_state(RESIST_SERVICE_NAME_BELGIUM, {PICK_RESIST}, BELGIUM_REWARD),
+                build_generic_service_one_state(RESIST_SERVICE_NAME_AUSTRIA, {PICK_RESIST}, AUSTRIA_REWARD),
+
+                build_generic_service_one_state(CHEMICALS_SERVICE_NAME_USA, {PICK_CHEMICALS}, DEFAULT_USA_REWARD),
+                build_generic_service_one_state(CHEMICALS_SERVICE_NAME_CANADA, {PICK_CHEMICALS}, CANADA_REWARD),
+                build_generic_service_one_state(CHEMICALS_SERVICE_NAME_CHINA, {PICK_CHEMICALS}, CANADA_REWARD), #
+                # manufacturing -> 14
+                build_complex_breakable_service(MASK_CREATION1_SERVICE_NAME, MASK_CREATION, DEFAULT_BROKEN_PROB, DEFAULT_UNEMPLOYABLE_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD),
+
+                build_generic_breakable_service(PHOTOLITOGRAPHY1_SERVICE_NAME, PHOTOLITOGRAPHY, DEFAULT_BROKEN_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD),
+                build_generic_breakable_service(PHOTOLITOGRAPHY2_SERVICE_NAME, PHOTOLITOGRAPHY, DEFAULT_BROKEN_PROB, DEFAULT_BROKEN_REWARD, HIGH_DEFAULT_USA_REWARD),
+
+                build_generic_breakable_service(ION_IMPLANTATION1_SERVICE_NAME, ION_IMPLANTATION, DEFAULT_BROKEN_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD),
+                build_generic_breakable_service(ION_IMPLANTATION2_SERVICE_NAME, ION_IMPLANTATION, DEFAULT_BROKEN_PROB, DEFAULT_BROKEN_REWARD, HIGH_DEFAULT_USA_REWARD),
+
+                build_generic_service_one_state(TESTING1_SERVICE_NAME, {TESTING}, DEFAULT_USA_REWARD),
+                build_generic_service_one_state(TESTING2_SERVICE_NAME, {TESTING}, HIGH_DEFAULT_USA_REWARD),
+                build_generic_service_one_state(TESTING3_SERVICE_NAME, {TESTING}, HIGH_DEFAULT_USA_REWARD), #
+
+                build_generic_breakable_service(SMART_TESTING1_SERVICE_NAME, SMART_TESTING, DEFAULT_BROKEN_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD),
+
+                build_generic_breakable_service(QUALITY1_SERVICE_NAME, QUALITY, DEFAULT_BROKEN_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD),
+                build_generic_breakable_service(QUALITY2_SERVICE_NAME, QUALITY, DEFAULT_BROKEN_PROB, DEFAULT_BROKEN_REWARD, HIGH_DEFAULT_USA_REWARD), #
+
+                build_complex_breakable_service(DICING1_SERVICE_NAME, DICING, DEFAULT_BROKEN_PROB, DEFAULT_UNEMPLOYABLE_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD),
+                build_complex_breakable_service(DICING2_SERVICE_NAME, DICING, DEFAULT_BROKEN_PROB, DEFAULT_UNEMPLOYABLE_PROB, DEFAULT_BROKEN_REWARD, HIGH_DEFAULT_USA_REWARD),
+
+                build_generic_service_one_state(PACKAGING1_SERVICE_NAME, {PACKAGING}, DEFAULT_USA_REWARD),
+                build_generic_service_one_state(PACKAGING2_SERVICE_NAME, {PACKAGING}, HIGH_DEFAULT_USA_REWARD),
+                build_generic_service_one_state(PACKAGING3_SERVICE_NAME, {PACKAGING}, HIGH_DEFAULT_USA_REWARD), #
+
+                build_generic_service_one_state(PACKAGING_COOLING1_SERVICE_NAME, {PACKAGING_COOLING}, DEFAULT_USA_REWARD),
+                build_generic_service_one_state(PACKAGING_COOLING2_SERVICE_NAME, {PACKAGING_COOLING}, HIGH_DEFAULT_USA_REWARD), #
+                build_generic_service_one_state(PACKAGING_COOLING3_SERVICE_NAME, {PACKAGING_COOLING}, HIGH_DEFAULT_USA_REWARD) #
+            ]
     return all_services
 
 
 # no loop in the automa
 def target_service_automata():
     '''Builds the target service automaton for the given dimension of the problem.'''
-    # we need to distinguished the different dimensions because of the service setup (different services models for different dimensions)
     transition_function = {
         "s0": {PICK_DESIGN: ("s1", 1.0, 0), },
         "s1": {PICK_SILICON: ("s2", 1.0, 0), },
@@ -448,18 +558,29 @@ def target_service_automata():
         "s9": {ION_IMPLANTATION: ("s10", 1.0, 0), },
         "s10": {f"ch_{ION_IMPLANTATION}": ("s11", 1.0, 0), },
 
-        "s11": {TESTING: ("s12", 1.0, 0), },
-        "s12": {f"ch_{TESTING}": ("s13", 1.0, 0), },
+        "s11": {
+            SMART_TESTING: ("s12", 0.7, 0), 
+            TESTING: ("s13", 0.3, 0),
+        },
+        "s12": {f"ch_{SMART_TESTING}": ("s14", 1.0, 0), },
 
-        "s13": {f"{DICING}": ("s14", 1.0, 0), },
-        "s14": {f"ch_{DICING}": ("s15", 1.0, 0), },
+        "s14": {QUALITY: ("s15", 1.0, 0), },
+        "s15": {f"ch_{QUALITY}": ("s16", 1.0, 0), },
+        
+        "s13": {DICING: ("s17", 1.0, 0), },
+        "s16": {f"{DICING}": ("s17", 1.0, 0), },
+        
+        "s17": {f"ch_{DICING}": ("s18", 1.0, 0), },
 
-        "s15": {PACKAGING: ("s16", 1.0, 0), },
-        "s16": {f"ch_{PACKAGING}": ("s17", 1.0, 0), }
+        "s18": {
+            PACKAGING: ("s19", 0.6, 0), 
+            PACKAGING_COOLING: ("s19", 0.4, 0),
+        },
+        "s19": {"no_op": ("s20", 1.0, 0), },
     }
 
     initial_state = "s0"
-    final_states = {"s17"}
+    final_states = {"s20"}
 
     return build_target_from_transitions(
         transition_function, initial_state, final_states
