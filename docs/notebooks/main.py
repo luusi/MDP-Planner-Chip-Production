@@ -31,12 +31,15 @@ elif version == "v4":
     from docs.notebooks.setup_v4 import *
 elif version == "v5":
     from docs.notebooks.setup_v5 import *
+elif version == "v6":
+    from docs.notebooks.setup_v6 import *
 
 now = datetime.now().strftime("%d_%m_%Y-%H_%M_%S")
 
-file_name = f"experimental_results/{now}_time_profiler_{mode}_{size}_{gamma}_{version}.txt"
-fp_compMDP = f"experimental_results/{now}_memory_profiler_composition_{mode}_{size}_{gamma}_{version}.log"
-fp_DPAnalytic = f"experimental_results/{now}_memory_profiler_policy_{mode}_{size}_{gamma}_{version}.log"
+directory = f"experimental_results"
+file_name = f"{directory}/{now}_time_profiler_{mode}_{size}_{gamma}_{version}.txt"
+fp_compMDP = f"{directory}/{now}_memory_profiler_composition_{mode}_{size}_{gamma}_{version}.log"
+fp_DPAnalytic = f"{directory}/{now}_memory_profiler_policy_{mode}_{size}_{gamma}_{version}.log"
 
 # AUTOMATA
 @profile(stream=open(fp_compMDP, "w+"))
