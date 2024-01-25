@@ -4,6 +4,8 @@ Implementation of a tool to compose Industral API of the manufacturing actorsvia
 
 Results of the experiments can be found in [chip_experimental_results](chip_experimental_results). Some results referring to the computation of the composition MDP can be null as we serialize the MDP in a pickle file so we do not have to recompute it each time.
 
+Graphical representations of the target and the composition MDP (`xsmall` size) can be found in [debug](docs/notebooks/debug.ipynb) notebook.
+
 ## How to replicate the experiments
 The experiments can be replicated either using Docker or from source code. We suggest to use Docker.
 
@@ -12,7 +14,7 @@ The configuration file [config.json](docs/notebooks/config.json) containing basi
 ```json
 {
     "mode": "automata",   //type of the target, accepted values are ["automata", "ltlf"]
-    "size": "small",      //size of the case study, accepted values are ["small", "medium", "large"]
+    "size": "xsmall",      //size of the case study, accepted values are ["xsmall", "small", "medium", "large"]
     "gamma": 0.9,         //gamma value for policy computation
     "phase": 2,           //in this case study such value is not used, you can skip this
     "serialize": false,   //if you want to save the composition in a pickle file, accepted value are [true, false], you can skip this

@@ -227,7 +227,7 @@ def build_complex_breakable_service(service_name: str, action_name: str, broken_
 def process_services(mode, dimension):
     '''Builds all the services for the given dimension of the problem.'''
     if mode == "automata":
-        if dimension == "small": # 14 services
+        if dimension == "xsmall": # 14 services
             all_services = [
                 # raw materials -> 5
                 build_generic_service_one_state(DESIGN_SERVICE_NAME_USA, {PICK_DESIGN}, DEFAULT_USA_REWARD),
@@ -246,7 +246,7 @@ def process_services(mode, dimension):
                 build_generic_service_one_state(PACKAGING1_SERVICE_NAME, {PACKAGING}, DEFAULT_USA_REWARD),
                 build_generic_service_one_state(PACKAGING_COOLING1_SERVICE_NAME, {PACKAGING_COOLING}, DEFAULT_USA_REWARD)
             ]
-        elif dimension == "medium": # 21
+        elif dimension == "small": # 21
             all_services = [
                 # raw materials -> 9
                 build_generic_service_one_state(DESIGN_SERVICE_NAME_USA, {PICK_DESIGN}, DEFAULT_USA_REWARD),
@@ -284,7 +284,7 @@ def process_services(mode, dimension):
 
                 build_generic_service_one_state(PACKAGING_COOLING1_SERVICE_NAME, {PACKAGING_COOLING}, DEFAULT_USA_REWARD)
             ]
-        elif dimension == "large": # 28
+        elif dimension == "medium": # 28
             all_services = [
                 # raw materials -> 14
                 build_generic_service_one_state(DESIGN_SERVICE_NAME_USA, {PICK_DESIGN}, DEFAULT_USA_REWARD),
@@ -329,9 +329,9 @@ def process_services(mode, dimension):
 
                 build_generic_service_one_state(PACKAGING_COOLING1_SERVICE_NAME, {PACKAGING_COOLING}, DEFAULT_USA_REWARD)
             ]
-        elif dimension == "xlarge": # 35
+        elif dimension == "large": # 35
             all_services = [
-                # raw materials -> 14
+                # raw materials -> 16
                 build_generic_service_one_state(DESIGN_SERVICE_NAME_USA, {PICK_DESIGN}, DEFAULT_USA_REWARD),
                 build_generic_service_one_state(DESIGN_SERVICE_NAME_UK, {PICK_DESIGN}, UK_REWARD),
                 build_generic_service_one_state(DESIGN_SERVICE_NAME_CHINA, {PICK_DESIGN}, CHINA_REWARD),
@@ -351,8 +351,8 @@ def process_services(mode, dimension):
 
                 build_generic_service_one_state(CHEMICALS_SERVICE_NAME_USA, {PICK_CHEMICALS}, DEFAULT_USA_REWARD),
                 build_generic_service_one_state(CHEMICALS_SERVICE_NAME_CANADA, {PICK_CHEMICALS}, CANADA_REWARD),
-                build_generic_service_one_state(CHEMICALS_SERVICE_NAME_CHINA, {PICK_CHEMICALS}, CANADA_REWARD), #
-                # manufacturing -> 14
+                build_generic_service_one_state(CHEMICALS_SERVICE_NAME_CHINA, {PICK_CHEMICALS}, CHINA_REWARD), #
+                # manufacturing -> 19
                 build_generic_breakable_service(MASK_CREATION1_SERVICE_NAME, MASK_CREATION, DEFAULT_BROKEN_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD),
 
                 build_generic_breakable_service(PHOTOLITOGRAPHY1_SERVICE_NAME, PHOTOLITOGRAPHY, DEFAULT_BROKEN_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD),
@@ -382,7 +382,7 @@ def process_services(mode, dimension):
                 build_generic_service_one_state(PACKAGING_COOLING3_SERVICE_NAME, {PACKAGING_COOLING}, HIGH_DEFAULT_USA_REWARD) #
             ]
     elif mode == "ltlf":
-        if dimension == "small": # 14 services
+        if dimension == "xsmall": # 14 services
             all_services = [
                 # raw materials -> 5
                 build_generic_service_one_state(DESIGN_SERVICE_NAME_USA, {PICK_DESIGN}, DEFAULT_USA_REWARD),
@@ -401,7 +401,7 @@ def process_services(mode, dimension):
                 build_generic_service_one_state(PACKAGING1_SERVICE_NAME, {PACKAGING}, DEFAULT_USA_REWARD),
                 build_generic_service_one_state(PACKAGING_COOLING1_SERVICE_NAME, {PACKAGING_COOLING}, DEFAULT_USA_REWARD)
             ]
-        elif dimension == "medium": # 21
+        elif dimension == "small": # 21
             all_services = [
                 # raw materials -> 9
                 build_generic_service_one_state(DESIGN_SERVICE_NAME_USA, {PICK_DESIGN}, DEFAULT_USA_REWARD),
@@ -439,7 +439,7 @@ def process_services(mode, dimension):
 
                 build_generic_service_one_state(PACKAGING_COOLING1_SERVICE_NAME, {PACKAGING_COOLING}, DEFAULT_USA_REWARD)
             ]
-        elif dimension == "large": # 28
+        elif dimension == "medium": # 28
             all_services = [
                 # raw materials -> 14
                 build_generic_service_one_state(DESIGN_SERVICE_NAME_USA, {PICK_DESIGN}, DEFAULT_USA_REWARD),
@@ -484,9 +484,9 @@ def process_services(mode, dimension):
 
                 build_generic_service_one_state(PACKAGING_COOLING1_SERVICE_NAME, {PACKAGING_COOLING}, DEFAULT_USA_REWARD)
             ]
-        elif dimension == "xlarge": # 35
+        elif dimension == "large": # 35
             all_services = [
-                # raw materials -> 14
+                # raw materials -> 16
                 build_generic_service_one_state(DESIGN_SERVICE_NAME_USA, {PICK_DESIGN}, DEFAULT_USA_REWARD),
                 build_generic_service_one_state(DESIGN_SERVICE_NAME_UK, {PICK_DESIGN}, UK_REWARD),
                 build_generic_service_one_state(DESIGN_SERVICE_NAME_CHINA, {PICK_DESIGN}, CHINA_REWARD),
@@ -506,8 +506,8 @@ def process_services(mode, dimension):
 
                 build_generic_service_one_state(CHEMICALS_SERVICE_NAME_USA, {PICK_CHEMICALS}, DEFAULT_USA_REWARD),
                 build_generic_service_one_state(CHEMICALS_SERVICE_NAME_CANADA, {PICK_CHEMICALS}, CANADA_REWARD),
-                build_generic_service_one_state(CHEMICALS_SERVICE_NAME_CHINA, {PICK_CHEMICALS}, CANADA_REWARD), #
-                # manufacturing -> 14
+                build_generic_service_one_state(CHEMICALS_SERVICE_NAME_CHINA, {PICK_CHEMICALS}, CHINA_REWARD), #
+                # manufacturing -> 19
                 build_complex_breakable_service(MASK_CREATION1_SERVICE_NAME, MASK_CREATION, DEFAULT_BROKEN_PROB, DEFAULT_UNEMPLOYABLE_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD),
 
                 build_generic_breakable_service(PHOTOLITOGRAPHY1_SERVICE_NAME, PHOTOLITOGRAPHY, DEFAULT_BROKEN_PROB, DEFAULT_BROKEN_REWARD, DEFAULT_USA_REWARD),
