@@ -31,8 +31,6 @@ elif version == "v4":
     from docs.notebooks.setup_v4 import *
 elif version == "v5":
     from docs.notebooks.setup_v5 import *
-elif version == "v6":
-    from docs.notebooks.setup_v6 import *
 
 now = datetime.now().strftime("%d_%m_%Y-%H_%M_%S")
 
