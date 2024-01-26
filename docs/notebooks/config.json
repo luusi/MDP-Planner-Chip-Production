@@ -1,8 +1,8 @@
 {
     "mode": "automata",
-    "size": "large",
+    "size": "xlarge",
     "gamma": 0.9,
     "phase": 2,
     "serialize": true,
-    "version": "v3"
+    "version": "v5"
 }

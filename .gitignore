@@ -5,6 +5,9 @@ __pycache__
 .sudo_as_admin_successful
 nohup.out
 experimental_results
+experimental_results_debug
+original_experimental_results
+manip.py
 *.pkl
 *.dot
 *.svg

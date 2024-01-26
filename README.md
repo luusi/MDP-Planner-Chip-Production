@@ -2,21 +2,23 @@
 
 Implementation of a tool to compose Industral API of the manufacturing actorsvia Markov Decision Processes.
 
-Results of the experiments can be found in [experimental_results](experimental_results). Some results referring to the computation of the composition MDP can be null as we serializa the MDP in a pickle file so we do not have to recompute it each time.
+Results of the experiments can be found in [chip_experimental_results](chip_experimental_results). Some results referring to the computation of the composition MDP can be null as we serialize the MDP in a pickle file so we do not have to recompute it each time.
+
+Graphical representations of the target and the composition MDP (`xsmall` size) can be found in [debug](docs/notebooks/debug.ipynb) notebook.
 
 ## How to replicate the experiments
 The experiments can be replicated either using Docker or from source code. We suggest to use Docker.
 
 #### Configuration file
-The configuration file [config.json](docs/notebooks/config.json) containing basic information needed to run the experiments.
+The configuration file [config.json](docs/notebooks/config.json) containing basic information needed to run the experiments. An example with information of the key-value pairs is given below.
 ```json
 {
     "mode": "automata",   //type of the target, accepted values are ["automata", "ltlf"]
-    "size": "small",      //size of the case study, accepted values are ["small", "medium", "large"]>
+    "size": "xsmall",      //size of the case study, accepted values are ["xsmall", "small", "medium", "large"]
     "gamma": 0.9,         //gamma value for policy computation
     "phase": 2,           //in this case study such value is not used, you can skip this
     "serialize": false,   //if you want to save the composition in a pickle file, accepted value are [true, false], you can skip this
-    "version": "v4",      //version of the case study, you can skip this
+    "version": "v5",      //version of the case study, you can skip this
 }
 ```
 
@@ -35,7 +37,7 @@ The configuration file [config.json](docs/notebooks/config.json) containing basi
 3. Start the controller:
   ```sh
   cd docs/notebooks
-  python3 main_v2.py 
+  python3 main.py 
   ```
 
 **Please note:** the configuration file conf.json contains the basic information needed to run the experiments. The JSON key ``mode`` accept the values ``[automata, ltlf]``, the key ``phase`` accepts ``[1,2]`` values (representing the assortment and manufacturing phases respectively), and the key ``size`` accepts ``[small, manageable1, manageable2, complex]`` values (related to the number of involved actors).
@@ -70,6 +72,6 @@ Then:
 - Run the Controller
   ```sh
   cd docs/notebook
-  python main_v2.py
+  python main.py
   ```
 
